@@ -8,10 +8,6 @@
 4. Implement basic networking, test on VMs
 5. Wire up Raspberry Pis and set up OS
 
----
-
 ### Implementation
-
----
 
 ### Timeline
