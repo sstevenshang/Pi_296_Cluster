@@ -1,6 +1,6 @@
 # Pi_296_Cluster
 
-# Project Logistics
+### Project Logistics
 
 - Team meeting: 5:30PM Mon, Wed @ Siebel Basement
 - Mentor meeting: 5:30PM Fri @ Siebel Basement
