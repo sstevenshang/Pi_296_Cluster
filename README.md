@@ -1,6 +1,7 @@
 # Pi_296_Cluster
 
 **Todo List**
+
 1. Put implementation details here!
 2. Put development timeline here!
 3. Learn about networking
