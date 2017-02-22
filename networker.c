@@ -6,8 +6,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
-int client()
+void* client(void* args)
 {
     int s;
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -17,7 +18,8 @@ int client()
     hints.ai_family = AF_INET; /* IPv4 only */
     hints.ai_socktype = SOCK_STREAM; /* TCP */
 
-    s = getaddrinfo("www.illinois.edu", "80", &hints, &result);
+    s = getaddrinfo("130.126.255.101", NULL, &hints, &result);
+
     if (s != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
             exit(1);
@@ -26,23 +28,22 @@ int client()
     if(connect(sock_fd, result->ai_addr, result->ai_addrlen) == -1){
                 perror("connect");
                 exit(2);
-        }
+    }
 
     char *buffer = "GET / HTTP/1.0\r\n\r\n";
     printf("SENDING: %s", buffer);
     printf("===\n");
     write(sock_fd, buffer, strlen(buffer));
 
-
     char resp[1000];
     int len = read(sock_fd, resp, 999);
     resp[len] = '\0';
     printf("%s\n", resp);
 
-    return 0;
+    return NULL;
 }
 
-int server()
+void server()
 {
     int s;
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -83,6 +84,15 @@ int server()
     printf("Read %d chars\n", len);
     printf("===\n");
     printf("%s\n", buffer);
+
+}
+
+int main(int argc, char const *argv[]) {
+
+    pthread_t thread;
+    server();
+    pthread_create(&thread, NULL, client, NULL);
+    pthread_join(thread, NULL);
 
     return 0;
 }
