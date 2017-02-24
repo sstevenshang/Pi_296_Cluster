@@ -31,29 +31,29 @@
    3. Have the master send bench test to workers, and them send back the results.
    4. (Reach) Work on library for using GPIO pins with a breadboard.
 
--Week3:
+- Week3:
    1. Develop error checking of expected return values from workers.
    2. Figure out how to make a task scheduler.
    3. Standardize ways to make nodes send back bad results when commmanded.
 
--Week4:
+- Week4:
    1. Finish any leftover from Week 3.
    2. Standardize way to give task to master while server running.
    3. Enable the master to send task out based on "priorities".
    4. (Reach) Have the master resend task to network when it gets bad data.
 
--Week5:
+- Week5:
    1. Work on fleshing out status checks and expected run time.
    2. Develop handing out node priority for master at run time.
    3. Enable the network nodes to all comunicate with one another, instead of just the master.
 
--Week6:
+- Week6:
    1. Finish any uncompleted work from week 5.
    2. Figure out how to integrate a previously taken down node into the network workforce.
    3. Figure out error handling of failed nodes with assigned work.
 
--Week7: 
+- Week7: 
    1. Unplanned.
 
--Week8:
+- Week8:
    1. Unplanned.
