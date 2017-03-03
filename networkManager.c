@@ -11,6 +11,8 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <pthread.h>
+#include <unistd.h>
 //returns fd of socket;
 //returns -1 if failed to create
 int setUpClient(char* addr, char* port){
@@ -29,6 +31,8 @@ int setUpClient(char* addr, char* port){
     perror("connect");
     return -1;
   }
+  fprintf(stdout, "Found connection on fd %d\n", socket_fd);
+  resetPipeClient(socket_fd);
   return socket_fd;
 }
 
@@ -78,6 +82,27 @@ char* getBinaryFile(int socket, char* name){
   close(file);
   return name;
 }
+
+void runBinaryFile(char* name){
+  if(name == NULL){ fprintf(stderr, "trying to exec a null, stopping that\n"); exit(0);}
+  pthread_t myThread;
+  pthread_attr_t* myAttr;
+  pthread_create(&myThread, myAttr, &threadManager, (void*) name);
+  pthread_join(myThread, NULL);
+}
+
+void* threadManager(void* arg){
+  execlp((char*) arg, NULL, NULL);
+  fprintf(stderr, "exec returned (bad)\n");
+  return (void*)-1;
+}
+
+void resetPipeClient(int socket){
+  write(socket, NULL, NULL);
+  read(socket, NULL, NULL);
+}
+
+
 //returns fd of socket TO READ AND WRITE
 //returns -1 in error
 int setUpServer(char* addr, char* port){
@@ -111,6 +136,7 @@ int setUpServer(char* addr, char* port){
     return -1;
   }
   fprintf(stdout, "connection found\n");
+  resetPipeServer(client_fd);
   return client_fd;
 }
 
@@ -158,6 +184,9 @@ int sendBinaryFile(int socket, char* name){
   }
   close(file);
   return 0;
+}
 
-
+void resetPipeServer(int socket){
+  read(socket, NULL, NULL);
+  write(socket, NULL, NULL);
 }
