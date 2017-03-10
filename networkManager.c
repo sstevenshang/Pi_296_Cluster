@@ -13,6 +13,32 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <unistd.h>
+
+
+//returns -1 if invalid message header, otherwise returns the byte position
+int getMessageType(char* header){
+  unsigned char headerByte = *header;
+  int type = 7;
+  while(type){
+    if(headerByte & 0x01){
+      if(headerByte >>1 == 1 << (type-1)){
+	return type;
+      }
+	return -1;
+    }
+    headerByte = headerByte >> 1;
+    type --;
+  }
+  return 0;
+}
+
+
+
+
+
+
+
+
 //returns fd of socket;
 //returns -1 if failed to create
 int setUpClient(char* addr, char* port){
@@ -72,7 +98,7 @@ char* getBinaryFile(int socket, char* name){
       if(k == -1){ close(file); return NULL;}
       s += k;
     }
-    s = write(socket, NULL, NULL); // nothing, give me more
+    s = write(socket, NULL, 0); // nothing, give me more
     len = read(socket, buf, bufSize);
   }
   if(len == -1){
@@ -98,8 +124,8 @@ void* threadManager(void* arg){
 }
 
 void resetPipeClient(int socket){
-  write(socket, NULL, NULL);
-  read(socket, NULL, NULL);
+  write(socket, NULL, 0);
+  read(socket, NULL, 0);
 }
 
 
@@ -141,10 +167,18 @@ int setUpServer(char* addr, char* port){
 }
 
 
+
+
 int cleanUpServer(int socket){
   shutdown(socket, SHUT_WR);
   return 0;
 }
+
+void taskManager(){
+
+}
+
+
 //returns fd for read in exec to send
 //returns -1 on error
 int getFdForReadFile(char* name){
@@ -166,27 +200,27 @@ int sendBinaryFile(int socket, char* name){
   while(len != 0){ //len read something
     if(len == -1){
       fprintf(stderr, "some error with reading from the fd %d, check for SIGPIPE\n", file);
-      return NULL;
+      return 0;
     }
     int s = write(socket, buf, len);
-    if(s == -1){ close(file); return NULL;}
+    if(s == -1){ close(file); return 0;}
     while(s != len){ // as long as write hasn't written all bytes
       int k = write(socket, buf + s, len - s);
-      if(k == -1){ close(file); return NULL;}
+      if(k == -1){ close(file); return 0;}
       s += k;
     }
-    s = read(socket, NULL, NULL); // ingnoring, putting more data
+    s = read(socket, NULL, 0); // ingnoring, putting more data
     len = read(file, buf, bufSize);
   }
   if(len == -1){
     fprintf(stderr, "some error with reading from the fd %d, check for SIGPIPE\n", file);
-    return NULL;
+    return 0;
   }
   close(file);
   return 0;
 }
 
 void resetPipeServer(int socket){
-  read(socket, NULL, NULL);
-  write(socket, NULL, NULL);
+  read(socket, NULL, 0);
+  write(socket, NULL, 0);
 }
