@@ -31,15 +31,17 @@ slave* endSlave = NULL;
 //returns -1 if invalid message header, otherwise returns the byte position
 int getMessageType(char* header){
   unsigned char headerByte = *header;
+//  fprintf(stdout, "gotten headerbyte is %d\n", (int)headerByte);
   int type = 7;
-  while(type){
-    if(headerByte & 0x01){
-      if(headerByte >>1 == 1 << (type-1)){
+  while(type != 0){
+    if((headerByte & 0x80) == 0x80){
+      if(((headerByte >> (7-type))& 0x01) == 0x01){
+  //      fprintf(stdout, "in getMessageType, returning %d\n", type);
 	return type;
       }
 	return -1;
     }
-    headerByte = headerByte >> 1;
+    headerByte = headerByte << 1;
     type --;
   }
   return 0;
@@ -56,7 +58,7 @@ int getMessageType(char* header){
 //returns -1 if failed to create
 int setUpClient(char* addr, char* port){
   int s;
-  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  int socket_fd = socket(AF_INET, SOCK_STREAM |SOCK_NONBLOCK, 0);
   struct addrinfo hints, *result;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
@@ -193,8 +195,7 @@ int addAnyIncomingConnections(){
     tmp->taskNo = 0;
     tmp->taskPos = -1;
     tmp->bufSize = 2048;
-    tmp->buf = (void*)malloc(tmp->bufSize);
-    puts("hit");
+    tmp->buf = (void*)calloc(1,tmp->bufSize);
     if(headSlave == NULL){
       headSlave = tmp;
       endSlave = tmp;
@@ -217,15 +218,15 @@ int cleanUpServer(int socket){
 
 void slaveManager(){
     slave* cur = headSlave;
-    int bufSize = 2048;
-    char buf[bufSize];
+    int tmpBufSize = 2048;
+    char tmpBuf[tmpBufSize];
     while(cur != NULL){
       if(cur->running){
         if(cur->taskNo == -1){
           fprintf(stderr, "You messed up somewhere setting a taskNo to -1 with the slave at address %p\n", (void*)cur);
 	  
         } else if(cur->taskNo == 0){ //taskNo 0 is slave setup;
-          size_t bytesRead = read(cur->socket,  buf, bufSize);
+          size_t bytesRead = read(cur->socket,  tmpBuf, tmpBufSize);
           if(bytesRead == (size_t)(-1)){
             if(errno == EWOULDBLOCK){//returned -1 becuase there was nothing to read, but no block.
 
@@ -233,14 +234,32 @@ void slaveManager(){
               fprintf(stderr, "Invalid read from slave at address %p\n", (void*)cur);
             }
           } else {
-            while(getMessageType(buf) != 2){
-              bytesRead = bytesRead + read(cur->socket,  buf+bytesRead, bufSize - bytesRead);
+            while(getMessageType(tmpBuf) != 2){ // see andrew on why this is iffy, if you care/want to fix
+              //going to assume for now message size < 2048, so no need to worry about reallocs of slave buf
+		if(bytesRead == -1){ continue;}
+		fprintf(stdout, "reading inmessage with taskNo 0\n");
+              tmpBuf[bytesRead] = '\0';
+              if(strlen(cur->buf) == 0){ //to keep original message header
+                char* slaveBuf = (char*)cur->buf; puts("hit");
+		slaveBuf[0] = tmpBuf[0];
+		slaveBuf[1] = '\0';
+              }
+              strcpy((cur->buf)+strlen(cur->buf), tmpBuf+1); //copies sent message minus header to slave buffer, which overrides previous stores null byte
+              fprintf(stdout, "current slave buffer is: %s\n", cur->buf);
+              sleep(3);//this is temporary, so I don't have to deal incomplete writes on slave end
+              bytesRead = read(cur->socket,  tmpBuf, tmpBufSize);
             }
           }
+          if(strcmp((cur->buf)+1, RECEIVEME) != 0){
+            fprintf(stderr, "Wrong message sent to master, %s , %s\n", (cur->buf)+1, RECEIVEME);
+          } else {
+            fprintf(stdout, "right message sent to master\n");
+          }
+          cur->running = 0;
         }
 
 
-
+      
       }
       cur = cur->next;
     }

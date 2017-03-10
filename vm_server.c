@@ -17,7 +17,7 @@ int main(int argc, char **argv){
     while(running){
       int testVal1 = addAnyIncomingConnections();
       if(testVal1 != -1){ fprintf(stdout, "added a connection\n");}
-      //slaveManager();
+      slaveManager();
 
     }
 //  int running = 1;
@@ -29,8 +29,9 @@ int main(int argc, char **argv){
  //   if(bytesRead != 0){ //some input from stdin
  //     
  //   }
-    int socket_fd = setUpServer(NULL, "9001");
-    sendBinaryFile(socket_fd, "./hi.out");
+    //int socket_fd = setUpServer(NULL, "9001");
+    //sendBinaryFile(socket_fd, "./hi.out");
  // }
-  return cleanUpServer(socket_fd);
+  return 1;
+  //return cleanUpServer(socket_fd);
 }
