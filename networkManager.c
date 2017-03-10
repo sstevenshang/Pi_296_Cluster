@@ -14,7 +14,16 @@
 #include <pthread.h>
 #include <unistd.h>
 
+typedef struct slave {
+  int running; //0 if waiting, 1 if busy
+  int socket;
+  int taskNo; //if running = 0, taskNo == -1
+  int taskPos;
+  struct slave* next;
+} slave;
 
+slave* headSlave = NULL;
+slave* endSlave = NULL;
 //returns -1 if invalid message header, otherwise returns the byte position
 int getMessageType(char* header){
   unsigned char headerByte = *header;
@@ -133,7 +142,7 @@ void resetPipeClient(int socket){
 //returns -1 in error
 int setUpServer(char* addr, char* port){
   int s;
-  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
   struct addrinfo hints, *result;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
@@ -155,7 +164,8 @@ int setUpServer(char* addr, char* port){
       return -1;
     }
   struct sockaddr_in *result_addr = (struct sockaddr_in*)result->ai_addr;
-  fprintf(stdout, "waiting for connection on port %s\n", port);
+  return 1;
+ /* fprintf(stdout, "waiting for connection on port %s\n", port);
   int client_fd = accept(socket_fd, NULL, NULL);
   if(client_fd == -1){
     fprintf(stderr, "failed on waiting for client to connect\n");
@@ -164,9 +174,25 @@ int setUpServer(char* addr, char* port){
   fprintf(stdout, "connection found\n");
   resetPipeServer(client_fd);
   return client_fd;
+  */
 }
-
-
+//returns -1 when no new connections, otherwise returns fd of pipe
+int addAnyIncomingConnections(int socket){
+  int client_fd = accept(socket, NULL, NULL);
+  if(client_fd != -1){  //found a connection
+    slave* tmp = malloc(sizeof(slave));
+    tmp->socket = client_fd;
+    tmp->running = 1;
+    tmp->next = NULL;
+    tmp->taskNo = 0;
+    tmp->taskPos = -1; 
+    slave* oldEnd = endSlave;
+    oldEnd->next = tmp;
+    endSlave = tmp;
+    return client_fd;
+  }
+  return client_fd;
+}
 
 
 int cleanUpServer(int socket){
@@ -174,8 +200,22 @@ int cleanUpServer(int socket){
   return 0;
 }
 
-void taskManager(){
+void slaveManager(){
+    slave* cur = headSlave;
+    while(cur != NULL){
+      if(cur->running){
+        if(cur->taskNo == -1){
+          fprintf(stderr, "You messed up somewhere setting a taskNo to -1 with the slave at address %p\n", (void*)cur);
+	  
+        } else if(cur->taskNo == 0){ //taskNo 0 is slave setup;
+          
+        }
 
+
+
+      }
+      cur = cur->next;
+    }
 }
 
 

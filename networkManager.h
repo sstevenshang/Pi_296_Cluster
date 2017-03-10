@@ -39,8 +39,9 @@ char* getBinaryFile(int socket, char* name);
 void runBinaryFile(char* name);
 void* threadManager(void* arg);
 void resetPipeClient(int socket);
-void taskHandler();
 //server only code
+int addAnyIncomingConnection(int socket);
+void slaveManager();
 int getFdForReadFile(char* name);
 int setUpServer(char* addr, char* port);
 int cleanUpServer(int socket);
