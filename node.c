@@ -23,6 +23,7 @@ typedef struct {
 	node_id* master_node_id;
 
 	int status;
+	int load;
 	int socket;
 	int master_socket;
 	int master_server_mode;
@@ -78,4 +79,5 @@ void setUpNode(node* this, node_id* master_node_id) {
 	}
 
 	int status = IDLE;
+	int load = 0;
 }

@@ -34,9 +34,9 @@ int main(int argc, char const *argv[])
 	// RUN SERVER_MAIN or MASTER_MAIN
 
 	if (this_node->master_server_mode) {
-		master_main(this_node);
+		master_main(this_node, all_nodes_ids);
 	} else {
-		server_main(this_node);
+		server_main(this_node, all_nodes_ids);
 	}
 
 	return 0;
