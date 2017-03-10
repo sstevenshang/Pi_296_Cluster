@@ -10,6 +10,6 @@
 int main(int argc, char **argv)
 {
   int socket_fd = setUpClient("sp17-cs241-005.cs.illinois.edu", "9001");
-  getBinaryFile(socket_fd, "./gotHi.out");
+//  getBinaryFile(socket_fd, "./gotHi.out");
   return cleanUpClient(socket_fd);
 }

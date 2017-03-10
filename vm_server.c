@@ -13,10 +13,11 @@ int main(int argc, char **argv){
     while(running == -1){
 	running = setUpServer(NULL, "9001");
     }
-
+    fprintf(stdout, "server running\n");
     while(running){
-      addAnyIncomingConnections();
-      slaveManager();
+      int testVal1 = addAnyIncomingConnections();
+      if(testVal1 != -1){ fprintf(stdout, "added a connection\n");}
+      //slaveManager();
 
     }
 //  int running = 1;

@@ -15,7 +15,7 @@
   every sent message will be headed with a 1byte "info" section
   bit0:  valid
   bit1:  undeclared as of yet
-  bit2:  undeclared as of yet
+  bit2:  EOF
   bit3:  check/bool statement
   bit4:  exec file
   bit5:  data file
@@ -40,7 +40,7 @@ void runBinaryFile(char* name);
 void* threadManager(void* arg);
 void resetPipeClient(int socket);
 //server only code
-int addAnyIncomingConnection(int socket);
+int addAnyIncomingConnections();
 void slaveManager();
 int getFdForReadFile(char* name);
 int setUpServer(char* addr, char* port);

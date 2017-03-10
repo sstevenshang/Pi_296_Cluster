@@ -14,11 +14,15 @@
 #include <pthread.h>
 #include <unistd.h>
 
+int client_incoming_fd = -1;
+
 typedef struct slave {
   int running; //0 if waiting, 1 if busy
   int socket;
   int taskNo; //if running = 0, taskNo == -1
   int taskPos;
+  int bufSize;
+  void* buf;
   struct slave* next;
 } slave;
 
@@ -67,7 +71,7 @@ int setUpClient(char* addr, char* port){
     return -1;
   }
   fprintf(stdout, "Found connection on fd %d\n", socket_fd);
-  resetPipeClient(socket_fd);
+//  resetPipeClient(socket_fd);
   return socket_fd;
 }
 
@@ -164,6 +168,7 @@ int setUpServer(char* addr, char* port){
       return -1;
     }
   struct sockaddr_in *result_addr = (struct sockaddr_in*)result->ai_addr;
+  client_incoming_fd = socket_fd;
   return 1;
  /* fprintf(stdout, "waiting for connection on port %s\n", port);
   int client_fd = accept(socket_fd, NULL, NULL);
@@ -177,15 +182,17 @@ int setUpServer(char* addr, char* port){
   */
 }
 //returns -1 when no new connections, otherwise returns fd of pipe
-int addAnyIncomingConnections(int socket){
-  int client_fd = accept(socket, NULL, NULL);
+int addAnyIncomingConnections(){
+  int client_fd = accept(client_incoming_fd, NULL, NULL);
   if(client_fd != -1){  //found a connection
     slave* tmp = malloc(sizeof(slave));
     tmp->socket = client_fd;
     tmp->running = 1;
     tmp->next = NULL;
     tmp->taskNo = 0;
-    tmp->taskPos = -1; 
+    tmp->taskPos = -1;
+    tmp->bufSize = 2048;
+    tmp->buf = (void*)malloc(tmp->bufSize);
     slave* oldEnd = endSlave;
     oldEnd->next = tmp;
     endSlave = tmp;
@@ -202,13 +209,26 @@ int cleanUpServer(int socket){
 
 void slaveManager(){
     slave* cur = headSlave;
+    int bufSize = 2048;
+    char buf[bufSize];
     while(cur != NULL){
       if(cur->running){
         if(cur->taskNo == -1){
           fprintf(stderr, "You messed up somewhere setting a taskNo to -1 with the slave at address %p\n", (void*)cur);
 	  
         } else if(cur->taskNo == 0){ //taskNo 0 is slave setup;
-          
+          size_t bytesRead = read(cur->socket,  buf, bufSize);
+          if(bytesRead == (size_t)(-1)){
+            if(errno == EWOULDBLOCK){//returned -1 becuase there was nothing to read, but no block.
+
+            } else {
+              fprintf(stderr, "Invalid read from slave at address %p\n", (void*)cur);
+            }
+          } else {
+            while(getMessageType(buf) != 2){
+              bytesRead = bytesRead + read(cur->socket,  buf+bytesRead, bufSize - bytesRead);
+            }
+          }
         }
 
 
