@@ -185,7 +185,8 @@ int setUpServer(char* addr, char* port){
 int addAnyIncomingConnections(){
   int client_fd = accept(client_incoming_fd, NULL, NULL);
   if(client_fd != -1){  //found a connection
-    slave* tmp = malloc(sizeof(slave));
+    fprintf(stdout, "got something\n");
+    slave* tmp = (slave*)malloc(sizeof(slave));
     tmp->socket = client_fd;
     tmp->running = 1;
     tmp->next = NULL;
@@ -193,11 +194,18 @@ int addAnyIncomingConnections(){
     tmp->taskPos = -1;
     tmp->bufSize = 2048;
     tmp->buf = (void*)malloc(tmp->bufSize);
-    slave* oldEnd = endSlave;
-    oldEnd->next = tmp;
-    endSlave = tmp;
+    puts("hit");
+    if(headSlave == NULL){
+      headSlave = tmp;
+      endSlave = tmp;
+    } else {
+      slave* oldEnd = endSlave;
+      oldEnd->next = tmp;
+      endSlave = tmp;
+    }
     return client_fd;
   }
+  //fprintf(stdout, "no connections yet\n");
   return client_fd;
 }
 
