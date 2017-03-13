@@ -9,7 +9,12 @@ typedef struct {
 	char* file_to_execute;
 } task;
 
-void sentHeartbeat(node* this_node) {
+void* sentHeartbeat(void* load) {
+	node* this_node = (node*) load;
+	while(1) {
+		sleep(5);
+		
+	}
 }
 
 int executeRequest(node* this_node, char* file_to_execute) {

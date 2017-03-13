@@ -9,7 +9,7 @@ typedef struct {
 	char* file_to_send;
 } request;
 
-void listenToHeartbeat(node* this_node, node_id** all_nodes_ids) {
+void* listenToHeartbeat(node* this_node, node_id** all_nodes_ids) {
 
 }
 
