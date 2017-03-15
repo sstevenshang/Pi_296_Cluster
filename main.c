@@ -1,8 +1,9 @@
-#include "server_main.h"
-#include "master_main.h"
 #include "node.h"
+#include "server.h"
+#include "master.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #define NODE_COUNT 4
 #define NODE_ADDRESSES { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4" }

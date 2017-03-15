@@ -1,8 +1,4 @@
-#include <sys/socket.h>
-#include <stdio.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <sys/types.h>
+#include "heartbeat.h"
 
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
@@ -102,18 +98,3 @@ void listenToHeartbeat(int socket_fd, int* stethoscope) {
 		}
 	}
 }
-
-void reportHeartbeat(char* beat_addr, char* beat_port) {
-	/* keep track of num of beat/skip balance
-	   kill node if skip imbalanced
-	   revive node if beat imbalanced*/
-
-	updateNodeStatus();
-}
-
-
-
-
-
-
-
