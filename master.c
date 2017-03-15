@@ -1,5 +1,6 @@
 #include "node.h"
 #include "networkManager.h"
+#include "heartbeat.h"
 
 /* MASTER FUNCTIONS */
 
@@ -13,12 +14,6 @@ int master_main(node* this_node, node_id** all_nodes_ids) {
 
 	return 0;
 }
-
-typedef struct {
-	node* this_node;
-	node_id* server_id;
-	char* file_to_send;
-} request;
 
 void* listenToHeartbeat(node* this_node, node_id** all_nodes_ids) {
 
