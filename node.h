@@ -25,6 +25,8 @@ typedef struct {
 	int alive;
 	int cur_load;
 
+	int beat;
+
 	struct node* next;
 
 } node;
@@ -37,6 +39,6 @@ char** node_addresses = { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.
 char** node_ports = { "9001", "9001", "9001", "9001" };
 char* default_master_address = "192.168.1.1";
 
-node_id* construct_nodes();
+node* construct_nodes();
 int is_equal_address(char* a, char* b);
-node_id* node_constructor(char* address, char* port);
+node* node_constructor(char* address, char* port);

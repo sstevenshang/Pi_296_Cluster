@@ -8,7 +8,7 @@
  * figure out what to do if the master goes down and comes back up.
  * */
 
-node_id* construct_nodes() {
+node* construct_nodes() {
 
     char* local_addr = get_local_address();
     node* local_node = NULL;
@@ -28,7 +28,7 @@ int is_equal_address(char* a, char* b) {
     return (!strcmp(a, b));
 }
 
-node_id* node_constructor(char* address, char* port) {
+node* node_constructor(char* address, char* port) {
     node* this = malloc(sizeof(node));
     this->node_addr = strdup(address);
     this->node_port = strdup(address); 
@@ -41,5 +41,17 @@ node_id* node_constructor(char* address, char* port) {
     }
     this->alive = IS_ALIVE;
     this->cur_load = IDLE;
+    this->neat = 0;
     return this;
+}
+
+node* traverseNodes(char* address) {
+    node* temp = head;
+    while (temp) {
+        if (is_equal_address(address, temp->node_addr)) {
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
 }

@@ -16,10 +16,22 @@ int master_main(node* this_node) {
 	return 0;
 }
 
-void reportHeartbeat(char* beat_addr, char* beat_port) {
+void reportHeartbeat(char* beat_addr) {
+
 	/* keep track of num of beat/skip balance
 	   kill node if skip imbalanced
 	   revive node if beat imbalanced*/
+	node* temp = traverseNodes(beat_addr);
+	temp->beat++;
 
 	//updateNodeStatus();
+}
+
+void updateNodeStatus() {
+
+	int count = 0;
+	while(1) {
+
+	}
+
 }
