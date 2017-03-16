@@ -4,35 +4,17 @@
 
 /* MASTER FUNCTIONS */
 
-int master_main(node* this_node, node_id** all_nodes_ids) {
+int master_main(node* this_node) {
+
+	// Spawn thread for heartbeat
 
 	while(1) {
-
-		// GET TASK INPUT
-
+		// Wait for task input
+		// Distribute task
+		// Spawn thread to send request
 	}
-
 	return 0;
 }
-
-void* listenToHeartbeat(node* this_node, node_id** all_nodes_ids) {
-
-}
-
-node_id* findNodeWithLeastLoad(node* this_node, node_id** master_node_id) {
-	return NULL;
-}
-
-int sendRequest(node* this_node, node_id* target) {
-	return 0;
-}
-
-void* sendRequestHandler(void* load) {
-
-	request* my_request = (request*)load;
-	return NULL;
-}
-
 
 void reportHeartbeat(char* beat_addr, char* beat_port) {
 	/* keep track of num of beat/skip balance
