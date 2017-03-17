@@ -14,16 +14,18 @@ int master_main(node* this_node) {
 	pthread_create(&stethoscope_thread, NULL, updateNodeStatusThread, &listen);
 
 	updateNodeStatusThread(&listen);
-*/
+
 	while(1) {
 		// Wait for task input
 		// Distribute task
 		// Spawn thread to send request
 	}
-/*
+
 	pthread_join(heartbeat_thread, NULL);
 	pthread_join(stethoscope_thread, NULL);
 */
+
+
 	return 0;
 }
 /*

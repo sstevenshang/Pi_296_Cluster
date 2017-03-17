@@ -9,7 +9,14 @@
 #include <unistd.h>
 
 //I'm ignoring heartbeat focused functions until I get everything else working -A
-int master_main(node* this_node);
+int master_main();
+int addAnyIncomingConnections();
+//void slaveManager();
+int getFdForReadFile(char* name);
+int setUpMaster(char* addr, char* port);
+int cleanUpMaster(int socket);
+int sendBinaryFile(int socket, char* name);
+//void resetPipeServer(int socket);
 //void reportHeartbeat(char* beat_addr);
 //void* listenToHeartbeatThread(void* load);
 //void* updateNodeStatusThread(void* load);
