@@ -17,15 +17,12 @@ typedef struct {
 	char* node_addr;
 	char* node_port;
 
-	char* master_addr;
-	char* master_port;
-
 	int socket;
 
 	int alive;
 	int cur_load;
 
-	int beat;
+	double last_beat_received_time;
 
 	struct node* next;
 

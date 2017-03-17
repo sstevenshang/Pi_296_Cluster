@@ -46,10 +46,10 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 	int socket_fd = setUpUDPClient();
 	int status;
 	while (*alive) {
+		sleep(3);
 		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
 			printf("Failed: failed to send heartbeat");
 		}
-		sleep(3);
 	}
 }
 

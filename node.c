@@ -21,6 +21,7 @@ node* construct_nodes() {
             local_node = cur;
         } 
     }
+    head = local_node;
     return local_node;
 }
 
@@ -33,6 +34,7 @@ node* node_constructor(char* address, char* port) {
     this->node_addr = strdup(address);
     this->node_port = strdup(address); 
     if (is_equal_address(address, default_master_address)) {
+        cur_master = this;
         this->master = IS_MASTER;
         this->socket = setUpClient();
     } else {
@@ -41,7 +43,7 @@ node* node_constructor(char* address, char* port) {
     }
     this->alive = IS_ALIVE;
     this->cur_load = IDLE;
-    this->neat = 0;
+    this->last_beat_received_time = 0;
     return this;
 }
 
