@@ -15,5 +15,5 @@
 #include <pthread.h>
 #include <unistd.h>
 
-int setUpClient(node_id* my_id);
-int setUpServer(node_id* my_id);
+int setUpClient(node* my_id);
+int setUpServer(node* my_id);
