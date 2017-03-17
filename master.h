@@ -1,4 +1,4 @@
-// #include "networkManager.h"
+#include "networkManager.h"
 #include "heartbeat.h"
 #include <time.h>
 #include <pthread.h>
