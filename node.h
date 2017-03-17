@@ -15,7 +15,7 @@
 #define UNAVALIBLE -1
 
 
-typedef struct {
+typedef struct node {
 
 	char* node_addr;
 	char* node_port;

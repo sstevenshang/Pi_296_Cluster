@@ -10,10 +10,10 @@ int master_main(node* this_node) {
 
 	int listen = 1;
 
-	pthread_create(&heartbeat_thread, 0, listenToHeartbeatThread, &listen);
-	pthread_create(&stethoscope_thread, 0, updateNodeStatusThread, &listen);
+	pthread_create(&heartbeat_thread, NULL, listenToHeartbeatThread, &listen);
+	pthread_create(&stethoscope_thread, NULL, updateNodeStatusThread, &listen);
 
-	void* updateNodeStatusThread();
+	updateNodeStatusThread(&listen);
 
 	while(1) {
 		// Wait for task input
@@ -34,7 +34,8 @@ void reportHeartbeat(char* beat_addr) {
 }
 
 void* listenToHeartbeatThread(void* listen) {
-	listenToHeartbeat(*((int*)listen));
+	listenToHeartbeat((int*)listen);
+	return NULL;
 }
 
 
@@ -55,6 +56,7 @@ void* updateNodeStatusThread(void* listen) {
 		}
 		sleep(2);
 	}
+	return NULL;
 }
 
 void resetBeats() {
