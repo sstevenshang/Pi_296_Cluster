@@ -39,13 +39,16 @@ int setUpWorker(char* addr, char* port){
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   s = getaddrinfo(addr, port, &hints, &result);
+  fprintf(stdout, "using %s and %s\n", addr, port);
   if(s != 0){
     fprintf(stderr, "failed to find %s at port %s\n", addr, port);
     return -1;
   }
   if(connect(socket_fd, result->ai_addr, result->ai_addrlen)==-1){
-    perror("connect");
-    return -1;
+    if(errno != EINPROGRESS){
+      perror("connect");
+      return -1;
+    }
   }
   fprintf(stdout, "Found connection on fd %d\n", socket_fd);
 //  resetPipeClient(socket_fd);

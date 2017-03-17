@@ -29,7 +29,7 @@ int master_main() {
         setUpMaster(defaultMasterPort);
         runningM = 1;
         while(runningM == 1){
-        
+          addAnyIncomingConnections();
         }
         cleanUpMaster(clientIncomingFd);
 	return 0;
