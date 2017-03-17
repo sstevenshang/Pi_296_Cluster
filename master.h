@@ -1,4 +1,7 @@
-// #include "networkManager.h"
+#ifndef MASTER_H
+#define MASTER_H
+
+#include "networkManager.h"
 #include "heartbeat.h"
 #include <time.h>
 #include <pthread.h>
@@ -9,3 +12,5 @@ void* listenToHeartbeatThread(void* load);
 void* updateNodeStatusThread(void* load);
 void resetBeats();
 double getTime();
+
+#endif 

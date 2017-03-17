@@ -1,3 +1,6 @@
+#ifndef MASTER_H
+#define MASTER_H
+
 #include <sys/socket.h>
 #include <stdio.h>
 #include <netinet/in.h>
@@ -17,3 +20,5 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
 
 void listenToHeartbeat(int* stethoscope);
+
+#endif

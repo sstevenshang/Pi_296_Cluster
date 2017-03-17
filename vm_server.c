@@ -27,7 +27,7 @@ int main(int argc, char **argv){
 //    size_t bytesRead = read(0, buf, 99);
  //   buf[bytesRead] = '\0';
  //   if(bytesRead != 0){ //some input from stdin
- //     
+ //
  //   }
     //int socket_fd = setUpServer(NULL, "9001");
     //sendBinaryFile(socket_fd, "./hi.out");
