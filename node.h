@@ -24,6 +24,7 @@ typedef struct {
 
 	int alive;
 	int cur_load;
+	int is_master;
 
 	double last_beat_received_time;
 
