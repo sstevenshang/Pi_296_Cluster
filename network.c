@@ -1,6 +1,6 @@
 #include "networkManager.h"
 
-int setUpClient(node_id* my_id) {
+int setUpClient(node* my_id) {
 
 	char* addr = my_id->addr;
 	char* port = my_id->port;
@@ -31,7 +31,7 @@ int setUpClient(node_id* my_id) {
 }
 
 // TODO
-int setUpServer(node_id* my_id) {
+int setUpServer(node* my_id) {
 
 	char* addr = my_id->addr;
 	char* port = my_id->port;
@@ -69,5 +69,3 @@ int setUpServer(node_id* my_id) {
 	my_id->master_socket = socket_fd;
 	return socket_fd;
 }
-
-
