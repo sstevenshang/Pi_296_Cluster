@@ -43,7 +43,8 @@ int setUpMaster(char* port){
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE;
-  s = getaddrinfo(NULL, port, &hints, &result);
+  char* junk2; junk2 = NULL;
+  s = getaddrinfo(junk2, port, &hints, &result);
   if(s != 0){
     fprintf(stderr, "failed to find at port %s\n", port);
     return -1;
@@ -58,8 +59,11 @@ int setUpMaster(char* port){
       perror("listen()");
       return -1;
     }
-  //struct sockaddr_in *result_addr = (struct sockaddr_in*)result->ai_addr;
+  struct sockaddr_in *result_addr = (struct sockaddr_in*)result->ai_addr;
+  void* junk = result_addr + 1;
+  junk ++;
   clientIncomingFd = socket_fd;
+  fprintf(stdout, "adding fd %d\n", clientIncomingFd);
   return 1;
 }
 
