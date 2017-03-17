@@ -1,5 +1,5 @@
-#ifndef MASTER_H
-#define MASTER_H
+#ifndef _HEARTBEAT_H_
+#define _HEARTBEAT_H_
 
 #include <sys/socket.h>
 #include <stdio.h>
