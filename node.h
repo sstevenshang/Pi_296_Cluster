@@ -32,8 +32,8 @@ node* head;
 node* cur_master;
 
 size_t node_counts = 4;
-char** node_addresses = { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4" };
-char** node_ports = { "9001", "9001", "9001", "9001" };
+char* node_addresses[4] = { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4" };
+char* node_ports[4] = { "9001", "9001", "9001", "9001" };
 char* default_master_address = "192.168.1.1";
 
 node* construct_nodes();

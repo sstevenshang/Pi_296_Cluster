@@ -19,7 +19,7 @@ node* construct_nodes() {
         temp = cur;
         if (is_equal_address(node_addresses[i], local_addr)) {
             local_node = cur;
-        } 
+        }
     }
     head = local_node;
     return local_node;
@@ -32,7 +32,7 @@ int is_equal_address(char* a, char* b) {
 node* node_constructor(char* address, char* port) {
     node* this = malloc(sizeof(node));
     this->node_addr = strdup(address);
-    this->node_port = strdup(address); 
+    this->node_port = strdup(address);
     if (is_equal_address(address, default_master_address)) {
         cur_master = this;
         this->master = IS_MASTER;
