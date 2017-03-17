@@ -1,28 +1,32 @@
 #include "worker.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <signal.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <unistd.h>
 /* SERVER FUNCTIONS */
+int running = 0;
+char* defaultPort = "9001";
+char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
+int socketFd = -1;
 
-int server_main(node* this_node) {
 
+
+
+int server_main() {
+    char tempBuf[100];
+    fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
+    size_t bytesRead = read(fileno(stdin), tempBuf, 99);
+    tempBuf[bytesRead] = '\0';
+    if(bytesRead == 1){ strcpy(tempBuf, defaultMaster);}
+    socketFd = setUpWorker(tempBuf, defaultPort);
+    if(socketFd == -1){
+      fprintf(stderr, "Failed connection, try again later\n");
+      return 0;
+    }
+    running = 1;
 	// Spwan thread for heartbeat
-	while(1) {
+    while(running) {
 		// Wait for incoming connection
 		// Spwan thread to execute
-	}
-	return 0;
+    }
+    cleanUpWorker(socketFd);
+    return 0;
 }
 
 
@@ -45,7 +49,7 @@ int setUpWorker(char* addr, char* port){
   }
   fprintf(stdout, "Found connection on fd %d\n", socket_fd);
 //  resetPipeClient(socket_fd);
-//    return socket_fd;
+  return socket_fd;
 }
 
 int cleanUpWorker(int socket){

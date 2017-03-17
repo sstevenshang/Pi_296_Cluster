@@ -36,14 +36,14 @@ typedef struct node {
 
 } node;
 
-node* head;
-node* lastInList;
+extern node* head;
+extern node* lastInList;
 //node* cur_master;
 
 //size_t node_counts = 4;
 //char* node_addresses[4] = { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4" };
 //char* node_ports[4] = { "9001", "9001", "9001", "9001" };
-char* default_master_address = "192.168.1.1";
+//char* default_master_address = "192.168.1.1";
 
 void addNode(int socket_fd);
 void removeNode(node* oldNode);

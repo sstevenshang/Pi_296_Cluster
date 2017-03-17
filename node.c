@@ -62,6 +62,9 @@ node* traverseNodes(char* address) {
 
 //starting here -Andrew
 
+head = NULL;
+lastInList = NULL;
+
 void addNode(int socketFd){
   node* newNode = (node*)malloc(sizeof(node));
   newNode->socket_fd = socketFd;

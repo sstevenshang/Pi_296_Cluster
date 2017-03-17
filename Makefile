@@ -9,7 +9,7 @@ OBJS = main.o heartbeat.o master.o node.o worker.o
 
 # set up compiler
 CC = clang
-WARNINGS = -Wall -Wextra -Werror -Wno-error=unused-parameter
+WARNINGS = -Wall -Wextra -Werror -Wno-error=unused-parameter -Wno-write-strings
 CFLAGS_DEBUG   = -O0 $(WARNINGS) -g -std=c99 -c -MMD -MP -D_GNU_SOURCE -DDEBUG
 CFLAGS_RELEASE = -O2 $(WARNINGS)    -std=c99 -c -MMD -MP -D_GNU_SOURCE
 
