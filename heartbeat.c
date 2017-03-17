@@ -51,6 +51,7 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 			printf("Failed: failed to send heartbeat");
 		}
 	}
+	cleanupUDPSocket(socket_fd);
 }
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
@@ -77,12 +78,13 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 	return 0;
 }
 
-void listenToHeartbeat(int socket_fd, int* stethoscope) {
+void listenToHeartbeat(int* stethoscope) {
 
 	unsigned char buffer[BUFSIZE];
 	struct sockaddr_in clientAddr;
 	socklen_t addrlen = sizeof(clientAddr);
 	int byte_received = 0;
+	int socket_fd = setUpUDPClient();
 
 	while(*stethoscope) {
 
@@ -97,4 +99,8 @@ void listenToHeartbeat(int socket_fd, int* stethoscope) {
 			printf("SUCCESS: received \"%s\" from %s:%s\n", buffer, beat_addr, beat_port);
 		}
 	}
+	cleanupUDPSocket(socket_fd);
 }
+
+
+

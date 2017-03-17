@@ -1,19 +1,29 @@
 #include "node.h"
-#include "networkManager.h"
-#include "heartbeat.h"
-#include <time.h>
 
 /* MASTER FUNCTIONS */
 
 int master_main(node* this_node) {
 
 	// Spawn thread for heartbeat
+	pthread_t heartbeat_thread;
+	pthread_t stethoscope_thread;
+
+	int listen = 1;
+
+	pthread_create(&heartbeat_thread, 0, listenToHeartbeatThread, &listen);
+	pthread_create(&stethoscope_thread, 0, updateNodeStatusThread, &listen);
+
+	void* updateNodeStatusThread();
 
 	while(1) {
 		// Wait for task input
 		// Distribute task
 		// Spawn thread to send request
 	}
+
+	pthread_join(heartbeat_thread, NULL);
+	pthread_join(stethoscope_thread, NULL);
+
 	return 0;
 }
 
@@ -23,21 +33,16 @@ void reportHeartbeat(char* beat_addr) {
 	temp->last_beat_received_time = time_received;
 }
 
-void* listenToHeartbeatThread(void* load) {
-	int socket_fd = setUpUDPClient();
-	listenToHeartbeat(socket_fd, 1);
+void* listenToHeartbeatThread(void* listen) {
+	listenToHeartbeat(*((int*)listen));
 }
 
 
-void* updateNodeStatusThread(void* load) {
-
-	/* keep track of num of beat/skip balance
-	   kill node if skip imbalanced
-	   revive node if beat imbalanced*/
+void* updateNodeStatusThread(void* listen) {
 
 	resetBeats();
 	double time;
-	while(1) {
+	while(*((int*)listen)) {
 		node* temp = head;
 		for (size_t i=0; i<node_counts; i++) {
 			if (temp->alive) {
