@@ -57,3 +57,46 @@
 
 - Week8:
    1. Unplanned.
+
+### The Structure:
+
+    main.c -> Set Up Nodes -> Run server_main.c or master_main.c
+            (node.c)
+           
+     master_main.c  -> (master.c functions)
+                    -> keep heartbeat from servers
+                    -> wait for uploaded tasks
+                    -> distribute task   
+                    -> create new thread 
+                    -> join thread after receiving flag from subthread
+
+                       (subthread) -> call networkManager.c -> sendTask -> server
+                                   -> idle -> wait for response
+                                           -> return response from thread
+     
+     server_main.c  -> (server.c functions)
+                    -> keep heartbeat to master
+                    -> wait for task from amster
+                    -> create new thread
+                    -> join thread after receiving flag from subthread
+
+                       (subthread) -> execute task
+                                   -> call networkManager.c -> sendResponse -> master
+                                   -> exit
+
+### How The Network Handles Itself
+
+Situation one: System startup
+	This means the default master node, or server, has not started yet. Thus, the server will being starting up, using port 9001 by default as the accepting slave nodes port. After starting up with no errors, the server will listen until it hears a connect, creating a separate port for that connection, and waiting for the message with bits (0,3) stating, "Do you receive me?". The server will respond "Yes, I received you.", The slave will then send a message with bits(0,6) with message "Ready for work.", and remain waiting until the server sends it some message.
+
+Situation two: Server sending a task to a slave
+	If the master is sending a task with data needing to be available in a node, it will handle the data sent before sending the exec file. This includes any args needed for the exec file. After the slave has everything needed to run the exec, the master will send a message with bits (0,4) and the raw binary file to be saved and exec on the slave. Subsequent messages will contain the message bits. After the Master has finished sending the binary file, it will send a message with bits (0,3) stating "Are you running?". The slave, after exec the program, will send a message with bits (0,6) "Running.". At this point, the server 'should' continuously ping the slave for status updates.
+
+Situation three: Server sending data to a slave
+	For any data file sent to a slave from a standby situation, the message bits (0,5) will be followed by 64 bytes for a file name. The following data will be placed into that file opened on the slave. Any subsequent messages containing more data will be with the bits (0,5) followed by the data, not using the 64bytes space for the name. After the data is done sending, the server will send a message (0,3) stating "Are you ok?". The slave will send a message (0,6) "Ready for work." and wait.
+
+Situation four: Slave finished with task
+	Whenever a master message of (0,3) "Are you running?" is received after a slave is finished running, the slave will send back a message (0,6) "Finished running." The master will either send a (0,3) message of "I received you.", in which the slave will send (0,6) "Ready for work." and wait. If any data is needed from the slave, one should follow the "Getting data from slave".
+
+Situation five: Getting data from slave
+	The master will send a (0,3) message asking "Send me the file:", followed by the file name to send. The slave will then send (0,5) message followed by 64 bytes of the file name, followed by data, following the convention for sending data to a slave. When all the data is send, the slave will send the (0,3) message "Ready for work.".
