@@ -1,5 +1,5 @@
 #include "heartbeat.h"
-
+#include <unistd.h>
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 
