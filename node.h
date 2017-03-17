@@ -19,15 +19,16 @@
 
 typedef struct node {
 
-	char* node_addr;
-	char* node_port;
+	//char* node_addr;
+	//char* node_port;
 
-	int socket;
+	int socket_fd;
 
 	int alive;
 	int cur_load;
 	int is_master;
-
+        int taskNo;
+        int taskPos;
 	double last_beat_received_time;
 
 	struct node* next;
@@ -35,16 +36,20 @@ typedef struct node {
 } node;
 
 node* head;
-node* cur_master;
+node* lastInList;
+//node* cur_master;
 
-size_t node_counts = 4;
-char* node_addresses[4] = { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4" };
-char* node_ports[4] = { "9001", "9001", "9001", "9001" };
+//size_t node_counts = 4;
+//char* node_addresses[4] = { "192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4" };
+//char* node_ports[4] = { "9001", "9001", "9001", "9001" };
 char* default_master_address = "192.168.1.1";
 
-node* construct_nodes();
-int is_equal_address(char* a, char* b);
-node* node_constructor(char* address, char* port);
-node* traverseNodes(char* address);
+void addNode(int socket_fd);
+
+
+//node* construct_nodes();
+//int is_equal_address(char* a, char* b);
+//node* node_constructor(char* address, char* port);
+//node* traverseNodes(char* address);
 
 #endif
