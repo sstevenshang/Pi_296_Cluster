@@ -1,5 +1,5 @@
 #include "networkManager.h"
-
+#include "node.h"
 int setUpClient(node* my_id) {
 
 	char* addr = my_id->addr;

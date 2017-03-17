@@ -7,7 +7,7 @@
 /* TODO:
  * figure out what to do if the master goes down and comes back up.
  * */
-
+/*
 node* construct_nodes() {
 
     char* local_addr = get_local_address();
@@ -56,4 +56,13 @@ node* traverseNodes(char* address) {
         temp = temp->next;
     }
     return NULL;
+}
+
+*/
+
+//starting here -Andrew
+
+void addNode(int socketFd){
+  node* newNode = malloc(sizeof(node));
+  newNode->
 }
