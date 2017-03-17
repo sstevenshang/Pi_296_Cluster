@@ -1,4 +1,4 @@
-#include "node.h"
+#include "master.h"
 
 /* MASTER FUNCTIONS */
 

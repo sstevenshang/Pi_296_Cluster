@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 
@@ -98,13 +99,10 @@ void listenToHeartbeat(int* stethoscope) {
 		} else {
 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
 			//char* beat_port = inet_ntoa(clientAddr.sin_port);
-			
+
 			reportHeartbeat(beat_addr);
 			printf("SUCCESS: received \"%s\" from %s\n", buffer, beat_addr/*, beat_port*/);
 		}
 	}
 	cleanupUDPSocket(socket_fd);
 }
-
-
-
