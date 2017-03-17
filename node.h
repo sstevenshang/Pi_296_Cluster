@@ -1,3 +1,6 @@
+#ifndef _NODE_H_
+#define _NODE_H_
+
 #include <string.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
@@ -40,3 +43,5 @@ char* default_master_address = "192.168.1.1";
 node* construct_nodes();
 int is_equal_address(char* a, char* b);
 node* node_constructor(char* address, char* port);
+
+#endif
