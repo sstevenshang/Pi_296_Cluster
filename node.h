@@ -2,8 +2,10 @@
 #define _NODE_H_
 
 #include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
+#include "network.h"
 
 #define IS_MASTER 1
 #define IS_WORKER 0

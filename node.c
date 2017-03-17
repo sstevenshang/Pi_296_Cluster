@@ -13,7 +13,7 @@ node* construct_nodes() {
     char* local_addr = get_local_address();
     node* local_node = NULL;
     node* temp = NULL;
-    for (size_t i=0; i<node_count; i++) {
+    for (size_t i=0; i<node_counts; i++) {
         node* cur = node_constructor(node_addresses[i], node_ports[i]);
         cur->next = temp;
         temp = cur;
@@ -35,10 +35,10 @@ node* node_constructor(char* address, char* port) {
     this->node_port = strdup(address);
     if (is_equal_address(address, default_master_address)) {
         cur_master = this;
-        this->master = IS_MASTER;
+        this->is_master = IS_MASTER;
         this->socket = setUpClient();
     } else {
-        this->master = IS_WORKER;
+        this->is_master = IS_WORKER;
         this->socket = setUpServer();
     }
     this->alive = IS_ALIVE;

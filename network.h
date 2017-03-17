@@ -1,5 +1,7 @@
-#include "node.h"
+#ifndef NETWORK_H
+#define NETWORK_H
 
+#include "node.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,3 +19,5 @@
 
 int setUpClient(node* my_id);
 int setUpServer(node* my_id);
+
+#endif
