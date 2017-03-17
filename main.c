@@ -1,6 +1,6 @@
 #include "node.h"
 // #include "server.h"
-//#include "master.h"
+#include "master.h"
 #include "worker.h"
 #include <string.h>
 #include <stdio.h>
@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
         }
         buf[2] = '\0';
 	if (strcmp("1\n", buf)==0) {
-//		master_main();
+		master_main();
 	} else if(strcmp("2\n", buf)==0) {
 		server_main();
 	} else {

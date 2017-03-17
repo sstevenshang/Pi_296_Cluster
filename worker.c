@@ -1,7 +1,7 @@
 #include "worker.h"
 /* SERVER FUNCTIONS */
-int running = 0;
-char* defaultPort = "9001";
+int runningC = 0;
+char* defaultClientPort = "9001";
 char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 int socketFd = -1;
 
@@ -14,14 +14,14 @@ int server_main() {
     size_t bytesRead = read(fileno(stdin), tempBuf, 99);
     tempBuf[bytesRead] = '\0';
     if(bytesRead == 1){ strcpy(tempBuf, defaultMaster);}
-    socketFd = setUpWorker(tempBuf, defaultPort);
+    socketFd = setUpWorker(tempBuf, defaultClientPort);
     if(socketFd == -1){
       fprintf(stderr, "Failed connection, try again later\n");
       return 0;
     }
-    running = 1;
+    runningC = 1;
 	// Spwan thread for heartbeat
-    while(running) {
+    while(runningC) {
 		// Wait for incoming connection
 		// Spwan thread to execute
     }
@@ -100,13 +100,13 @@ char* getBinaryFile(int socket, char* name){
 void runBinaryFile(char* name){
   if(name == NULL){ fprintf(stderr, "trying to exec a null, stopping that\n"); exit(0);}
   pthread_t myThread;
-  pthread_attr_t* myAttr;
+  pthread_attr_t* myAttr = NULL;
   pthread_create(&myThread, myAttr, &threadManager, (void*) name);
   pthread_join(myThread, NULL);
 }
 
 void* threadManager(void* arg){
-  execlp((char*) arg, NULL, NULL);
+  execlp((char*) arg, (char*)arg, NULL,(char*)NULL);
   fprintf(stderr, "exec returned (bad)\n");
   return (void*)-1;
 }

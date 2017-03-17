@@ -20,7 +20,7 @@
 //#include "networkManager.h"
 //#include "heartbeat.h"
 
-extern int running;
+extern int runningC;
 extern int socketFd;
 extern char* defaultMaster;
 extern char* defaultPort;
