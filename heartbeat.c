@@ -1,5 +1,9 @@
 #include "heartbeat.h"
+#include "master.h"
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 
@@ -44,7 +48,7 @@ void cleanupUDPSocket(int socket_fd) {
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 	int socket_fd = setUpUDPClient();
-	int status;
+	//int status;
 	while (*alive) {
 		sleep(3);
 		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
@@ -88,15 +92,15 @@ void listenToHeartbeat(int* stethoscope) {
 
 	while(*stethoscope) {
 
-		byte_received = recvfrom(socket_fd, buffer, BUFSIZE, 0, (struct sockaddr*)&clientAddr, &addrlen)
+		byte_received = recvfrom(socket_fd, buffer, BUFSIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
 		if (byte_received < 0) {
 			perror("FAILED: failed to receive from client");
 		} else {
 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-			char* beat_port = inet_ntoa(clientAddr.sin_port);
+			//char* beat_port = inet_ntoa(clientAddr.sin_port);
 			
-			reportHeartbeat(beat_addr, beat_port);
-			printf("SUCCESS: received \"%s\" from %s:%s\n", buffer, beat_addr, beat_port);
+			reportHeartbeat(beat_addr);
+			printf("SUCCESS: received \"%s\" from %s\n", buffer, beat_addr/*, beat_port*/);
 		}
 	}
 	cleanupUDPSocket(socket_fd);
