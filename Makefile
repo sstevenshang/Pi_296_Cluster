@@ -1,44 +1,55 @@
+OBJS_DIR = .objs
 
-CFLAGS = -I. -Wall -Winit-self -Wextra -Wno-nonnull  -Wno-unused-variable -Wno-unused-result -pthread -Wno-unused-parameter
-# Source, Executable, Includes, Library Defines
-INCL   = networkManager.h
-SRC    = networkManager.c vm_server.c vm_client.c
-OBJ    = $(SRC:.c=.o)
+# define all of student executables
+EXE_RELEASE = key_lime_cluster
+EXE_DEBUG = $(EXE_RELEASE)-debug
 
-# Compiler, Linker Defines
-CC      = /usr/bin/gcc
-LIBPATH = -L.
-LDFLAGS = -o $(EXE) $(LIBPATH)
-CFDEBUG = -ansi -pedantic -Wall -g -DDEBUG $(LDFLAGS)
-RM      = /bin/rm -f
+# list object file dependencies for each
+OBJS = main.o heartbeat.o master.o node.o worker.o
 
-# Compile and Assemble C Source Files into Object Files
-%.o: %.c
-	$(CC) -c $(CFLAGS) $*.c
+# set up compiler
+CC = clang
+WARNINGS = -Wall -Wextra -Werror -Wno-error=unused-parameter
+CFLAGS_DEBUG   = -O0 $(WARNINGS) -g -std=c99 -c -MMD -MP -D_GNU_SOURCE -DDEBUG
+CFLAGS_RELEASE = -O2 $(WARNINGS)    -std=c99 -c -MMD -MP -D_GNU_SOURCE
 
-# Link all Object Files with external Libraries into Binaries
-all: vm_server vm_client pi_server pi_client clean
+# set up linker
+LD = clang
+LDFLAGS = -pthread -fPIC
 
-vm_server: networkManager.o vm_server.o
-	gcc networkManager.o vm_server.o $(CFLAGS) -o vm_server_exe
+.PHONY: all
+all: release
 
-vm_client: networkManager.o vm_client.o
-	gcc networkManager.o vm_client.o $(CFLAGS) -o vm_client_exe
+# build types
+.PHONY: release
+.PHONY: debug
 
-pi_server: networkManager.o pi_server.o
-	gcc networkManager.o pi_server.o $(CFLAGS) -o pi_server_exe
+release: $(EXE_RELEASE)
+debug:   $(EXE_DEBUG)
 
-pi_client: networkManager.o pi_client.o
-	gcc networkManager.o pi_client.o $(CFLAGS) -o pi_client_exe
+# include dependencies
+-include $(OBJS_DIR)/*.d
 
+$(OBJS_DIR):
+	@mkdir -p $(OBJS_DIR)
 
-# Objects depend on these Libraries
-$(OBJ): $(INCL)
+# patterns to create objects
+# keep the debug and release postfix for object files so that we can always
+# separate them correctly
+$(OBJS_DIR)/%-release.o: %.c | $(OBJS_DIR)
+	$(CC) $(CFLAGS_RELEASE) $< -o $@
 
-# Create a gdb/dbx Capable Executable with DEBUG flags turned on
-debug:
-	$(CC) $(CFDEBUG) $(SRC)
+$(OBJS_DIR)/%-debug.o: %.c | $(OBJS_DIR)
+	$(CC) $(CFLAGS_DEBUG) $< -o $@
 
-# Clean Up Objects, Exectuables, Dumps out of source directory
+# exes
+# you will need a pair of exe and exe-debug targets for each exe
+$(EXE_RELEASE): $(OBJS:%.o=$(OBJS_DIR)/%-release.o)
+	$(LD) $^ $(LDFLAGS) -o $@
+
+$(EXE_DEBUG): $(OBJS:%.o=$(OBJS_DIR)/%-debug.o)
+	$(LD) $^ $(LDFLAGS) -o $@
+
+.PHONY: clean
 clean:
-	rm -rf *.o
+	rm -rf .objs $(EXE_RELEASE) $(EXE_DEBUG)
