@@ -63,6 +63,36 @@ node* traverseNodes(char* address) {
 //starting here -Andrew
 
 void addNode(int socketFd){
-  node* newNode = malloc(sizeof(node));
-  newNode->
+  node* newNode = (node*)malloc(sizeof(node));
+  newNode->socket_fd = socketFd;
+  newNode->alive = 1;
+  newNode->cur_load = 0;
+  newNode->taskNo = 0;
+  newNode->taskPos = 0;
+  newNode->next = NULL;
+  if(head == NULL){
+    head = newNode;
+    lastInList = newNode;
+  } else {
+    lastInList->next = newNode;
+    lastInList = newNode;
+  }
+}
+
+void removeNode(node* oldNode){
+  if(head == oldNode){
+    head = oldNode->next;
+    free(oldNode);
+  }
+  node* holder = head;
+  
+  while(holder != NULL){
+    if(holder->next == oldNode){
+      holder->next = oldNode->next;
+      free(oldNode);
+      exit(0);
+    }
+    holder = holder->next;
+  }
+  fprintf(stderr, "You tried removing an invalid node address: %p\n", oldNode);
 }

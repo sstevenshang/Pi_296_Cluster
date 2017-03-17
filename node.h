@@ -1,11 +1,12 @@
 #ifndef _NODE_H_
 #define _NODE_H_
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-#include "network.h"
+//#include "network.h"
 
 #define IS_MASTER 1
 #define IS_WORKER 0
@@ -45,7 +46,7 @@ node* lastInList;
 char* default_master_address = "192.168.1.1";
 
 void addNode(int socket_fd);
-
+void removeNode(node* oldNode);
 
 //node* construct_nodes();
 //int is_equal_address(char* a, char* b);
