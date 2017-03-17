@@ -16,4 +16,4 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
 
-void listenToHeartbeat(int socket_fd, int* stethoscope);
+void listenToHeartbeat(int* stethoscope);

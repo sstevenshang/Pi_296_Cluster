@@ -1,6 +1,4 @@
-#include "node.h"
-#include "networkManager.h"
-#include "heartbeat.h"
+#include "worker.h"
 
 /* SERVER FUNCTIONS */
 
