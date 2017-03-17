@@ -6,6 +6,7 @@
 #include <time.h>
 #include <pthread.h>
 #include "node.h"
+#include <unistd.h>
 
 int master_main(node* this_node);
 void reportHeartbeat(char* beat_addr);
