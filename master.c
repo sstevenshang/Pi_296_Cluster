@@ -1,31 +1,12 @@
 #include "master.h"
 
 /* MASTER FUNCTIONS */
+
 int runningM = 0;
 int clientIncomingFd = -1;
 char* defaultMasterPort = "9001";
+
 int master_main() {
-
-	// Spawn thread for heartbeat
-/*	pthread_t heartbeat_thread;
-	pthread_t stethoscope_thread;
-
-	int listen = 1;
-
-	pthread_create(&heartbeat_thread, NULL, listenToHeartbeatThread, &listen);
-	pthread_create(&stethoscope_thread, NULL, updateNodeStatusThread, &listen);
-
-	updateNodeStatusThread(&listen);
-
-	while(1) {
-		// Wait for task input
-		// Distribute task
-		// Spawn thread to send request
-	}
-
-	pthread_join(heartbeat_thread, NULL);
-	pthread_join(stethoscope_thread, NULL);
-*/
         setUpMaster(defaultMasterPort);
         runningM = 1;
         while(runningM == 1){
@@ -68,14 +49,17 @@ int setUpMaster(char* port){
 }
 
 int addAnyIncomingConnections(){
-  int client_fd = accept(clientIncomingFd, NULL, NULL);
-  if(client_fd != -1){  //found a connection
-    fprintf(stdout, "got something\n");
-    addNode(client_fd);
+
+  struct sockaddr_in clientname;
+  size_t size = sizeof(clientname);
+  int client_fd = accept(clientIncomingFd, (struct sockaddr *) &clientname, (socklen_t*) &size);
+  if(client_fd != -1){
+    char* client_address = strdup(inet_ntoa(clientname.sin_addr));
+    fprintf(stdout, "got incoming connection from %s\n", client_address);
+    addNode(client_fd, client_address);
     return client_fd;
   }
-  //fprintf(stdout, "no connections yet\n");
-    return client_fd;
+  return client_fd;
 }
 
 int cleanUpMaster(int socket){
@@ -120,46 +104,45 @@ int sendBinaryFile(int socket, char* name){
   close(file);
   return 0;
 }
-/*
+
+void listenToHeartbeat(void* keepalive) {
+
+  unsigned char buffer[BUFSIZE];
+  struct sockaddr_in clientAddr;
+  socklen_t addrlen = sizeof(clientAddr);
+  int byte_received = 0;
+  int socket_fd = setUpUDPClient();
+  int keep_listenning = *((int*)keepalive);
+
+  while(keep_listenning) {
+    byte_received = recvfrom(socket_fd, buffer, BUFSIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
+    if (byte_received < 0) {
+      perror("FAILED: failed to receive from client");
+    } else {
+      char* beat_addr = inet_ntoa(clientAddr.sin_addr);
+      reportHeartbeat(beat_addr);
+      printf("SUCCESS: received \"%s\" from %s\n", buffer, beat_addr);
+    }
+    keep_listenning = *((int*)load);
+  }
+  close(socket_fd);
+}
+
+int setUpUDPClient() {
+
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_fd < 0) {
+    perror("FAILED: unable to create socket");
+    return -1;
+  }
+  return socket_fd;
+}
+
 void reportHeartbeat(char* beat_addr) {
-	double time_received = getTime();
-	node* temp = traverseNodes(beat_addr);
-	temp->last_beat_received_time = time_received;
-}
-
-void* listenToHeartbeatThread(void* listen) {
-	listenToHeartbeat((int*)listen);
-	return NULL;
-}
-
-
-void* updateNodeStatusThread(void* listen) {
-
-	resetBeats();
-	double time;
-	while(*((int*)listen)) {
-		node* temp = head;
-		for (size_t i=0; i<node_counts; i++) {
-			if (temp->alive) {
-				time = getTime();
-				if ((time - temp->last_beat_received_time) > 9) {
-					temp->alive = IS_DEAD;
-				}
-				temp = temp->next;
-			}
-		}
-		sleep(2);
-	}
-	return NULL;
-}
-
-void resetBeats() {
-		node* temp = head;
-		for (size_t i=0; i<node_counts; i++) {
-			double time = getTime();
-			temp->last_beat_received_time = time;
-			temp = temp->next;
-		}
+  double time_received = getTime();
+  node* temp = searchNodeByAddr(beat_addr);
+  if (temp)
+    temp->last_beat_received_time = time_received;
 }
 
 double getTime() {
@@ -167,4 +150,37 @@ double getTime() {
   clock_gettime(CLOCK_MONOTONIC, &t);
   return t.tv_sec + 1e-9 * t.tv_nsec;
 }
-*/
+
+// void* updateNodeStatusThread(void* listen) {
+//   resetBeats();
+//   double time;
+//   while(*((int*)listen)) {
+//     node* temp = head;
+//     for (size_t i=0; i<node_counts; i++) {
+//       if (temp->alive) {
+//         time = getTime();
+//         if ((time - temp->last_beat_received_time) > 9) {
+//           temp->alive = IS_DEAD;
+//         }
+//         temp = temp->next;
+//       }
+//     }
+//     sleep(2);
+//   }
+//   return NULL;
+// }
+
+// void resetBeats() {
+//     node* temp = head;
+//     for (size_t i=0; i<node_counts; i++) {
+//       double time = getTime();
+//       temp->last_beat_received_time = time;
+//       temp = temp->next;
+//     }
+// }
+
+
+
+
+
+

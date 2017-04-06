@@ -4,21 +4,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 
-int setUpUDPClient() {
-
-	int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-
-	if (socket_fd < 0) {
-		perror("FAILED: unable to create socket");
-		return -1;
-	}
-
-	return socket_fd;
-}
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int setUpUDPServer() {
 
@@ -27,7 +18,6 @@ int setUpUDPServer() {
 		perror("FAILED: unable to create socket");
 		return -1;
 	}
-
 	struct sockaddr_in serverAddr;
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(SERVER_PORT);
@@ -43,13 +33,9 @@ int setUpUDPServer() {
 	return socket_fd;
 }
 
-void cleanupUDPSocket(int socket_fd) {
-	close(socket_fd);
-}
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 	int socket_fd = setUpUDPClient();
-	//int status;
 	while (*alive) {
 		sleep(3);
 		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
@@ -83,26 +69,3 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 	return 0;
 }
 
-void listenToHeartbeat(int* stethoscope) {
-
-	unsigned char buffer[BUFSIZE];
-	struct sockaddr_in clientAddr;
-	socklen_t addrlen = sizeof(clientAddr);
-	int byte_received = 0;
-	int socket_fd = setUpUDPClient();
-
-	while(*stethoscope) {
-
-		byte_received = recvfrom(socket_fd, buffer, BUFSIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
-		if (byte_received < 0) {
-			perror("FAILED: failed to receive from client");
-		} else {
-			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-			//char* beat_port = inet_ntoa(clientAddr.sin_port);
-
-			reportHeartbeat(beat_addr);
-			printf("SUCCESS: received \"%s\" from %s\n", buffer, beat_addr/*, beat_port*/);
-		}
-	}
-	cleanupUDPSocket(socket_fd);
-}
