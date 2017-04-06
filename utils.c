@@ -1,7 +1,7 @@
 #include "utils.h"
 
 //Credit: http://stackoverflow.com/questions/3769405/determining-cpu-utilization
-//Needs to be tested on linux
+//Needs to be tested on hardware
 double get_local_usage() {
   long double a[4], b[4], loadavg;
   FILE *fp;
@@ -27,6 +27,8 @@ double get_local_usage() {
 }
 
 //Another contender for this function
+//Needs to be tested on hardware
+//Credit: https://www.raspberrypi.org/forums/viewtopic.php?t=64835&p=479657 : should work on raspberrypi
 // double get_local_usage() {
 //    int FileHandler;
 //    char FileBuffer[1024];

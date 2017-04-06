@@ -7,6 +7,7 @@
 
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
+#define SERVER_IP4 "127.0.0.1"
 
 int setUpUDPClient() {
 
@@ -31,7 +32,7 @@ int setUpUDPServer() {
 	struct sockaddr_in serverAddr;
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(SERVER_PORT);
-	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP4);
 	memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
 
 	int status = bind(socket_fd, (struct  sockaddr*) &serverAddr, sizeof(serverAddr));
@@ -61,8 +62,8 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
-	char* message = "BEAT";
-	size_t length = strlen(message) + 1;
+	double cpu_usage = get_local_usage();
+	size_t length = sizeof(cpu_usage);
 
 	struct sockaddr_in serverAddr;
 

@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <sys/types.h>
+#include <utils.h>
 
 #include "master.h"
 
