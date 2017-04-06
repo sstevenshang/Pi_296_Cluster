@@ -4,22 +4,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 #define SERVER_IP4 "127.0.0.1"
 
-int setUpUDPClient() {
-
-	int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-
-	if (socket_fd < 0) {
-		perror("FAILED: unable to create socket");
-		return -1;
-	}
-
-	return socket_fd;
-}
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int setUpUDPServer() {
 
@@ -28,7 +19,6 @@ int setUpUDPServer() {
 		perror("FAILED: unable to create socket");
 		return -1;
 	}
-
 	struct sockaddr_in serverAddr;
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(SERVER_PORT);
@@ -44,13 +34,9 @@ int setUpUDPServer() {
 	return socket_fd;
 }
 
-void cleanupUDPSocket(int socket_fd) {
-	close(socket_fd);
-}
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 	int socket_fd = setUpUDPClient();
-	//int status;
 	while (*alive) {
 		sleep(3);
 		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
