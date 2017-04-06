@@ -62,7 +62,9 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
+	// char* message = "BEAT";
 	double cpu_usage = get_local_usage();
+	// size_t length = strlen(message) + 1;
 	size_t length = sizeof(cpu_usage);
 
 	struct sockaddr_in serverAddr;
@@ -86,7 +88,8 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
 void listenToHeartbeat(int* stethoscope) {
 
-	unsigned char buffer[BUFSIZE];
+	// unsigned char buffer[BUFSIZE];
+	double client_usage;
 	struct sockaddr_in clientAddr;
 	socklen_t addrlen = sizeof(clientAddr);
 	int byte_received = 0;
@@ -94,13 +97,12 @@ void listenToHeartbeat(int* stethoscope) {
 
 	while(*stethoscope) {
 
-		byte_received = recvfrom(socket_fd, buffer, BUFSIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
+		byte_received = recvfrom(socket_fd, &client_usage, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
 		if (byte_received < 0) {
 			perror("FAILED: failed to receive from client");
 		} else {
 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
 			//char* beat_port = inet_ntoa(clientAddr.sin_port);
-
 			reportHeartbeat(beat_addr);
 			printf("SUCCESS: received \"%s\" from %s\n", buffer, beat_addr/*, beat_port*/);
 		}
