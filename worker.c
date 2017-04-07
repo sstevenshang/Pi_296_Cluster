@@ -176,7 +176,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
   memset((char*)&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family = AF_INET;
   serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
-  serverAddr.sin_port = htons(destinationPort);
+  serverAddr.sin_port = htons(9010);
 
   printf("sending to %s:%s\n", destinationAddr, destinationPort);
   int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
