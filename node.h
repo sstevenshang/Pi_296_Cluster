@@ -19,18 +19,21 @@
 
 
 typedef struct node {
-
 	int socket_fd;
 	int alive;
-	int cur_load;
-    int taskNo;
-    int taskPos;
+  int taskNo;
+  int taskPos;
 
+	//Current CPU usage of the node
+	double cur_load;
+
+	//Last recieved heartbeat
 	double last_beat_received_time;
+
+	//Ip address of the node
 	char* address;
 
 	struct node* next;
-
 } node;
 
 extern node* head;

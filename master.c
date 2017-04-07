@@ -49,7 +49,6 @@ int setUpMaster(char* port){
 }
 
 int addAnyIncomingConnections(){
-
   struct sockaddr_in clientname;
   size_t size = sizeof(clientname);
   int client_fd = accept(clientIncomingFd, (struct sockaddr *) &clientname, (socklen_t*) &size);
@@ -71,7 +70,7 @@ int getFdForReadFile(char* name){
   FILE * read_fd = fopen(name, "rb");
   if(read_fd == NULL){
     fprintf(stderr, "Error opening file %s\n", name);
-    return -1; 
+    return -1;
   }
   return fileno(read_fd);
 }
@@ -106,8 +105,7 @@ int sendBinaryFile(int socket, char* name){
 }
 
 void listenToHeartbeat(void* keepalive) {
-
-  unsigned char buffer[BUFSIZE];
+  double client_usage;
   struct sockaddr_in clientAddr;
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
@@ -115,21 +113,21 @@ void listenToHeartbeat(void* keepalive) {
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {
-    byte_received = recvfrom(socket_fd, buffer, BUFSIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
+    byte_received = recvfrom(socket_fd, &client_usage, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
     if (byte_received < 0) {
       perror("FAILED: failed to receive from client");
     } else {
       char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-      reportHeartbeat(beat_addr);
-      printf("SUCCESS: received \"%s\" from %s\n", buffer, beat_addr);
+      reportHeartbeat(beat_addr, client_usage);
+      printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr);
     }
-    keep_listenning = *((int*)load);
+    //Not sure what this is, but causes a compile error
+    // keep_listenning = *((int*)load);
   }
   close(socket_fd);
 }
 
 int setUpUDPClient() {
-
   int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_fd < 0) {
     perror("FAILED: unable to create socket");
@@ -138,11 +136,13 @@ int setUpUDPClient() {
   return socket_fd;
 }
 
-void reportHeartbeat(char* beat_addr) {
+void reportHeartbeat(char* beat_addr, double client_usage) {
   double time_received = getTime();
-  node* temp = searchNodeByAddr(beat_addr);
-  if (temp)
-    temp->last_beat_received_time = time_received;
+  node* reported_node = searchNodeByAddr(beat_addr);
+  if (reported_node) {
+      reported_node->last_beat_received_time = time_received;
+      reported_node->cur_load = client_usage;
+  }
 }
 
 double getTime() {
@@ -178,9 +178,3 @@ double getTime() {
 //       temp = temp->next;
 //     }
 // }
-
-
-
-
-
-

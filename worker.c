@@ -11,7 +11,6 @@ char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-
 int server_main() {
     char tempBuf[100];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
@@ -32,8 +31,6 @@ int server_main() {
     cleanUpWorker(socketFd);
     return 0;
 }
-
-
 
 int setUpWorker(char* addr, char* port){
   int s;
@@ -73,7 +70,6 @@ int getFdForWriteFile(char* name){
   }
   return write_fd;
 }
-
 
 char* getBinaryFile(int socket, char* name){
   int file = getFdForWriteFile(name);
@@ -145,11 +141,10 @@ int setUpUDPServer() {
 	return socket_fd;
 }
 
-
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 	int socket_fd = setUpUDPClient();
 	while (*alive) {
-		sleep(3);
+    //Takes one second to compute
 		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
 			printf("Failed: failed to send heartbeat");
 		}
@@ -200,8 +195,8 @@ void listenToHeartbeat(int* stethoscope) {
 		} else {
 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
 			//char* beat_port = inet_ntoa(clientAddr.sin_port);
-			reportHeartbeat(beat_addr);
-			printf("SUCCESS: received \"%d\" from %s\n", buffer, beat_addr/*, beat_port*/);
+			reportHeartbeat(beat_addr, client_usage);
+			printf("SUCCESS: received \"%d\" from %s\n", client_usage, beat_addr/*, beat_port*/);
 		}
 	}
 	cleanupUDPSocket(socket_fd);

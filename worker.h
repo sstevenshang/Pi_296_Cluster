@@ -14,12 +14,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
-#include <utils.h>
 #include <unistd.h>
 
 //Our headers
 #include "master.h"
 #include "node.h"
+#include "utils.h"
 //#include "networkManager.h"
 
 extern int runningC;
