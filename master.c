@@ -65,7 +65,7 @@ int addAnyIncomingConnections(int incomingFd) {
     if (client_fd != -1) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);
-        addNode(client_fd, client_address);
+        addNode(client_fd, client_address, f);
         return client_fd;
     }
     return client_fd;

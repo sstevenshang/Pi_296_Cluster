@@ -36,10 +36,6 @@ typedef struct node {
 	struct node* next;
 } node;
 
-node *workerHead;
-node *clientHead;
-node *lastInList;
-
 void addNode(int socket_fd, char *address, node *head);
 void removeNode(node *oldNode, node *head);
 void cleanNode(node *to_free);
