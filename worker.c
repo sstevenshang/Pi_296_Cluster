@@ -163,7 +163,7 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
   int socket_fd = setUpUDPClient();
   while (*alive) {
     //Takes one second to compute
-    while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
+    if (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
       printf("Failed: failed to send heartbeat");
     }
   }
@@ -173,17 +173,16 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
   double cpu_usage = get_local_usage();
-  size_t length = sizeof(cpu_usage);
+  char message[50];
+  sprintf(message, "%f", cpu_usage);
 
   struct sockaddr_in serverAddr;
+  memset((char*)&servaddr, 0, sizeof(servaddr));
   serverAddr.sin_family = AF_INET;
   serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
   serverAddr.sin_port = inet_addr(destinationPort);
-  memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
 
-  socklen_t dest_len = sizeof(serverAddr);
-
-  int status = sendto(socket_fd, &cpu_usage, length, 0, (struct sockaddr*) &serverAddr, dest_len);
+  int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
   if (status < 0) {
     perror("FAILED: unable to send message to server");
     return -1;

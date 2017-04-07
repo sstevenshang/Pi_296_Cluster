@@ -157,7 +157,6 @@ int setUpUDPServer() {
 
 
 void* listenToHeartbeat(void* keepalive) {
-  double client_usage;
 
   struct sockaddr_in clientAddr;
   socklen_t addrlen = sizeof(clientAddr);
@@ -167,7 +166,9 @@ void* listenToHeartbeat(void* keepalive) {
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {
-    byte_received = recvfrom(socket_fd, &client_usage, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
+    char buffer[50];
+    byte_received = recvfrom(socket_fd, &buffer, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
+    double client_usage = atof(s);
     if (byte_received < 0) {
       perror("FAILED: failed to receive from client");
     } else {
