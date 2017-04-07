@@ -36,7 +36,7 @@ typedef struct node {
 	struct node* next;
 } node;
 
-void addNode(int socket_fd, char *address, node *head);
+void addNode(int socket_fd, char *address, node **head);
 void removeNode(node *oldNode, node *head);
 void cleanNode(node *to_free);
 void free_all_nodes();

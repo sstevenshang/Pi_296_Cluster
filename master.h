@@ -20,7 +20,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-
+#include "taskManager.h"
 extern int runningM;
 extern int client_incoming_fd;
 

@@ -24,7 +24,8 @@ int master_main() {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);
             addAnyIncomingConnections(incomingFdClient, 1);
-            //manageTask(workerList);
+//	if(workerList == NULL){puts("a");}
+            manageTask(workerList);
         } else {
             return -1;
         }
@@ -77,9 +78,9 @@ int addAnyIncomingConnections(int incomingFd, int mode) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);
         if (mode == 0) { // worker
-            addNode(client_fd, client_address, workerList);
+            addNode(client_fd, client_address, &workerList);
         } else {
-            addNode(client_fd, client_address, interfaceList);
+            addNode(client_fd, client_address, &interfaceList);
         }
         return client_fd;
     }

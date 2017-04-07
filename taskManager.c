@@ -1,4 +1,7 @@
+#include "taskManager.h"
 
+int messageBufSize = 4096;
+char messageBuf[4096];
 
 
 void manageTask(node* head){
@@ -6,6 +9,7 @@ void manageTask(node* head){
 
   node* tmp = head;
   while(tmp != NULL){
+//    puts("hitTask");
     if(tmp->taskNo == 0){ //no task assigned
       
     } else if(tmp->taskNo == 1){
@@ -29,10 +33,31 @@ void manageTask(node* head){
   }
 }
 
+int getMessageType(char* header){
+  unsigned char headerByte = *header;
+//  fprintf(stdout, "gotten headerbyte is %d\n", (int)headerByte);
+  int type = 7;
+  while(type != 0){
+    if((headerByte & 0x80) == 0x80){
+      if(((headerByte >> (7-type))& 0x01) == 0x01){
+  //      fprintf(stdout, "in getMessageType, returning %d\n", type);
+        return type;
+      }
+        return -1;
+    }
+    headerByte = headerByte << 1;
+    type --;
+  }
+  return 0;
+
+}
+
 void handleTaskOne(node* task){
-  //expects a message
   
-  //sends 
+  //expects a message RECEIVEME
+  
+  //sends RECEIVED
+  //recieves READY
 }
 
 void handleTaskTwo(node* task){

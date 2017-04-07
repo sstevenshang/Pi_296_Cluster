@@ -23,10 +23,10 @@
   bit7:  error
 
 
-
+*/
 
 void manageTask(node* head);
-
+int getMessageType(char* header);
 
 void handleTaskOne(node* task);
 void handleTaskTwo(node* task);
