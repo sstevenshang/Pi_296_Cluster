@@ -1,7 +1,9 @@
 #include "node.h"
 
 void addNode(int socketFd, char *address, node **head) {
-    node *newNode = (node *)malloc(sizeof(node));
+
+    node *newNode = malloc(sizeof(node));
+
     newNode->socket_fd = socketFd;
     newNode->alive = 1;
     newNode->cur_load = 0;
@@ -10,12 +12,17 @@ void addNode(int socketFd, char *address, node **head) {
     newNode->next = NULL;
     newNode->address = address;
     newNode->last_beat_received_time = 0;
-    if(*head == NULL){*head = newNode; return ;}
-    node* tmp = *head;
-    node* tmpNext = tmp->next;
-    while(tmpNext != NULL){ tmpNext = tmpNext->next;}
-    tmpNext = newNode;
-    puts("hit");
+
+    if(*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    node* temp = *head;
+    while(temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
 }
 
 void removeNode(node *oldNode, node *head) {
