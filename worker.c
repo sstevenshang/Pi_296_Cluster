@@ -177,7 +177,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
   sprintf(message, "%f", cpu_usage);
 
   struct sockaddr_in serverAddr;
-  memset((char*)&servaddr, 0, sizeof(servaddr));
+  memset((char*)&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family = AF_INET;
   serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
   serverAddr.sin_port = inet_addr(destinationPort);
