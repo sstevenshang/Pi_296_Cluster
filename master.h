@@ -25,7 +25,7 @@ extern int runningM;
 extern int client_incoming_fd;
 
 int master_main();
-int addAnyIncomingConnections();
+int addAnyIncomingConnections(int incomingFd, int mode);
 int getFdForReadFile(char* name);
 int setUpMaster(char* port);
 int cleanUpMaster(int socket);

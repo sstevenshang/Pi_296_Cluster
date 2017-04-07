@@ -35,8 +35,8 @@ int master_main() {
     runningM = 1;
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
-            addAnyIncomingConnections(incomingFdWorker);
-            addAnyIncomingConnections(incomingFdClient);
+            addAnyIncomingConnections(incomingFdWorker, 0);
+            addAnyIncomingConnections(incomingFdClient, 1);
             //manageTask(workerList);
         } else {
             return -1;
@@ -95,7 +95,7 @@ int setUpMaster(char* port){
   return socket_fd;
 }
 
-int addAnyIncomingConnections(int incomingFd) {
+int addAnyIncomingConnections(int incomingFd, int mode) {
     struct sockaddr_in clientname;
     size_t size = sizeof(clientname);
     int client_fd = accept(incomingFd, (struct sockaddr *)&clientname,
@@ -103,7 +103,11 @@ int addAnyIncomingConnections(int incomingFd) {
     if (client_fd != -1) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);
-        addNode(client_fd, client_address, f);
+        if (mode == 0) { // worker
+            addNode(client_fd, client_address, workerList);
+        } else {
+            addNode(client_fd, client_address, interfaceList);
+        }
         return client_fd;
     }
     return client_fd;
