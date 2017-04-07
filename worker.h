@@ -41,6 +41,5 @@ int setUpUDPClient();
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
 double get_local_usage();
-char* get_local_addr();
 
 #endif

@@ -167,8 +167,8 @@ void* listenToHeartbeat(void* keepalive) {
 
   while(keep_listenning) {
     char buffer[50];
-    byte_received = recvfrom(socket_fd, &buffer, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
-    double client_usage = atof(s);
+    byte_received = recvfrom(socket_fd, &buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddr, &addrlen);
+    double client_usage = atof(buffer);
     if (byte_received < 0) {
       perror("FAILED: failed to receive from client");
     } else {
