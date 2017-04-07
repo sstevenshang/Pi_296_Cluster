@@ -6,22 +6,37 @@
 
 /* SERVER FUNCTIONS */
 int runningC = 0;
-char* defaultClientPort = "9001";
-char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
+static char* defaultClientPort = "9001";
+static char* heartbeat_port_listener = "9010";
+static int alive = 1;
+//Buffer to hold master name/ IP
+static char master_addr[1024];
 int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
-char* master_addr;
 pthread_t heartbeat_thread;
 
+//Asynchronously wait on child processes
+void cleanup(int signal) {
+  (void) signal;
+  while (waitpid((pid_t) (-1), 0, WNOHANG) > 0) {}
+}
+
 int server_main() {
-    char tempBuf[100];
+    //Asynchronously wait on any child processes
+    signal(SIGCHLD, cleanup);
+    char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
+    char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
-    size_t bytesRead = read(fileno(stdin), tempBuf, 99);
+    size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
     tempBuf[bytesRead] = '\0';
-    if(bytesRead == 1){ strcpy(tempBuf, defaultMaster);}
-    master_addr = strdup(tempBuf);
+    if(bytesRead == 1) {
+      strcpy(master_addr, "sp17-cs241-005.cs.illinois.edu");
+    } else {
+      strcpy(master_addr, tempBuf);
+    }
+
     socketFd = setUpWorker(tempBuf, defaultClientPort);
+
     if(socketFd == -1){
       fprintf(stderr, "Failed connection, try again later\n");
       return 0;
@@ -128,11 +143,11 @@ void resetPipeClient(int socket){
   read(socket, NULL, 0);
 }
 
-
 // HEARTBEAT CODE
-
 void* spwan_heartbeat(void* load) {
-  heartbeat(master_addr, defaultClientPort, 1);
+  heartbeat(master_addr, heartbeat_port_listener, &alive);
+  (void) load;
+  return NULL;
 }
 
 int setUpUDPClient() {
@@ -145,7 +160,7 @@ int setUpUDPClient() {
 }
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
-  int socket_fd = setUpUDPServer();
+  int socket_fd = setUpUDPClient();
   while (*alive) {
     //Takes one second to compute
     while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
@@ -199,10 +214,3 @@ double get_local_usage() {
 
   return loadavg;
 }
-
-
-
-
-
-
-

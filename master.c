@@ -5,20 +5,46 @@
 int runningM = 0;
 int clientIncomingFd = -1;
 char* defaultMasterPort = "9001";
+char* master_ip;
+int keepalive = 1;
+static pthread_t heart_beat_lister_thread;
 
 int master_main() {
-        setUpMaster(defaultMasterPort);
-        runningM = 1;
-        while(runningM == 1){
-          addAnyIncomingConnections();
-        }
-        cleanUpMaster(clientIncomingFd);
+  setUpMaster(defaultMasterPort);
+  runningM = 1;
+
+  //Spawn the heart_beat_lister_thread
+  pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+
+  while(runningM == 1){
+    addAnyIncomingConnections();
+  }
+
+  //Join the heart_beat_lister_thread with the main thread
+  pthread_join(heart_beat_lister_thread, NULL);
+
+  cleanUpMaster(clientIncomingFd);
 	return 0;
+}
+
+// @param socket_fd = the TCP socket we created ealier
+char* get_local_addr(int socket_fd) {
+
+ 	struct ifreq ifr;
+	ifr.ifr_addr.sa_family = AF_INET;
+
+	strncpy(ifr.ifr_name, "etho0", IFNAMSIZ-1);
+	ioctl(socket_fd, SIOCGIFADDR, &ifr);
+	char* addr = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
+	printf("my local address is: %s\n", addr);
+	return addr;
 }
 
 int setUpMaster(char* port){
   int s;
   int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+  master_ip = get_local_addr(socket_fd);
+  master_ip = "128.174.11.96";
   struct addrinfo hints, *result;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
@@ -130,15 +156,14 @@ int setUpUDPServer(char* master_addr, char* master_port) {
 }
 
 
-void listenToHeartbeat(void* keepalive) {
-
+void* listenToHeartbeat(void* keepalive) {
   double client_usage;
 
   struct sockaddr_in clientAddr;
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
 
-  int socket_fd = setUpUDPServer();
+  int socket_fd = setUpUDPServer(master_ip, "9010");
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {
@@ -152,6 +177,7 @@ void listenToHeartbeat(void* keepalive) {
     }
   }
   close(socket_fd);
+  return NULL;
 }
 
 void reportHeartbeat(char* beat_addr, double client_usage) {
@@ -168,8 +194,3 @@ double getTime() {
   clock_gettime(CLOCK_MONOTONIC, &t);
   return t.tv_sec + 1e-9 * t.tv_nsec;
 }
-
-
-
-
-

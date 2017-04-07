@@ -7,11 +7,14 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <net/if.h>
 #include <pthread.h>
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -34,7 +37,7 @@ void reportHeartbeat(char* beat_addr, double client_usage);
 //Gets the current time
 double getTime();
 int setUpUDPServer(char* master_addr, char* master_port);
-void listenToHeartbeat(void* keepalive);
+void* listenToHeartbeat(void* keepalive);
 void reportHeartbeat(char* beat_addr, double client_usage);
 
 #endif
