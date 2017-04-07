@@ -9,16 +9,6 @@ char* defaultInterfacePort = "6789";
 node* workerList = NULL;
 node* interfaceList = NULL;
 int master_main() {
-<<<<<<< HEAD
-        int clientIncomingFd = setUpMaster(defaultMasterPort);
-	int interfaceIncomingFd = setUpMaster(defaultInterfacePort);
-        runningM = 1;
- 	
-        while(runningM == 1){
-          addAnyIncomingConnections(clientIncomingFd, workerList);
-	  addAnyIncomingConnections(interfaceIncomingFd, interfaceList);
-          manageTask(workerList);
-=======
     int incomingFdWorker = setUpMaster("defaultMasterPort");
     int incomingFdClient = setUpMaster("1024");
     runningM = 1;
@@ -26,9 +16,9 @@ int master_main() {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker);
             addAnyIncomingConnections(incomingFdClient);
+            //manageTask(workerList);
         } else {
             return -1;
->>>>>>> 57d3751c6dabe2558f89ac06c64288a3051ff9c7
         }
     }
     cleanUpMaster(incomingFdWorker);
@@ -188,8 +178,3 @@ double getTime() {
   clock_gettime(CLOCK_MONOTONIC, &t);
   return t.tv_sec + 1e-9 * t.tv_nsec;
 }
-
-
-
-
-

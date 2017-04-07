@@ -1,10 +1,11 @@
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "node.h"
 // #include "server.h"
 #include "master.h"
 #include "worker.h"
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "interface.c"
 //Need to write server.h, server.c, and this function server_main somewhere
 /*void server_main(node* n) {
 	(void) n;
@@ -24,7 +25,7 @@ int main(int argc, char const *argv[])
     }
     buf[2] = '\0';
     if (strcmp("0\n", buf) == 0) {
-        interface_main();
+        interface_main(argc, argv);
 	} else if (strcmp("1\n", buf) == 0) {
 		master_main();
 	} else if(strcmp("2\n", buf) == 0) {
