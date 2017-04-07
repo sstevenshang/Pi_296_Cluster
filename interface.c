@@ -8,7 +8,7 @@ void print_usage();
 
 int main(int argc, char const *argv[]) {
 	printf("1234\n");
-	wait_for_input();
+	wait_for_input(argv);
 	printf("2345\n");
 	return 0;
 }
@@ -17,7 +17,7 @@ void print_usage(char const *argv[]) {
 	printf("usage: ./%s [executable]\n", argv[0]);
 }
 
-int wait_for_input() {
+int wait_for_input(char const *argv[]) {
 
 	char* buffer = NULL;
 	size_t size = 0;
