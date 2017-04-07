@@ -19,23 +19,23 @@ void addNode(int socketFd, char *address, node **head) {
 }
 
 void removeNode(node *oldNode, node *head) {
+
     if (head == oldNode) {
         head = oldNode->next;
         cleanNode(oldNode);
+        return;
     }
-    node *holder = head;
 
+    node *holder = head;
     while (holder != NULL) {
         if (holder->next == oldNode) {
             holder->next = oldNode->next;
             cleanNode(oldNode);
-            // exit(0);
             return;
         }
         holder = holder->next;
     }
-    fprintf(stderr, "You tried removing an invalid node address: %p\n",
-        oldNode);
+    fprintf(stderr, "You tried removing an invalid node address: %p\n",oldNode);
 }
 
 void cleanNode(node* to_free) {

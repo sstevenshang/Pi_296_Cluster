@@ -218,6 +218,8 @@ void* keepNodesInCheck(void* load) {
                     printf("node %s is dead\n", cur->address);
                     cur->alive = 0;
                     removeNode(cur, workerList);
+                    cur = workerList;
+                    continue;
                 }
             }
             cur = cur->next;
