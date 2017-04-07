@@ -13,6 +13,9 @@ int keepalive = 1;
 static pthread_t heart_beat_lister_thread;
 
 int master_main() {
+
+    master_ip = get_local_addr();
+
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
@@ -44,16 +47,16 @@ char* get_local_addr() {
 
 	strncpy(ifr.ifr_name, "etho0", IFNAMSIZ-1);
 	ioctl(_fd, SIOCGIFADDR, &ifr);
-	char* addr = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-	printf("my local address is: %s\n", addr);
+	char* addr = strdup(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+  printf("my local address is: %s\n", addr);
   close(_fd);
+
 	return addr;
 }
 
 int setUpMaster(char* port){
   int s;
   int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-  master_ip = get_local_addr();
   //master_ip = "128.174.11.96";
   struct addrinfo hints, *result;
   memset(&hints, 0, sizeof(struct addrinfo));
