@@ -104,12 +104,41 @@ int sendBinaryFile(int socket, char* name){
   return 0;
 }
 
+// HEART_BEAT CODE
+
+int setUpUDPServer(char* master_addr, char* master_port) {
+
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_fd < 0) {
+    perror("FAILED: unable to create socket");
+    return -1;
+  }
+
+  struct sockaddr_in serverAddr;
+  serverAddr.sin_family = AF_INET;
+  serverAddr.sin_port = htons(master_port);
+  serverAddr.sin_addr.s_addr = inet_addr(master_addr);
+  memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
+
+  int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
+  if (status < 0) {
+    perror("FAILED: unable to bind socket");
+    return -1;
+  }
+
+  return socket_fd;
+}
+
+
 void listenToHeartbeat(void* keepalive) {
+
   double client_usage;
+
   struct sockaddr_in clientAddr;
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
-  int socket_fd = setUpUDPClient();
+
+  int socket_fd = setUpUDPServer();
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {
@@ -121,19 +150,8 @@ void listenToHeartbeat(void* keepalive) {
       reportHeartbeat(beat_addr, client_usage);
       printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr);
     }
-    //Not sure what this is, but causes a compile error
-    // keep_listenning = *((int*)load);
   }
   close(socket_fd);
-}
-
-int setUpUDPClient() {
-  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (socket_fd < 0) {
-    perror("FAILED: unable to create socket");
-    return -1;
-  }
-  return socket_fd;
 }
 
 void reportHeartbeat(char* beat_addr, double client_usage) {
@@ -151,30 +169,7 @@ double getTime() {
   return t.tv_sec + 1e-9 * t.tv_nsec;
 }
 
-// void* updateNodeStatusThread(void* listen) {
-//   resetBeats();
-//   double time;
-//   while(*((int*)listen)) {
-//     node* temp = head;
-//     for (size_t i=0; i<node_counts; i++) {
-//       if (temp->alive) {
-//         time = getTime();
-//         if ((time - temp->last_beat_received_time) > 9) {
-//           temp->alive = IS_DEAD;
-//         }
-//         temp = temp->next;
-//       }
-//     }
-//     sleep(2);
-//   }
-//   return NULL;
-// }
 
-// void resetBeats() {
-//     node* temp = head;
-//     for (size_t i=0; i<node_counts; i++) {
-//       double time = getTime();
-//       temp->last_beat_received_time = time;
-//       temp = temp->next;
-//     }
-// }
+
+
+

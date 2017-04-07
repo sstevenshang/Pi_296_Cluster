@@ -11,12 +11,15 @@ char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
+char* master_addr;
+
 int server_main() {
     char tempBuf[100];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 99);
     tempBuf[bytesRead] = '\0';
     if(bytesRead == 1){ strcpy(tempBuf, defaultMaster);}
+    master_addr = strdup(tempBuf);
     socketFd = setUpWorker(tempBuf, defaultClientPort);
     if(socketFd == -1){
       fprintf(stderr, "Failed connection, try again later\n");
@@ -119,6 +122,10 @@ void resetPipeClient(int socket){
   read(socket, NULL, 0);
 }
 
+void* spwan_heartbeat(void* load) {
+  heartbeat(master_addr, defaultClientPort, 1);
+}
+
 int setUpUDPServer() {
 
 	int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -142,18 +149,14 @@ int setUpUDPServer() {
 }
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
-	int socket_fd = setUpUDPClient();
+	int socket_fd = setUpUDPServer();
 	while (*alive) {
     //Takes one second to compute
 		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
 			printf("Failed: failed to send heartbeat");
 		}
 	}
-	cleanupUDPSocket(socket_fd);
-}
-
-void cleanupUDPSocket(int socket_fd) {
-  //TODO
+  close(socket_fd);
 }
 
 double get_local_usage() {
@@ -206,26 +209,3 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 	return 0;
 }
 
-// void listenToHeartbeat(int* stethoscope) {
-//
-// 	// unsigned char buffer[BUFSIZE];
-// 	double client_usage;
-// 	struct sockaddr_in clientAddr;
-// 	socklen_t addrlen = sizeof(clientAddr);
-// 	int byte_received = 0;
-// 	int socket_fd = setUpUDPClient();
-//
-// 	while(*stethoscope) {
-//
-// 		byte_received = recvfrom(socket_fd, &client_usage, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
-// 		if (byte_received < 0) {
-// 			perror("FAILED: failed to receive from client");
-// 		} else {
-// 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-// 			//char* beat_port = inet_ntoa(clientAddr.sin_port);
-// 			reportHeartbeat(beat_addr, client_usage);
-// 			printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr/*, beat_port*/);
-// 		}
-// 	}
-// 	cleanupUDPSocket(socket_fd);
-// }

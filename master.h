@@ -33,8 +33,8 @@ void reportHeartbeat(char* beat_addr, double client_usage);
 
 //Gets the current time
 double getTime();
-
-//Returns the fd for a UDP client
-int setUpUDPClient();
+int setUpUDPServer(char* master_addr, char* master_port);
+void listenToHeartbeat(void* keepalive);
+void reportHeartbeat(char* beat_addr, double client_usage);
 
 #endif

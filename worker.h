@@ -16,10 +16,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//Our headers
 #include "master.h"
 #include "node.h"
-//#include "networkManager.h"
 
 extern int runningC;
 extern int socketFd;
@@ -38,9 +36,7 @@ void resetPipeClient(int socket);
 double get_local_usage();
 
 //heartbeat functions
-int setUpUDPClient();
 int setUpUDPServer();
-void cleanupUDPSocket(int socket_fd);
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
 void cleanupUDPSocket(int socket_fd);
