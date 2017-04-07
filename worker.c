@@ -168,7 +168,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
 	socklen_t dest_len = sizeof(serverAddr);
 
-	int status = sendto(socket_fd, cpu_usage, length, 0, (struct sockaddr*) &serverAddr, dest_len);
+	int status = sendto(socket_fd, &cpu_usage, length, 0, (struct sockaddr*) &serverAddr, dest_len);
 
 	if (status < 0) {
 		perror("FAILED: unable to send message to server");
