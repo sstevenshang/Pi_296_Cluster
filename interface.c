@@ -2,32 +2,31 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "node.h"
+#include "master.h"
+#include "worker.h"
 
 int wait_for_input();
 void print_usage();
 
-int main(int argc, char const *argv[]) {
-	printf("1234\n");
-	wait_for_input();
-	printf("2345\n");
+int interface_main(int argc, char const *argv[]) {
+	wait_for_input(argv);
 	return 0;
 }
 
 void print_usage(char const *argv[]) {
-	printf("usage: ./%s [executable]\n", argv[0]);
+	printf("usage: %s [executable]\n", argv[0]);
 }
 
 int wait_for_input(char const *argv[]) {
 	char* buffer = NULL;
 	size_t size = 0;
 	size_t i = 0;
+	master_main();
 	printf("Enter executable name: ");
 	while((i = getline(&buffer, &size, stdin)) > 0) {
-printf("1\n");
 		buffer[i - 1] = 0;
-printf("2\n");
-		puts(buffer);
-printf("3\n");
+		printf("You entered: %s\n", buffer);
 		if (access(buffer, X_OK) == 0) {
 			// execute(buffer);
 			printf("executing %s\n", buffer);
