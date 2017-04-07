@@ -182,6 +182,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
   serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
   serverAddr.sin_port = htons(destinationPort);
 
+  printf("sending to %s:%s\n", destinationAddr, destinationPort);
   int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
   if (status < 0) {
     perror("FAILED: unable to send message to server");
