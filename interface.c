@@ -13,6 +13,10 @@ int main(int argc, char const *argv[]) {
 	return 0;
 }
 
+void print_usage(char const *argv[]) {
+	printf("usage: ./%s [executable]\n", argv[0]);
+}
+
 int wait_for_input() {
 
 	char* buffer = NULL;
@@ -32,8 +36,4 @@ int wait_for_input() {
 		size = 0;
 	}
 	return 0;
-}
-
-void print_usage(char const *argv[]) {
-	printf("usage: ./%s [executable]\n", argv[0]);
 }
