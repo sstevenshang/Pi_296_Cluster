@@ -5,7 +5,7 @@ EXE_RELEASE = key_lime_cluster
 EXE_DEBUG = $(EXE_RELEASE)-debug
 
 # list object file dependencies for each
-OBJS = main.o master.o node.o worker.o
+OBJS = interface.o master.o node.o worker.o
 
 # set up compiler
 CC = clang
