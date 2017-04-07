@@ -10,28 +10,33 @@ node* workerList = NULL;
 node* interfaceList = NULL;
 char* master_ip;
 int keepalive = 1;
-static pthread_t heart_beat_lister_thread;
+pthread_t heart_beat_lister_thread;
+pthread_t node_checking_thread;
+pthread_mutex_t node_list_m = PTHREAD_MUTEX_INITIALIZER;
 
 int master_main() {
 
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
-    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat,
-        &keepalive);
+    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+    pthread_create(&node_checking_thread, NULL, keepNodesInCheck, NULL);
 
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);
             addAnyIncomingConnections(incomingFdClient, 1);
-//	if(workerList == NULL){puts("a");}
+            pthread_mutex_lock(&node_list_m);
             manageTask(workerList);
+            pthread_mutex_unlock(&node_list_m);
         } else {
             return -1;
         }
     }
     //Join the heart_beat_lister_thread with the main thread
     pthread_join(heart_beat_lister_thread, NULL);
+    pthread_join(node_checking_thread, NULL);
+    pthread_destroy(&node_list_m);
     cleanUpMaster(incomingFdWorker);
     cleanUpMaster(incomingFdClient);
 	  return 0;
@@ -78,7 +83,9 @@ int addAnyIncomingConnections(int incomingFd, int mode) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);
         if (mode == 0) { // worker
+            pthread_mutex_lock(&node_list_m);
             addNode(client_fd, client_address, &workerList);
+            pthread_mutex_unlock(&node_list_m);
         } else {
             addNode(client_fd, client_address, &interfaceList);
         }
@@ -183,11 +190,13 @@ void* listenToHeartbeat(void* keepalive) {
 
 void reportHeartbeat(char* beat_addr, double client_usage) {
   double time_received = getTime();
+  pthread_mutex_lock(&node_list_m);
   node *reported_node = searchNodeByAddr(beat_addr, workerList);
   if (reported_node) {
       reported_node->last_beat_received_time = time_received;
       reported_node->cur_load = client_usage;
   }
+  pthread_mutex_unlock(&node_list_m);
 }
 
 double getTime() {
@@ -200,11 +209,12 @@ void* keepNodesInCheck(void* load) {
     int keep = 1;
     double cur_time;
     while(keep) {
+        pthread_mutex_lock(&node_list_m);
         node* cur = workerList; // head
         while (cur != NULL) {
             cur_time = getTime();
             if (cur->last_beat_received_time != 0) {
-                if (cur_time - cur->last_beat_received_time > 5) {
+                if (cur_time - cur->last_beat_received_time > 5.0) {
                     printf("node %s is dead\n", cur->address);
                     cur->alive = 0;
                     removeNode(cur, workerList);
@@ -212,7 +222,8 @@ void* keepNodesInCheck(void* load) {
             }
             cur = cur->next;
         }
-        sleep(1);
+        pthread_mutex_unlock(&node_list_m);
+        sleep(2);
     }
     return NULL;
 }
