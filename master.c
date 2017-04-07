@@ -39,18 +39,17 @@ int master_main() {
 	  return 0;
 }
 
-// @param socket_fd = the TCP socket we created ealier
 char* get_local_addr() {
 
-  int _fd = socket(AF_INET, SOCK_DGRAM, 0);
+    int _fd = socket(AF_INET, SOCK_DGRAM, 0);
  	struct ifreq ifr;
 	ifr.ifr_addr.sa_family = AF_INET;
 
 	strncpy(ifr.ifr_name, "etho0", IFNAMSIZ-1);
 	ioctl(_fd, SIOCGIFADDR, &ifr);
 	char* addr = strdup(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
-  printf("my local address is: %s\n", addr);
-  close(_fd);
+    printf("my local address is: %s\n", addr);
+    close(_fd);
 
 	return addr;
 }
