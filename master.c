@@ -46,6 +46,7 @@ char* get_local_addr() {
 	ioctl(_fd, SIOCGIFADDR, &ifr);
 	char* addr = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 	printf("my local address is: %s\n", addr);
+  close(_fd);
 	return addr;
 }
 

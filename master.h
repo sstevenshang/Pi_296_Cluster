@@ -31,10 +31,8 @@ int setUpMaster(char* port);
 int cleanUpMaster(int socket);
 int sendBinaryFile(int socket, char* name);
 
-//Called by master to report the heartbeat, update usage statistics
 void reportHeartbeat(char* beat_addr, double client_usage);
-
-//Gets the current time
+char* get_local_addr();
 double getTime();
 int setUpUDPServer(char* master_addr, char* master_port);
 void* listenToHeartbeat(void* keepalive);
