@@ -152,6 +152,34 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 	cleanupUDPSocket(socket_fd);
 }
 
+void cleanupUDPSocket(int socket_fd) {
+  //TODO
+}
+
+double get_local_usage() {
+  long double a[4], b[4], loadavg;
+  FILE *fp;
+
+  fp = fopen("/proc/stat","r");
+  if (!fp) {
+    return -1;
+  }
+  fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&a[0],&a[1],&a[2],&a[3]);
+  fclose(fp);
+  sleep(1);
+
+  fp = fopen("/proc/stat","r");
+  if (!fp) {
+    return -1;
+  }
+  fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&b[0],&b[1],&b[2],&b[3]);
+  fclose(fp);
+
+  loadavg = ((b[0]+b[1]+b[2]) - (a[0]+a[1]+a[2])) / ((b[0]+b[1]+b[2]+b[3]) - (a[0]+a[1]+a[2]+a[3]));
+
+  return loadavg;
+}
+
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
 	// char* message = "BEAT";
@@ -178,26 +206,26 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 	return 0;
 }
 
-void listenToHeartbeat(int* stethoscope) {
-
-	// unsigned char buffer[BUFSIZE];
-	double client_usage;
-	struct sockaddr_in clientAddr;
-	socklen_t addrlen = sizeof(clientAddr);
-	int byte_received = 0;
-	int socket_fd = setUpUDPClient();
-
-	while(*stethoscope) {
-
-		byte_received = recvfrom(socket_fd, &client_usage, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
-		if (byte_received < 0) {
-			perror("FAILED: failed to receive from client");
-		} else {
-			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-			//char* beat_port = inet_ntoa(clientAddr.sin_port);
-			reportHeartbeat(beat_addr, client_usage);
-			printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr/*, beat_port*/);
-		}
-	}
-	cleanupUDPSocket(socket_fd);
-}
+// void listenToHeartbeat(int* stethoscope) {
+//
+// 	// unsigned char buffer[BUFSIZE];
+// 	double client_usage;
+// 	struct sockaddr_in clientAddr;
+// 	socklen_t addrlen = sizeof(clientAddr);
+// 	int byte_received = 0;
+// 	int socket_fd = setUpUDPClient();
+//
+// 	while(*stethoscope) {
+//
+// 		byte_received = recvfrom(socket_fd, &client_usage, sizeof(client_usage), 0, (struct sockaddr*)&clientAddr, &addrlen);
+// 		if (byte_received < 0) {
+// 			perror("FAILED: failed to receive from client");
+// 		} else {
+// 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
+// 			//char* beat_port = inet_ntoa(clientAddr.sin_port);
+// 			reportHeartbeat(beat_addr, client_usage);
+// 			printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr/*, beat_port*/);
+// 		}
+// 	}
+// 	cleanupUDPSocket(socket_fd);
+// }
