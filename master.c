@@ -155,17 +155,6 @@ int setUpUDPServer() {
   return socket_fd;
 }
 
-34    for (i=0; i<NPACK; i++) {
-35      if (recvfrom(s, buf, BUFLEN, 0, &si_other, &slen)==-1)
-36        diep("recvfrom()");
-37      printf("Received packet from %s:%d\nData: %s\n\n",
-38             inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port), buf);
-39    }
-40
-41    close(s);
-42    return 0;
-43 }
-
 void* listenToHeartbeat(void* keepalive) {
 
   struct sockaddr_in clientAddr;
