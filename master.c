@@ -16,7 +16,8 @@ int master_main() {
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
-    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat,
+        &keepalive);
 
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
@@ -194,7 +195,7 @@ void* listenToHeartbeat(void* keepalive) {
 
 void reportHeartbeat(char* beat_addr, double client_usage) {
   double time_received = getTime();
-  node* reported_node = searchNodeByAddr(beat_addr);
+  node *reported_node = searchNodeByAddr(beat_addr, workerList);
   if (reported_node) {
       reported_node->last_beat_received_time = time_received;
       reported_node->cur_load = client_usage;

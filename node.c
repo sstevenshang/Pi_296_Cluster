@@ -1,22 +1,22 @@
 #include "node.h"
 
-void addNode(int socketFd, char* address, node *head) {
-  node* newNode = (node*)malloc(sizeof(node));
-  newNode->socket_fd = socketFd;
-  newNode->alive = 1;
-  newNode->cur_load = 0;
-  newNode->taskNo = 0;
-  newNode->taskPos = 0;
-  newNode->next = NULL;
-  newNode->address = address;
-  newNode->last_beat_received_time = 0;
-  if(head == NULL){
-    head = newNode;
-    lastInList = newNode;
-  } else {
-    lastInList->next = newNode;
-    lastInList = newNode;
-  }
+void addNode(int socketFd, char *address, node *head) {
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->socket_fd = socketFd;
+    newNode->alive = 1;
+    newNode->cur_load = 0;
+    newNode->taskNo = 0;
+    newNode->taskPos = 0;
+    newNode->next = NULL;
+    newNode->address = address;
+    newNode->last_beat_received_time = 0;
+    if(head == NULL){
+        head = newNode;
+        // lastInList = newNode;
+    }/* else {
+        lastInList->next = newNode;
+        lastInList = newNode;
+    }*/
 }
 
 void removeNode(node *oldNode, node *head) {
