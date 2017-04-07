@@ -34,7 +34,8 @@ void removeNode(node* oldNode){
     if(holder->next == oldNode){
       holder->next = oldNode->next;
       cleanNode(oldNode);
-      exit(0);
+      // exit(0);
+      return;
     }
     holder = holder->next;
   }
@@ -44,6 +45,15 @@ void removeNode(node* oldNode){
 void cleanNode(node* to_free) {
   free(to_free->address);
   free(to_free);
+}
+
+void free_all_nodes() {
+  node* iter = head;
+  while (iter) {
+    node* temp = iter->next;
+    cleanNode(iter);
+    iter = temp;
+  }
 }
 
 node* searchNodeByAddr(char* beat_addr) {

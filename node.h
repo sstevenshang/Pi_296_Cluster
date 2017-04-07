@@ -42,6 +42,7 @@ extern node* lastInList;
 void addNode(int socket_fd, char* address);
 void removeNode(node* oldNode);
 void cleanNode(node* to_free);
+void free_all_nodes();
 node* searchNodeByAddr(char* beat_addr);
 
 #endif
