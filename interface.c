@@ -14,7 +14,7 @@ int main(int argc, char const *argv[]) {
 }
 
 void print_usage(char const *argv[]) {
-	printf("usage: ./%s [executable]\n", argv[0]);
+	printf("usage: %s [executable]\n", argv[0]);
 }
 
 int wait_for_input(char const *argv[]) {
