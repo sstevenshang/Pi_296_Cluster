@@ -36,9 +36,10 @@ void resetPipeClient(int socket);
 double get_local_usage();
 
 //heartbeat functions
-int setUpUDPServer();
+void* spwan_heartbeat(void* load);
+int setUpUDPClient();
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
-void cleanupUDPSocket(int socket_fd);
+double get_local_usage();
 // void listenToHeartbeat(int* stethoscope);
 #endif

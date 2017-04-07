@@ -12,6 +12,7 @@ int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 char* master_addr;
+pthread_t heartbeat_thread;
 
 int server_main() {
     char tempBuf[100];
@@ -26,11 +27,16 @@ int server_main() {
       return 0;
     }
     runningC = 1;
-	// Spwan thread for heartbeat
+
+	  // Spwan thread for heartbeat
+    pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
+
     while(runningC) {
 		// Wait for incoming connection
 		// Spwan thread to execute
     }
+
+    pthread_join(heartbeat_thread, NULL);
     cleanUpWorker(socketFd);
     return 0;
 }
@@ -122,41 +128,52 @@ void resetPipeClient(int socket){
   read(socket, NULL, 0);
 }
 
+
+// HEARTBEAT CODE
+
 void* spwan_heartbeat(void* load) {
   heartbeat(master_addr, defaultClientPort, 1);
 }
 
-int setUpUDPServer() {
-
-	int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket_fd < 0) {
-		perror("FAILED: unable to create socket");
-		return -1;
-	}
-	struct sockaddr_in serverAddr;
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(SERVER_PORT);
-	serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP4);
-	memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
-
-	int status = bind(socket_fd, (struct  sockaddr*) &serverAddr, sizeof(serverAddr));
-	if (status < 0) {
-		perror("FAILED: unable to bind socket");
-		return -1;
-	}
-
-	return socket_fd;
+int setUpUDPClient() {
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_fd < 0) {
+    perror("FAILED: unable to create socket");
+    return -1;
+  }
+  return socket_fd;
 }
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
-	int socket_fd = setUpUDPServer();
-	while (*alive) {
+  int socket_fd = setUpUDPServer();
+  while (*alive) {
     //Takes one second to compute
-		while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
-			printf("Failed: failed to send heartbeat");
-		}
-	}
+    while (sendHeartbeat(socket_fd, destinationAddr, destinationPort) == -1) {
+      printf("Failed: failed to send heartbeat");
+    }
+  }
   close(socket_fd);
+}
+
+int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
+
+  double cpu_usage = get_local_usage();
+  size_t length = sizeof(cpu_usage);
+
+  struct sockaddr_in serverAddr;
+  serverAddr.sin_family = AF_INET;
+  serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
+  serverAddr.sin_port = inet_addr(destinationPort);
+  memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
+
+  socklen_t dest_len = sizeof(serverAddr);
+
+  int status = sendto(socket_fd, &cpu_usage, length, 0, (struct sockaddr*) &serverAddr, dest_len);
+  if (status < 0) {
+    perror("FAILED: unable to send message to server");
+    return -1;
+  }
+  return 0;
 }
 
 double get_local_usage() {
@@ -183,29 +200,9 @@ double get_local_usage() {
   return loadavg;
 }
 
-int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
-	// char* message = "BEAT";
-	double cpu_usage = get_local_usage();
-	// size_t length = strlen(message) + 1;
-	size_t length = sizeof(cpu_usage);
 
-	struct sockaddr_in serverAddr;
 
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
-	serverAddr.sin_port = inet_addr(destinationPort);
-	memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
 
-	socklen_t dest_len = sizeof(serverAddr);
 
-	int status = sendto(socket_fd, &cpu_usage, length, 0, (struct sockaddr*) &serverAddr, dest_len);
-
-	if (status < 0) {
-		perror("FAILED: unable to send message to server");
-		return -1;
-	}
-
-	return 0;
-}
 
