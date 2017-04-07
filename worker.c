@@ -28,13 +28,9 @@ int server_main() {
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
-    tempBuf[bytesRead] = '\0';
-    if(bytesRead == 1) {
-      strcpy(master_addr, "sp17-cs241-005.cs.illinois.edu");
-    } else {
-      strcpy(master_addr, tempBuf);
-    }
-
+    tempBuf[bytesRead-1] = '\0';
+    printf("%s\n", tempBuf);
+    strcpy(master_addr, tempBuf);
     socketFd = setUpWorker(tempBuf, defaultClientPort);
 
     if(socketFd == -1){
@@ -144,11 +140,6 @@ void resetPipeClient(int socket){
 }
 
 // HEARTBEAT CODE
-void* spwan_heartbeat(void* load) {
-  heartbeat(master_addr, heartbeat_port_listener, &alive);
-  (void) load;
-  return NULL;
-}
 
 int setUpUDPClient() {
   int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -157,6 +148,11 @@ int setUpUDPClient() {
     return -1;
   }
   return socket_fd;
+}
+
+void* spwan_heartbeat(void* load) {
+  heartbeat(master_addr, heartbeat_port_listener, &alive);
+  return NULL;
 }
 
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
