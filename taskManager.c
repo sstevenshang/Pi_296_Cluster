@@ -1,4 +1,4 @@
-
+#include "taskManager.h"
 
 
 void manageTask(node* head){
@@ -6,6 +6,7 @@ void manageTask(node* head){
 
   node* tmp = head;
   while(tmp != NULL){
+//    puts("hitTask");
     if(tmp->taskNo == 0){ //no task assigned
       
     } else if(tmp->taskNo == 1){
@@ -30,9 +31,11 @@ void manageTask(node* head){
 }
 
 void handleTaskOne(node* task){
-  //expects a message
   
-  //sends 
+  //expects a message RECEIVEME
+  
+  //sends RECEIVED
+  //recieves READY
 }
 
 void handleTaskTwo(node* task){

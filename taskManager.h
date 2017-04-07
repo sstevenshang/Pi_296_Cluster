@@ -23,7 +23,7 @@
   bit7:  error
 
 
-
+*/
 
 void manageTask(node* head);
 
