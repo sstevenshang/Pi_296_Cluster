@@ -34,7 +34,6 @@ char* getBinaryFile(int socket, char* name);
 void runBinaryFile(char* name);
 void* threadManager(void* arg);
 void resetPipeClient(int socket);
-double get_local_usage();
 
 //heartbeat functions
 void* spwan_heartbeat(void* load);
@@ -42,5 +41,6 @@ int setUpUDPClient();
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
 double get_local_usage();
-// void listenToHeartbeat(int* stethoscope);
+char* get_local_addr();
+
 #endif

@@ -49,13 +49,14 @@ int master_main() {
 }
 
 // @param socket_fd = the TCP socket we created ealier
-char* get_local_addr(int socket_fd) {
+char* get_local_addr() {
 
+  int _fd = socket(AF_INET, SOCK_DGRAM, 0);
  	struct ifreq ifr;
 	ifr.ifr_addr.sa_family = AF_INET;
 
 	strncpy(ifr.ifr_name, "etho0", IFNAMSIZ-1);
-	ioctl(socket_fd, SIOCGIFADDR, &ifr);
+	ioctl(_fd, SIOCGIFADDR, &ifr);
 	char* addr = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 	printf("my local address is: %s\n", addr);
 	return addr;
@@ -64,8 +65,8 @@ char* get_local_addr(int socket_fd) {
 int setUpMaster(char* port){
   int s;
   int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-  master_ip = get_local_addr(socket_fd);
-  master_ip = "128.174.11.96";
+  master_ip = get_local_addr();
+  //master_ip = "128.174.11.96";
   struct addrinfo hints, *result;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
