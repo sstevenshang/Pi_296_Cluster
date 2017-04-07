@@ -141,10 +141,10 @@ int setUpUDPServer() {
   }
 
   struct sockaddr_in serverAddr;
+  memset((char*)&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family = AF_INET;
-  serverAddr.sin_port = htons(INADDR_ANY);
-  serverAddr.sin_addr.s_addr = inet_addr("9010");
-  memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
+  serverAddr.sin_addr.s_addr = inet_addr(INADDR_ANY);
+  serverAddr.sin_port = htons("9010");
 
   int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
   if (status < 0) {
@@ -155,10 +155,21 @@ int setUpUDPServer() {
   return socket_fd;
 }
 
+34    for (i=0; i<NPACK; i++) {
+35      if (recvfrom(s, buf, BUFLEN, 0, &si_other, &slen)==-1)
+36        diep("recvfrom()");
+37      printf("Received packet from %s:%d\nData: %s\n\n",
+38             inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port), buf);
+39    }
+40
+41    close(s);
+42    return 0;
+43 }
 
 void* listenToHeartbeat(void* keepalive) {
 
   struct sockaddr_in clientAddr;
+  memset((char*)&clientAddr, 0, sizeof(clientAddr));
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
 
@@ -168,7 +179,6 @@ void* listenToHeartbeat(void* keepalive) {
   while(keep_listenning) {
     char buffer[50];
     byte_received = recvfrom(socket_fd, &buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddr, &addrlen);
-    printf("received something\n");
     double client_usage = atof(buffer);
     if (byte_received < 0) {
       perror("FAILED: failed to receive from client");
