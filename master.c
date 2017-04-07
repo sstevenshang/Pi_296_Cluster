@@ -36,7 +36,7 @@ int master_main() {
     //Join the heart_beat_lister_thread with the main thread
     pthread_join(heart_beat_lister_thread, NULL);
     pthread_join(node_checking_thread, NULL);
-    pthread_destroy(&node_list_m);
+    pthread_mutex_destroy(&node_list_m);
     cleanUpMaster(incomingFdWorker);
     cleanUpMaster(incomingFdClient);
 	  return 0;

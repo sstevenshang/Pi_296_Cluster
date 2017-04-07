@@ -36,5 +36,6 @@ double getTime();
 int setUpUDPServer();
 void* listenToHeartbeat(void* keepalive);
 void reportHeartbeat(char* beat_addr, double client_usage);
+void* keepNodesInCheck(void* load);
 
 #endif
