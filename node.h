@@ -21,8 +21,8 @@
 typedef struct node {
 	int socket_fd;
 	int alive;
-  int taskNo;
-  int taskPos;
+  	int taskNo;
+  	int taskPos;
 
 	//Current CPU usage of the node
 	double cur_load;

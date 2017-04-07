@@ -195,3 +195,24 @@ double getTime() {
   clock_gettime(CLOCK_MONOTONIC, &t);
   return t.tv_sec + 1e-9 * t.tv_nsec;
 }
+
+void* keepNodesInCheck(void* load) {
+    int keep = 1;
+    double cur_time;
+    while(keep) {
+        node* cur = workerList; // head
+        while (cur != NULL) {
+            cur_time = getTime();
+            if (cur->last_beat_received_time != 0) {
+                if (cur_time - cur->last_beat_received_time > 5) {
+                    printf("node %s is dead\n", cur->address);
+                    cur->alive = 0;
+                    removeNode(cur, workerList);
+                }
+            }
+            cur = cur->next;
+        }
+        sleep(1);
+    }
+    return NULL;
+}
