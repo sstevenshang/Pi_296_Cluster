@@ -5,12 +5,18 @@
 int runningM = 0;
 int clientIncomingFd = -1;
 char* defaultMasterPort = "9001";
-
+char* defaultInterfacePort = "6789";
+node* workerList = NULL;
+node* interfaceList = NULL;
 int master_main() {
-        setUpMaster(defaultMasterPort);
+        int clientIncomingFd = setUpMaster(defaultMasterPort);
+	int interfaceIncomingFd = setUpMaster(defaultInterfacePort);
         runningM = 1;
+ 	
         while(runningM == 1){
-          addAnyIncomingConnections();
+          addAnyIncomingConnections(clientIncomingFd, workerList);
+	  addAnyIncomingConnections(interfaceIncomingFd, interfaceList);
+          manageTask(workerList);
         }
         cleanUpMaster(clientIncomingFd);
 	return 0;
@@ -138,7 +144,7 @@ void listenToHeartbeat(void* keepalive) {
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
 
-  int socket_fd = setUpUDPServer();
+  int socket_fd = 17;//setUpUDPServer();
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {
