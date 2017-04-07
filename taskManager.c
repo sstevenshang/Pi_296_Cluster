@@ -1,5 +1,8 @@
 #include "taskManager.h"
 
+int messageBufSize = 4096;
+char messageBuf[4096];
+
 
 void manageTask(node* head){
   if(head == NULL){return;}
@@ -28,6 +31,25 @@ void manageTask(node* head){
 
     tmp = tmp->next;
   }
+}
+
+int getMessageType(char* header){
+  unsigned char headerByte = *header;
+//  fprintf(stdout, "gotten headerbyte is %d\n", (int)headerByte);
+  int type = 7;
+  while(type != 0){
+    if((headerByte & 0x80) == 0x80){
+      if(((headerByte >> (7-type))& 0x01) == 0x01){
+  //      fprintf(stdout, "in getMessageType, returning %d\n", type);
+        return type;
+      }
+        return -1;
+    }
+    headerByte = headerByte << 1;
+    type --;
+  }
+  return 0;
+
 }
 
 void handleTaskOne(node* task){
