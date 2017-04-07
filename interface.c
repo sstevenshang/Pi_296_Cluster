@@ -23,8 +23,11 @@ int wait_for_input(char const *argv[]) {
 	size_t i = 0;
 	printf("Enter executable name: ");
 	while((i = getline(&buffer, &size, stdin)) > 0) {
-		buffer[i-1] = 0;
+printf("1\n");
+		buffer[i - 1] = 0;
+printf("2\n");
 		puts(buffer);
+printf("3\n");
 		if (access(buffer, X_OK) == 0) {
 			// execute(buffer);
 			printf("executing %s\n", buffer);
