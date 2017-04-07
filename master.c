@@ -14,8 +14,6 @@ static pthread_t heart_beat_lister_thread;
 
 int master_main() {
 
-    master_ip = get_local_addr();
-
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
@@ -36,21 +34,6 @@ int master_main() {
     cleanUpMaster(incomingFdWorker);
     cleanUpMaster(incomingFdClient);
 	  return 0;
-}
-
-char* get_local_addr() {
-
-    int _fd = socket(AF_INET, SOCK_DGRAM, 0);
- 	struct ifreq ifr;
-	ifr.ifr_addr.sa_family = AF_INET;
-
-	strncpy(ifr.ifr_name, "etho0", IFNAMSIZ-1);
-	ioctl(_fd, SIOCGIFADDR, &ifr);
-	char* addr = strdup(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
-    printf("my local address is: %s\n", addr);
-    close(_fd);
-
-	return addr;
 }
 
 int setUpMaster(char* port){
@@ -148,7 +131,7 @@ int sendBinaryFile(int socket, char* name){
 
 // HEART_BEAT CODE
 
-int setUpUDPServer(char* master_addr, char* master_port) {
+int setUpUDPServer() {
 
   int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_fd < 0) {
@@ -158,8 +141,8 @@ int setUpUDPServer(char* master_addr, char* master_port) {
 
   struct sockaddr_in serverAddr;
   serverAddr.sin_family = AF_INET;
-  serverAddr.sin_port = htons(master_port);
-  serverAddr.sin_addr.s_addr = inet_addr(master_addr);
+  serverAddr.sin_port = htons(INADDR_ANY);
+  serverAddr.sin_addr.s_addr = inet_addr("9010");
   memset(serverAddr.sin_zero, 0, sizeof(serverAddr.sin_zero));
 
   int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
@@ -179,7 +162,7 @@ void* listenToHeartbeat(void* keepalive) {
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
 
-  int socket_fd = setUpUDPServer(master_ip, "9010");
+  int socket_fd = setUpUDPServer();
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {

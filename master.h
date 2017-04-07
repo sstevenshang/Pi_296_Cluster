@@ -32,9 +32,8 @@ int cleanUpMaster(int socket);
 int sendBinaryFile(int socket, char* name);
 
 void reportHeartbeat(char* beat_addr, double client_usage);
-char* get_local_addr();
 double getTime();
-int setUpUDPServer(char* master_addr, char* master_port);
+int setUpUDPServer();
 void* listenToHeartbeat(void* keepalive);
 void reportHeartbeat(char* beat_addr, double client_usage);
 
