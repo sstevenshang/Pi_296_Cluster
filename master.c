@@ -7,12 +7,19 @@ int clientIncomingFd = -1;
 char* defaultMasterPort = "9001";
 
 int master_main() {
-        setUpMaster(defaultMasterPort);
-        runningM = 1;
-        while(runningM == 1){
-          addAnyIncomingConnections();
+    int incomingFdWorker = setUpMaster("defaultMasterPort");
+    int incomingFdClient = setUpMaster("1024");
+    runningM = 1;
+    while (runningM == 1) {
+        if (incomingFdWorker != -1 && incomingFdClient != -1) {
+            addAnyIncomingConnections(incomingFdWorker);
+            addAnyIncomingConnections(incomingFdClient);
+        } else {
+            return -1;
         }
-        cleanUpMaster(clientIncomingFd);
+    }
+    cleanUpMaster(incomingFdWorker);
+    cleanUpMaster(incomingFdClient);
 	return 0;
 }
 
@@ -42,23 +49,23 @@ int setUpMaster(char* port){
     }
   struct sockaddr_in *result_addr = (struct sockaddr_in*)result->ai_addr;
   void* junk = result_addr + 1;
-  junk ++;
-  clientIncomingFd = socket_fd;
-  fprintf(stdout, "adding fd %d\n", clientIncomingFd);
-  return 1;
+  junk++;
+  fprintf(stdout, "socket_fd = %d\n", socket_fd);
+  return socket_fd;
 }
 
-int addAnyIncomingConnections(){
-  struct sockaddr_in clientname;
-  size_t size = sizeof(clientname);
-  int client_fd = accept(clientIncomingFd, (struct sockaddr *) &clientname, (socklen_t*) &size);
-  if(client_fd != -1){
-    char* client_address = strdup(inet_ntoa(clientname.sin_addr));
-    fprintf(stdout, "got incoming connection from %s\n", client_address);
-    addNode(client_fd, client_address);
+int addAnyIncomingConnections(int incomingFd) {
+    struct sockaddr_in clientname;
+    size_t size = sizeof(clientname);
+    int client_fd = accept(incomingFd, (struct sockaddr *)&clientname,
+        (socklen_t *)&size);
+    if (client_fd != -1) {
+        char *client_address = strdup(inet_ntoa(clientname.sin_addr));
+        fprintf(stdout, "got incoming connection from %s\n", client_address);
+        addNode(client_fd, client_address);
+        return client_fd;
+    }
     return client_fd;
-  }
-  return client_fd;
 }
 
 int cleanUpMaster(int socket){
