@@ -217,7 +217,7 @@ void* keepNodesInCheck(void* load) {
                 if (cur_time - cur->last_beat_received_time > 5.0) {
                     printf("node %s is dead\n", cur->address);
                     cur->alive = 0;
-                    removeNode(cur, workerList);
+                    removeNode(cur, &workerList);
                     break;
                 }
             }
