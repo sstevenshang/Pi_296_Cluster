@@ -9,7 +9,7 @@ typedef struct queue {
 
 typedef struct queue_node {
 	char* data;
-	struct queue_node* 
+	struct queue_node*
 } queue_node;
 
 queue* queue_create();
