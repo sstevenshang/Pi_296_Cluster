@@ -168,7 +168,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
 	socklen_t dest_len = sizeof(serverAddr);
 
-	int status = sendto(socket_fd, message, length, 0, (struct sockaddr*) &serverAddr, dest_len);
+	int status = sendto(socket_fd, cpu_usage, length, 0, (struct sockaddr*) &serverAddr, dest_len);
 
 	if (status < 0) {
 		perror("FAILED: unable to send message to server");
@@ -196,7 +196,7 @@ void listenToHeartbeat(int* stethoscope) {
 			char* beat_addr = inet_ntoa(clientAddr.sin_addr);
 			//char* beat_port = inet_ntoa(clientAddr.sin_port);
 			reportHeartbeat(beat_addr, client_usage);
-			printf("SUCCESS: received \"%d\" from %s\n", client_usage, beat_addr/*, beat_port*/);
+			printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr/*, beat_port*/);
 		}
 	}
 	cleanupUDPSocket(socket_fd);
