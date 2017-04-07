@@ -5,34 +5,19 @@
 int runningM = 0;
 int clientIncomingFd = -1;
 char* defaultMasterPort = "9001";
-<<<<<<< HEAD
+char* defaultInterfacePort = "6789";
+node* workerList = NULL;
+node* interfaceList = NULL;
 char* master_ip;
 int keepalive = 1;
 static pthread_t heart_beat_lister_thread;
 
 int master_main() {
-  setUpMaster(defaultMasterPort);
-  runningM = 1;
-
-  //Spawn the heart_beat_lister_thread
-  pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
-
-  while(runningM == 1){
-    addAnyIncomingConnections();
-  }
-
-  //Join the heart_beat_lister_thread with the main thread
-  pthread_join(heart_beat_lister_thread, NULL);
-
-  cleanUpMaster(clientIncomingFd);
-=======
-char* defaultInterfacePort = "6789";
-node* workerList = NULL;
-node* interfaceList = NULL;
-int master_main() {
-    int incomingFdWorker = setUpMaster("defaultMasterPort");
-    int incomingFdClient = setUpMaster("1024");
+    int incomingFdWorker = setUpMaster(defaultMasterPort);
+    int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
+    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);
@@ -42,10 +27,11 @@ int master_main() {
             return -1;
         }
     }
+    //Join the heart_beat_lister_thread with the main thread
+    pthread_join(heart_beat_lister_thread, NULL);
     cleanUpMaster(incomingFdWorker);
     cleanUpMaster(incomingFdClient);
->>>>>>> e0a8b67fe07be2240754ff12b04315e4bbce6260
-	return 0;
+	  return 0;
 }
 
 // @param socket_fd = the TCP socket we created ealier
@@ -189,11 +175,7 @@ void* listenToHeartbeat(void* keepalive) {
   socklen_t addrlen = sizeof(clientAddr);
   int byte_received = 0;
 
-<<<<<<< HEAD
   int socket_fd = setUpUDPServer(master_ip, "9010");
-=======
-  int socket_fd = 17;//setUpUDPServer();
->>>>>>> e0a8b67fe07be2240754ff12b04315e4bbce6260
   int keep_listenning = *((int*)keepalive);
 
   while(keep_listenning) {
