@@ -42,8 +42,8 @@ void removeNode(node* oldNode){
 }
 
 void cleanNode(node* to_free) {
-  free(node->address);
-  free(node);
+  free(to_free->address);
+  free(to_free);
 }
 
 node* searchNodeByAddr(char* beat_addr) {
