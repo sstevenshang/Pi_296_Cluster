@@ -1,9 +1,5 @@
 #include "node.h"
 
-node *workerHead = NULL;
-node *clientHead = NULL;
-node *lastInList = NULL;
-
 void addNode(int socketFd, char* address, node *head) {
   node* newNode = (node*)malloc(sizeof(node));
   newNode->socket_fd = socketFd;
