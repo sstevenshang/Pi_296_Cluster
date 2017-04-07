@@ -187,6 +187,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
     perror("FAILED: unable to send message to server");
     return -1;
   }
+  printf("message sent: usage = %s\n", message);
   return 0;
 }
 

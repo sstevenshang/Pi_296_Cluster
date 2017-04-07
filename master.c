@@ -173,8 +173,8 @@ void* listenToHeartbeat(void* keepalive) {
       perror("FAILED: failed to receive from client");
     } else {
       char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-      reportHeartbeat(beat_addr, client_usage);
       printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr);
+      reportHeartbeat(beat_addr, client_usage);
     }
   }
   close(socket_fd);
