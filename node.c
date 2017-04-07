@@ -25,15 +25,15 @@ void addNode(int socketFd, char *address, node **head) {
     temp->next = newNode;
 }
 
-void removeNode(node *oldNode, node *head) {
+void removeNode(node *oldNode, node **head) {
 
-    if (head == oldNode) {
-        head = oldNode->next;
+    if (*head == oldNode) {
+        *head = oldNode->next;
         cleanNode(oldNode);
         return;
     }
 
-    node *holder = head;
+    node *holder = *head;
     while (holder != NULL) {
         if (holder->next == oldNode) {
             holder->next = oldNode->next;

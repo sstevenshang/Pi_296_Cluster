@@ -37,7 +37,7 @@ typedef struct node {
 } node;
 
 void addNode(int socket_fd, char *address, node **head);
-void removeNode(node *oldNode, node *head);
+void removeNode(node *oldNode, node **head);
 void cleanNode(node *to_free);
 void free_all_nodes();
 node* searchNodeByAddr(char* beat_addr, node *head);
