@@ -35,20 +35,21 @@ void queue_push(queue* this, char* element) {
 
 char* queue_pull(queue* this) {
 
-	if（size == 0）
+	if (! this->size)
 		return NULL;
-    queue_node* node = this->head;
-    
-    char* data = strdup(node->data);
-    this->head = this->head->next;
+  queue_node* node = this->head;
 
-    if (this->head == NULL) {
-        this->tail = NULL;
-    }
-    this->size--;
-    free(this->data);
-    free(node);
-    return data;
+	//TODO let's move to a task struct for bookeeping reasons.
+  char* data = strdup(node->data);
+  this->head = this->head->next;
+
+  if (this->head == NULL) {
+      this->tail = NULL;
+  }
+  this->size--;
+  free(node->data);
+  free(node);
+  return data;
 }
 
 int queue_empty(queue* this) {
@@ -58,4 +59,3 @@ int queue_empty(queue* this) {
 size_t queue_size(queue* this) {
 	return this->size;
 }
-

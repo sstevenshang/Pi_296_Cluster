@@ -2,6 +2,8 @@
 #define _MASTER_H_
 
 #include "node.h"
+#include "scheduler.h"
+#include "taskManager.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -20,8 +22,6 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-#include "scheduler.h"
-#include "taskManager.h"
 
 extern int runningM;
 extern int client_incoming_fd;

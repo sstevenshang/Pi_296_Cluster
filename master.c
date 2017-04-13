@@ -206,9 +206,9 @@ double getTime() {
 }
 
 void* keepNodesInCheck(void* load) {
-    int keep = 1;
+    (void) load;  //Type casting to void to circumvent compiler warnings.
     double cur_time;
-    while(keep) {
+    while(runningM) {
         pthread_mutex_lock(&node_list_m);
         node* cur = workerList; // head
         while (cur != NULL) {

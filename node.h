@@ -17,6 +17,14 @@
 #define IDLE 0
 #define UNAVALIBLE -1
 
+#define MAX_TASKS_PER_NODE 5;
+
+//Struct to hold all prevelent information of a task. Feel free to add to it as needed.
+typedef struct task {
+	char* file_name;
+	//0 for failed, 1 for succeeded, 2 for running
+	char status;
+} task;
 
 typedef struct node {
 	int socket_fd;
@@ -34,7 +42,7 @@ typedef struct node {
 	char* address;
 
 	//List of tasks running on the node, removed when task is completed
-	// task** currently_running;
+	task** task_list;
 
 	struct node* next;
 } node;
