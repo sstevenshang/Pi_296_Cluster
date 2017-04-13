@@ -21,8 +21,8 @@
 typedef struct node {
 	int socket_fd;
 	int alive;
-  	int taskNo;
-  	int taskPos;
+  int taskNo;
+  int taskPos;
 
 	//Current CPU usage of the node
 	double cur_load;
@@ -32,6 +32,9 @@ typedef struct node {
 
 	//Ip address of the node
 	char* address;
+
+	//List of tasks running on the node, removed when task is completed
+	// task** currently_running;
 
 	struct node* next;
 } node;

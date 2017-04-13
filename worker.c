@@ -78,7 +78,7 @@ int setUpWorker(char* addr, char* port){
 
 int cleanUpWorker(int socket){
   shutdown(socket, SHUT_WR);
-
+  close(socket);
   return 0;
 }
 
@@ -125,10 +125,11 @@ void runBinaryFile(char* name){
   pthread_t myThread;
   pthread_attr_t* myAttr = NULL;
   pthread_create(&myThread, myAttr, &threadManager, (void*) name);
-  pthread_join(myThread, NULL);
+  // pthread_join(myThread, NULL);
 }
 
 void* threadManager(void* arg){
+  pthread_detach(pthread_self());
   execlp((char*) arg, (char*)arg, NULL,(char*)NULL);
   fprintf(stderr, "exec returned (bad)\n");
   return (void*)-1;
@@ -163,6 +164,7 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
       printf("Failed: failed to send heartbeat");
     }
   }
+  shutdown(socket_fd, SHUT_WR);
   close(socket_fd);
 }
 
