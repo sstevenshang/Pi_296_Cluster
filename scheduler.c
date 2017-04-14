@@ -26,9 +26,9 @@ void recover_tasks(node* worker) {
 }
 
 //Returns the worker node that is least used
-node* get_least_used_worker(node* head_worker) {
+node* get_least_used_worker(node* workers) {
 
-    node* cur = head_worker;
+    node* cur = workers;
     node* least_used = NULL;
     double load_factor;
     double least_load_factor = 1000;

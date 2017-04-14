@@ -7,7 +7,7 @@
 void schedule_task(task* task);
 void distribute_task(node* workers);
 void recover_tasks(node* worker);
-node* get_least_used_worker(node* head_worker);
+node* get_least_used_worker(node* workers);
 void shutdown_scheduler();
 
 #endif
