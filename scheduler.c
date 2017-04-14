@@ -27,8 +27,9 @@ int distribute_task(node* workers, task* work) {
       return 0;
   } else {
       for (size_t i=0; i<5; i++) {
-         if (the_one->tasks[i] == NULL) {
-             the_one->tasks[i] = work;
+         if (the_one->task_list[i] == NULL) {
+             the_one->task_list[i] = work;
+             set_num_of_task(the_one, get_num_of_task(the_one)+1);
              return 1;
          }
       }
@@ -45,6 +46,7 @@ void recover_tasks(node* worker) {
         *cur = NULL;
         cur++;
     }
+
 }
 
 //Returns the worker node that is least used
@@ -56,10 +58,14 @@ node* get_least_used_worker(node* workers) {
     double least_load_factor = 1000;
 
     while (cur != NULL) {
-        if (is_alive(cur) && cur->num_of_task >= 5) {
+        if (is_alive(cur)) {
             continue;
         }
-        load_factor = (cur->cur_load) + (cur->num_of_task * 2);
+        int num = get_num_of_task(cur)
+        if (num >= 5) {
+            continue;
+        }
+        load_factor = (cur->cur_load) + (cur->num * 2);
         if (load_factor < least_load_factor) {
             least_load_factor = load_factor;
             least_used = cur;
