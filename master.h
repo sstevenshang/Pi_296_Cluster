@@ -25,6 +25,8 @@
 
 extern int runningM;
 extern int client_incoming_fd;
+char* defaultMasterPort = "9001";
+char* defaultInterfacePort = "6789";
 
 int master_main();
 int addAnyIncomingConnections(int incomingFd, int mode);
