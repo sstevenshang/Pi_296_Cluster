@@ -1,6 +1,11 @@
 #ifndef _TASK_MANAGER_H_
 #define _TASK_MANAGER_H_
+
 #include "node.h"
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define READY "Ready for work."
 #define RECEIVEME "Do you receive me?"
@@ -34,7 +39,7 @@ void handleTaskThree(node* task);
 void handleTaskFour(node* task);
 void handleTaskFive(node* task);
 void handleTaskSix(node* task);
-
+int readSocketIntoBuf(int socket, void* buf, int bufSize);
 
 #endif
 

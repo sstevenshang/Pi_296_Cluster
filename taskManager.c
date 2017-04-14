@@ -3,6 +3,17 @@
 int messageBufSize = 4096;
 char messageBuf[4096];
 
+int readSocketIntoBuf(int socket, void* buf, int bufSize){
+  ssize_t bytesRead = read(socket, buf, bufSize);
+  if(bytesRead == -1){
+    if(errno == EWOULDBLOCK){ return 0;}
+    fprintf(stderr, "Invalid read from socket %d\n", socket);
+    return -1;
+  } else {
+    return 1;
+  }
+}
+
 
 void manageTask(node* head){
   if(head == NULL){return;}
@@ -53,7 +64,25 @@ int getMessageType(char* header){
 }
 
 void handleTaskOne(node* task){
-  
+  int bytesRead = readSocketIntoBuf(task->socket_fd, messageBuf, messageBufSize);
+  if (bytesRead == -1){
+    return;
+  } else if(bytesRead == 0){
+    return;
+  } else {
+    
+    int pos = task->taskPos;
+    switch(pos){
+      case 0:
+	break;
+      case 1:
+	break;
+      case 2:
+	break;
+    }
+
+
+  }
   //expects a message RECEIVEME
   
   //sends RECEIVED
