@@ -76,6 +76,9 @@ void setupNode(){
 int setUpWorker(char* addr, char* port){
   int s;
   int socket_fd = socket(AF_INET, SOCK_STREAM |SOCK_NONBLOCK, 0);
+  int p = 1;
+  s = setsockopt(socket_fd, SOL_SOCKET,  SO_REUSEADDR,
+                   (char *)&p, sizeof(p));
   struct addrinfo hints, *result;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
@@ -95,10 +98,10 @@ int setUpWorker(char* addr, char* port){
     while(i++ < CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){
       int checkVal;
       struct timeval tv; tv.tv_sec = 1; tv.tv_usec = 0;
-      fd_set rfd; FD_ZERO(&rfd); FD_SET(0, &rfd);
-      checkVal =select(socket_fd + 1, &rfd, NULL, NULL, &tv);
+      fd_set rfd; FD_ZERO(&rfd); FD_SET(socket_fd, &rfd);
+      checkVal =select(socket_fd + 1, NULL, &rfd, NULL, &tv);fprintf(stdout, "checkVal is %d wit hsock %d\n", checkVal, socket_fd);
       if(checkVal == -1){ return -1;} 
-      if(checkVal < 0){ break;}
+      if(checkVal > 0){ break;}
       if( i == CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){ fprintf(stderr, "failed to find connection\n"); return -1;}
       
     }

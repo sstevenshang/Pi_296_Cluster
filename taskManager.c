@@ -95,6 +95,7 @@ void addInfo(void* info, void* buf, size_t bufSize){ //assumes buf has space
 void resetHelper(node* task){
   task->taskPos ++;
   task->bufPos = 0;
+  task->bufWIP = 0;
 }
 
 int updateBuf(node* task, ssize_t bytes){
@@ -213,12 +214,14 @@ int handleTaskZeroWorker(node* task){//startup
   switch(pos){
 
     case 0: {
-      
+        puts("lol");
+        if(task->bufWIP == 0){
         strcpy(task->buf, RECEIVEME);
         int info = iBool;
-        addInfo( &info, task->buf, task->bufSize);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-        if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 2 - task->bufPos)){
+        addInfo( &info, task->buf, task->bufSize); task->bufWIP = 1;
+        }
+        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(task->buf) + 1 - task->bufPos);
+        fprintf(stdout, "wrote %zu bytes\n", bytesWrote);if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 2 - task->bufPos)){
           return updateBuf(task, bytesWrote);
         } else {
           resetHelper(task);
