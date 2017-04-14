@@ -36,6 +36,8 @@
 
 */
 
+
+void manageTaskWorker(node* head);
 void manageTaskMaster(node* head);
 int getMessageType(char* header);
 int updateBuf(node* task, ssize_t bytes);

@@ -15,7 +15,7 @@ static char master_addr[1024];
 int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_t heartbeat_thread;
-
+node curTask;
 //Asynchronously wait on child processes
 void cleanup(int signal) {
   (void) signal;
@@ -40,19 +40,37 @@ int server_main() {
       return 0;
     }
     runningC = 1;
-
+    setupNode();
+    
 	  // Spwan thread for heartbeat
     //pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
 
     while(runningC) {
 		// Wait for incoming connection
 		// Spwan thread to execute
+	manageTaskWorker(&curTask);
 	puts("currently connected"); sleep(2);
     }
 
     pthread_join(heartbeat_thread, NULL);
     cleanUpWorker(socketFd);
     return 0;
+}
+
+void setupNode(){
+    curTask.socket_fd = socketFd;
+    curTask.alive = 1;
+    curTask.cur_load = 0;
+    curTask.taskNo = 0;
+    curTask.taskPos = 0;
+    curTask.next = NULL;
+    
+    curTask.last_beat_received_time = 0;
+    curTask.bufSize = 4096;
+    curTask.bufPos = 0;
+    curTask.buf = (void*)malloc(curTask.bufSize);
+    curTask.bufWIP = 0;
+
 }
 
 int setUpWorker(char* addr, char* port){

@@ -182,3 +182,8 @@ void handleTaskFive(node* task){
 void handleTaskSix(node* task){
 
 }
+
+
+void manageTaskWorker(node* head){
+
+}
