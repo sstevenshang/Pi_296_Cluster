@@ -28,8 +28,10 @@ int server_main() {
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
+    if(bytesRead == 0){ fprintf(stdout, "Using default address %s\n", defaultMaster); strcpy(tempBuf, defaultMaster);} else {
     tempBuf[bytesRead-1] = '\0';
-    printf("%s\n", tempBuf);
+    printf("Using address %s\n", tempBuf);
+    }
     strcpy(master_addr, tempBuf);
     socketFd = setUpWorker(tempBuf, defaultClientPort);
 
