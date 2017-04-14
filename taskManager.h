@@ -45,11 +45,17 @@ void resetHelper(node* task);
 void taskDone(node* task);
 void addInfo(void* info, void* buf, size_t bufSize);
 int handleTaskOne(node* task);
-void handleTaskTwo(node* task);
-void handleTaskThree(node* task);
-void handleTaskFour(node* task);
-void handleTaskFive(node* task);
-void handleTaskSix(node* task);
+int handleTaskTwo(node* task);
+int handleTaskThree(node* task);
+int handleTaskFour(node* task);
+int handleTaskFive(node* task);
+int handleTaskSix(node* task);
+int handleTaskZeroWorker(node* task);
+int handleTaskOneWorker(node* task);
+int handleTaskTwoWorker(node* task);
+int handleTaskThreeWorker(node* task);
+int handleTaskFourWorker(node* task);
+
 ssize_t readSocketIntoBuf(int socket, void* buf, int bufSize);
 ssize_t writeBufIntoSocket(int socket, void* buf, int bufSize);
 #endif
