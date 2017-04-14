@@ -16,7 +16,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include <sys/select.h>
+#include <sys/time.h>
 #include "master.h"
 #include "node.h"
 

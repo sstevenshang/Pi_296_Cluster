@@ -3,7 +3,7 @@
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 #define SERVER_IP4 "127.0.0.1"
-
+#define CONNECTION_ATTEMPTS_BEFORE_GIVING_UP 5
 /* SERVER FUNCTIONS */
 int runningC = 0;
 static char* defaultClientPort = "9001";
@@ -81,7 +81,7 @@ int setUpWorker(char* addr, char* port){
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   s = getaddrinfo(addr, port, &hints, &result);
-  fprintf(stdout, "using %s and %s\n", addr, port);
+  //fprintf(stdout, "using %s and %s\n", addr, port);
   if(s != 0){
     fprintf(stderr, "failed to find %s at port %s\n", addr, port);
     return -1;
@@ -91,6 +91,19 @@ int setUpWorker(char* addr, char* port){
       perror("connect");
       return -1;
     }
+    int i = 0;
+    while(i++ < CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){
+      int checkVal;
+      struct timeval tv; tv.tv_sec = 1; tv.tv_usec = 0;
+      fd_set rfd; FD_ZERO(&rfd); FD_SET(0, &rfd);
+      checkVal =select(socket_fd + 1, &rfd, NULL, NULL, &tv);
+      if(checkVal == -1){ return -1;} 
+      if(checkVal < 0){ break;}
+      if( i == CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){ fprintf(stderr, "failed to find connection\n"); return -1;}
+      
+    }
+      
+    
   }
   fprintf(stdout, "Found connection on fd %d\n", socket_fd);
 //  resetPipeClient(socket_fd);
