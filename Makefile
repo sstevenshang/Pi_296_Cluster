@@ -5,7 +5,7 @@ EXE_RELEASE = key_lime_cluster
 EXE_DEBUG = $(EXE_RELEASE)-debug
 
 # list object file dependencies for each
-OBJS = main.o master.o node.o worker.o
+OBJS = main.o master.o node.o worker.o taskManager.o scheduler.o queue.o
 
 # set up compiler
 CC = clang
@@ -15,7 +15,7 @@ CFLAGS_RELEASE = -O2 $(WARNINGS)    -std=c99 -c -MMD -MP -D_GNU_SOURCE
 
 # set up linker
 LD = clang
-LDFLAGS = -pthread -fPIC
+LDFLAGS = -pthread -fPIC -lm
 
 .PHONY: all
 all: release

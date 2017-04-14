@@ -17,13 +17,24 @@
 #define IDLE 0
 #define UNAVALIBLE -1
 
+#define MAX_TASKS_PER_NODE 5;
+
+//Struct to hold all prevelent information of a task. Feel free to add to it as needed.
+typedef struct task {
+	char* file_name;
+	//0 for failed, 1 for succeeded, 2 for running
+	char status;
+} task;
 
 typedef struct node {
 	int socket_fd;
 	int alive;
   int taskNo;
   int taskPos;
-
+	void* buf; //for message
+	size_t bufSize; //defaults to 4096, can change
+	size_t bufPos; // start pos for writing/reading data for asyrcronous calls
+	int bufWIP; // bool if buf contains an incomplete message
 	//Current CPU usage of the node
 	double cur_load;
 
@@ -33,16 +44,16 @@ typedef struct node {
 	//Ip address of the node
 	char* address;
 
+	//List of tasks running on the node, removed when task is completed
+	task** task_list;
+
 	struct node* next;
 } node;
 
-extern node* head;
-extern node* lastInList;
-
-void addNode(int socket_fd, char* address);
-void removeNode(node* oldNode);
-void cleanNode(node* to_free);
+void addNode(int socket_fd, char *address, node **head);
+void removeNode(node *oldNode, node **head);
+void cleanNode(node *to_free);
 void free_all_nodes();
-node* searchNodeByAddr(char* beat_addr);
+node* searchNodeByAddr(char* beat_addr, node *head);
 
 #endif

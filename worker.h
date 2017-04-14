@@ -14,16 +14,16 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <unistd.h>
-
-//Our headers
+#include <sys/select.h>
+#include <sys/time.h>
 #include "master.h"
 #include "node.h"
-//#include "networkManager.h"
 
 extern int runningC;
 extern int socketFd;
-extern char* defaultMaster;
+//extern char* defaultMaster;
 extern char* defaultPort;
 
 //Non-heartbeat functions
@@ -35,14 +35,12 @@ char* getBinaryFile(int socket, char* name);
 void runBinaryFile(char* name);
 void* threadManager(void* arg);
 void resetPipeClient(int socket);
-double get_local_usage();
-
+void setupNode();
 //heartbeat functions
+void* spwan_heartbeat(void* load);
 int setUpUDPClient();
-int setUpUDPServer();
-void cleanupUDPSocket(int socket_fd);
 void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
-void cleanupUDPSocket(int socket_fd);
-// void listenToHeartbeat(int* stethoscope);
+double get_local_usage();
+
 #endif

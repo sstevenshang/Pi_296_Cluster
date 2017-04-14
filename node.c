@@ -1,45 +1,51 @@
 #include "node.h"
 
-node* head = NULL;
-node* lastInList = NULL;
+void addNode(int socketFd, char *address, node **head) {
 
-void addNode(int socketFd, char* address){
-  node* newNode = (node*)malloc(sizeof(node));
-  newNode->socket_fd = socketFd;
-  newNode->alive = 1;
-  newNode->cur_load = 0;
-  newNode->taskNo = 0;
-  newNode->taskPos = 0;
-  newNode->next = NULL;
-  newNode->address = address;
-  newNode->last_beat_received_time = 0;
-  if(head == NULL){
-    head = newNode;
-    lastInList = newNode;
-  } else {
-    lastInList->next = newNode;
-    lastInList = newNode;
-  }
+    node *newNode = malloc(sizeof(node));
+
+    newNode->socket_fd = socketFd;
+    newNode->alive = 1;
+    newNode->cur_load = 0;
+    newNode->taskNo = 0;
+    newNode->taskPos = 0;
+    newNode->next = NULL;
+    newNode->address = address;
+    newNode->last_beat_received_time = 0;
+    newNode->bufSize = 4096;
+    newNode->bufPos = 0;
+    newNode->buf = (void*)malloc(newNode->bufSize);
+    newNode->bufWIP = 0;
+    if(*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    node* temp = *head;
+    while(temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
 }
 
-void removeNode(node* oldNode){
+void removeNode(node *oldNode, node **head) {
 
-  if(head == oldNode){
-    head = oldNode->next;
-    cleanNode(oldNode);
-  }
-  node* holder = head;
-
-  while(holder != NULL){
-    if(holder->next == oldNode){
-      holder->next = oldNode->next;
-      cleanNode(oldNode);
-      // exit(0);
-      return;
+    if (*head == oldNode) {
+        *head = oldNode->next;
+        cleanNode(oldNode);
+        return;
     }
-    holder = holder->next;
-  }
-  fprintf(stderr, "You tried removing an invalid node address: %p\n", oldNode);
+
+    node *holder = *head;
+    while (holder != NULL) {
+        if (holder->next == oldNode) {
+            holder->next = oldNode->next;
+            cleanNode(oldNode);
+            return;
+        }
+        holder = holder->next;
+    }
+    fprintf(stderr, "You tried removing an invalid node address: %p\n",oldNode);
 }
 
 void cleanNode(node* to_free) {
@@ -47,7 +53,7 @@ void cleanNode(node* to_free) {
   free(to_free);
 }
 
-void free_all_nodes() {
+void free_all_nodes(node *head) {
   node* iter = head;
   while (iter) {
     node* temp = iter->next;
@@ -56,7 +62,7 @@ void free_all_nodes() {
   }
 }
 
-node* searchNodeByAddr(char* beat_addr) {
+node* searchNodeByAddr(char* beat_addr, node *head) {
   node* temp = head;
   while(temp != NULL) {
     if (strcmp(beat_addr, temp->address) == 0) {
