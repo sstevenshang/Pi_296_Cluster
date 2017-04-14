@@ -20,8 +20,6 @@
 
 #define MAX_TASKS_PER_NODE 5
 
-#define FAILED 0
-#define SUCCEEDED 1
 #define CURRENTLY_RUNNING 2
 #define ON_QUEUE 3
 

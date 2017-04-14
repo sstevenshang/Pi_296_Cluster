@@ -162,13 +162,12 @@ void runBinaryFile(char* name){
   pthread_t myThread;
   pthread_attr_t* myAttr = NULL;
   pthread_create(&myThread, myAttr, &threadManager, (void*) name);
-  // pthread_join(myThread, NULL);
 }
 
 void* threadManager(void* arg){
   pthread_detach(pthread_self());
-  execlp((char*) arg, (char*)arg, NULL,(char*)NULL);
-  fprintf(stderr, "exec returned (bad)\n");
+  if (system((char*) arg) == -1)
+    fprintf(stderr, "bad executable\n");
   return (void*)-1;
 }
 
