@@ -1,10 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "node.h"
 // #include "server.h"
-#include "master.h"
-#include "worker.h"
 #include "interface.c"
 //Need to write server.h, server.c, and this function server_main somewhere
 /*void server_main(node* n) {

@@ -80,7 +80,7 @@ int setUpClient(char *addr, char *port) {
       		return -1;
     	}
   	}
-  	fprintf(stdout, "Found connection on fd %d\n", socket_fd);
+  	fprintf(stdout, "Found connection on fd %d\n", socketFd);
   	return socketFd;
 }
 
@@ -88,42 +88,4 @@ int cleanUpClient(int socket) {
   	shutdown(socket, SHUT_WR);
   	close(socket);
   	return 0;
-}
-
-int sendBinaryFile(int socket, char *name) {
-    int file = fileno(fopen(name, "rb"));
-    int bufSize = 2048;
-    char buf[bufSize]; // completely abritray, could be up to 65535 (2^16 -1)
-    int len = read(file, buf, bufSize); // holds if no data in pipeline
-    while (len != 0) {  // len read something
-    	if (len == -1) {
-      	    fprintf(stderr,
-      	      "some error with reading from the fd %d, check for SIGPIPE\n",
-      	      file);
-      	    return 0;
-    	}
-    	int s = write(socket, buf, len);
-    	if (s == -1) {
-	    close(file);
-	    return 0;
-	}
-    	while (s != len) { // as long as write hasn't written all bytes
-      	    int k = write(socket, buf + s, len - s);
-      	    if (k == -1) {
-		close(file);
-		return 0;
-	    }
-      	    s += k;
-    	}
-    	s = read(socket, NULL, 0); // ingnoring, putting more data
-    	len = read(file, buf, bufSize);
-    }
-    if (len == -1) {
-    	fprintf(stderr,
-    	  "some error with reading from the fd %d, check for SIGPIPE\n",
-    	  file);
-    	return 0;
-    }
-    close(file);
-    return 0;
 }

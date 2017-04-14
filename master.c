@@ -4,6 +4,8 @@
 
 int runningM = 0;
 int clientIncomingFd = -1;
+char* defaultMasterPort = "9001";
+char* defaultInterfacePort = "6789";
 node* workerList = NULL;
 node* interfaceList = NULL;
 char* master_ip;
