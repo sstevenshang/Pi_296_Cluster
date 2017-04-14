@@ -22,7 +22,7 @@
 
 extern int runningC;
 extern int socketFd;
-extern char* defaultMaster;
+//extern char* defaultMaster;
 extern char* defaultPort;
 
 //Non-heartbeat functions

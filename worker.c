@@ -8,6 +8,7 @@
 int runningC = 0;
 static char* defaultClientPort = "9001";
 static char* heartbeat_port_listener = "9010";
+static char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 static int alive = 1;
 //Buffer to hold master name/ IP
 static char master_addr[1024];
@@ -24,11 +25,10 @@ void cleanup(int signal) {
 int server_main() {
     //Asynchronously wait on any child processes
     signal(SIGCHLD, cleanup);
-    char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
-    if(bytesRead == 0){ fprintf(stdout, "Using default address %s\n", defaultMaster); strcpy(tempBuf, defaultMaster);} else {
+    if(bytesRead == 1){ fprintf(stdout, "Using default address %s\n", defaultMaster); strcpy(tempBuf, defaultMaster);} else {
     tempBuf[bytesRead-1] = '\0';
     printf("Using address %s\n", tempBuf);
     }
@@ -42,7 +42,7 @@ int server_main() {
     runningC = 1;
 
 	  // Spwan thread for heartbeat
-    pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
+    //pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
 
     while(runningC) {
 		// Wait for incoming connection
