@@ -22,6 +22,7 @@ void addNode(int socketFd, char *address, node **head) {
     newNode->task_list = malloc(sizeof(task)*MAX_TASKS_PER_NODE);
 
     pthread_mutex_lock(&node_list_m);
+
     if(*head == NULL) {
         *head = newNode;
         pthread_mutex_unlock(&node_list_m);
@@ -163,4 +164,9 @@ void set_num_of_task(node* cur, int num_of_task) {
 
 void destroy_mutex() {
   pthread_mutex_destroy(&node_list_m);
+}
+
+void free_task(task* elem) {
+    free(elem->file_name);
+    free(elem);
 }

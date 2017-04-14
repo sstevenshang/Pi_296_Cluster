@@ -41,7 +41,7 @@ int server_main() {
     }
     runningC = 1;
     setupNode();
-    
+
 	  // Spwan thread for heartbeat
     //pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
 
@@ -64,7 +64,7 @@ void setupNode(){
     curTask.taskNo = 0;
     curTask.taskPos = 0;
     curTask.next = NULL;
-    
+
     curTask.last_beat_received_time = 0;
     curTask.bufSize = 4096;
     curTask.bufPos = 0;
@@ -100,13 +100,13 @@ int setUpWorker(char* addr, char* port){
       struct timeval tv; tv.tv_sec = 1; tv.tv_usec = 0;
       fd_set rfd; FD_ZERO(&rfd); FD_SET(socket_fd, &rfd);
       checkVal =select(socket_fd + 1, NULL, &rfd, NULL, &tv);fprintf(stdout, "checkVal is %d wit hsock %d\n", checkVal, socket_fd);
-      if(checkVal == -1){ return -1;} 
+      if(checkVal == -1){ return -1;}
       if(checkVal > 0){ break;}
       if( i == CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){ fprintf(stderr, "failed to find connection\n"); return -1;}
-      
+
     }
-      
-    
+
+
   }
   fprintf(stdout, "Found connection on fd %d\n", socket_fd);
 //  resetPipeClient(socket_fd);
@@ -189,6 +189,7 @@ int setUpUDPClient() {
 }
 
 void* spwan_heartbeat(void* load) {
+  (void) load;
   heartbeat(master_addr, heartbeat_port_listener, &alive);
   return NULL;
 }
