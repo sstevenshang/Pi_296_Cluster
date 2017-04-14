@@ -4,10 +4,10 @@
 #include "queue.h"
 #include "node.h"
 
-void schedule_task(char* task);
+void schedule_task(task* task);
 void distribute_task(node* workers);
-void recover_tasks(node* dead_worker);
-//Returns the worker node that is least used
-node* get_least_used_worker();
+void recover_tasks(node* worker);
+node* get_least_used_worker(node* head_worker);
+void shutdown_scheduler();
 
 #endif

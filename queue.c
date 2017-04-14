@@ -1,4 +1,10 @@
 #include "queue.h"
+#include "node.h"
+
+// typedef struct task {
+// 	char* file_name;
+// 	char status;
+// } task;
 
 queue* queue_create() {
 	queue* q = malloc(sizeof(queue));
@@ -13,16 +19,16 @@ void queue_destroy(queue* this) {
 	while(cur != NULL) {
 		queue_node* temp = cur;
 		cur = cur->next;
-		free(temp->data);
+		free_task(temp->data);
 		free(temp);
 	}
 	free(this);
 }
 
-void queue_push(queue* this, char* element) {
+void queue_push(queue* this, task* element) {
 	queue_node* node = malloc(sizeof(queue_node));
 	node->next = NULL;
-	node->data = strdup(element);
+	node->data = element;
 	if (this->head == NULL) {
 		this->head = node;
 		this->tail = node;
@@ -33,23 +39,20 @@ void queue_push(queue* this, char* element) {
 	this->size++;
 }
 
-char* queue_pull(queue* this) {
+task* queue_pull(queue* this) {
 
-	if (! this->size)
+	if (this->size == 0)
 		return NULL;
-  queue_node* node = this->head;
+  	queue_node* node = this->head;
 
-	//TODO let's move to a task struct for bookeeping reasons.
-  char* data = strdup(node->data);
-  this->head = this->head->next;
-
-  if (this->head == NULL) {
-      this->tail = NULL;
-  }
-  this->size--;
-  free(node->data);
-  free(node);
-  return data;
+  	task* rt_data = node->data;
+  	this->head = this->head->next;
+  	if (this->head == NULL) {
+    	this->tail = NULL;
+  	}
+  	this->size--;
+  	free(node);
+  	return rt_data;
 }
 
 int queue_empty(queue* this) {

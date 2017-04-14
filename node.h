@@ -29,8 +29,8 @@ typedef struct task {
 typedef struct node {
 	int socket_fd;
 	int alive;
-  int taskNo;
-  int taskPos;
+  	int taskNo;
+  	int taskPos;
 	void* buf; //for message
 	size_t bufSize; //defaults to 4096, can change
 	size_t bufPos; // start pos for writing/reading data for asyrcronous calls
@@ -46,6 +46,7 @@ typedef struct node {
 
 	//List of tasks running on the node, removed when task is completed
 	task** task_list;
+	int num_of_task;
 
 	struct node* next;
 } node;
@@ -55,5 +56,7 @@ void removeNode(node *oldNode, node **head);
 void cleanNode(node *to_free);
 void free_all_nodes();
 node* searchNodeByAddr(char* beat_addr, node *head);
+
+void free_task(task* elem);
 
 #endif

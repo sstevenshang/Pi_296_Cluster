@@ -16,6 +16,8 @@ void addNode(int socketFd, char *address, node **head) {
     newNode->bufPos = 0;
     newNode->buf = (void*)malloc(newNode->bufSize);
     newNode->bufWIP = 0;
+    newNode->num_of_task = 0;
+    newNode->task_list = NULL; // TODO: I set it to NULL for now
     if(*head == NULL) {
         *head = newNode;
         return;
@@ -71,4 +73,9 @@ node* searchNodeByAddr(char* beat_addr, node *head) {
     temp = temp->next;
   }
   return NULL;
+}
+
+void free_task(task* elem) {
+    free(elem->file_name);
+    free(task);
 }
