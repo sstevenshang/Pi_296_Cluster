@@ -25,7 +25,7 @@ int master_main() {
             addAnyIncomingConnections(incomingFdClient, 1);
             pthread_mutex_lock(&node_list_m);
   	    puts("about to run manager"); sleep(1);
-            manageTask(workerList);
+            manageTaskMaster(workerList);
             pthread_mutex_unlock(&node_list_m);
         } else {
             return -1;

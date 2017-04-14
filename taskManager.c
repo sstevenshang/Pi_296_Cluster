@@ -26,7 +26,7 @@ ssize_t writeBufIntoSocket(int socket, void* buf, int bufSize){
 }
 
 
-void manageTask(node* head){
+void manageTaskMaster(node* head){
   if(head == NULL){return;}
 
   node* tmp = head;
