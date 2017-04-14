@@ -108,7 +108,7 @@ int getFdForReadFile(char* name){
   return fileno(read_fd);
 }
 
-int sendBinaryFile(int socket, char* name){
+int sendBinaryFileP(int socket, char* name){
   int file = getFdForReadFile(name);
   if(file == -1){ return -1;}
   int bufSize = 2048;
