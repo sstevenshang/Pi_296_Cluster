@@ -118,7 +118,7 @@ int handleTaskOne(node* task){
       case 0:{
 	puts("case0");
 	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-puts("lol");	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
+fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +1 - task->bufPos)){
 	  return updateBuf(task, bytesRead);
 	} else {
 	  if (strcmp(RECEIVEME, task->buf) != 0){
@@ -134,8 +134,8 @@ puts("lol");	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
 	strcpy(task->buf, RECEIVED);
 	int info = iBool;
         addInfo( &info, task->buf, task->bufSize);
-	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-	if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 2 - task->bufPos)){
+	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+	if(bytesWrote != (ssize_t)(strlen(RECEIVED) +1- task->bufPos)){
 	  return updateBuf(task, bytesWrote);
 	} else {
 	  resetHelper(task);
@@ -143,8 +143,8 @@ puts("lol");	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
 	
       }case 2:{
 	puts("case2");
-	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-        if(bytesRead != (ssize_t)(strlen(READY) +2 - task->bufPos)){
+	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+        if(bytesRead != (ssize_t)(strlen(READY) +1 - task->bufPos)){
           return updateBuf(task, bytesRead);
         } else {
           if (strcmp(READY, task->buf) != 0){
