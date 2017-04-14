@@ -1,7 +1,6 @@
 #include "master.h"
 
 /* MASTER FUNCTIONS */
-
 int runningM = 0;
 int clientIncomingFd = -1;
 char* defaultMasterPort = "9001";
@@ -12,10 +11,8 @@ char* master_ip;
 int keepalive = 1;
 pthread_t heart_beat_lister_thread;
 pthread_t node_checking_thread;
-pthread_mutex_t node_list_m = PTHREAD_MUTEX_INITIALIZER;
 
 int master_main() {
-    
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
@@ -25,10 +22,8 @@ int master_main() {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);
             addAnyIncomingConnections(incomingFdClient, 1);
-            pthread_mutex_lock(&node_list_m);
             puts("about to run manager"); sleep(1);
             manageTaskMaster(workerList);
-            pthread_mutex_unlock(&node_list_m);
         } else {
             return -1;
         }
@@ -36,7 +31,6 @@ int master_main() {
     //Join the heart_beat_lister_thread with the main thread
     pthread_join(heart_beat_lister_thread, NULL);
     pthread_join(node_checking_thread, NULL);
-    pthread_mutex_destroy(&node_list_m);
     cleanUpMaster(incomingFdWorker);
     cleanUpMaster(incomingFdClient);
     return 0;
@@ -83,9 +77,7 @@ int addAnyIncomingConnections(int incomingFd, int mode) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);
         if (mode == 0) { // worker
-            pthread_mutex_lock(&node_list_m);
             addNode(client_fd, client_address, &workerList);
-            pthread_mutex_unlock(&node_list_m);
         } else {
             addNode(client_fd, client_address, &interfaceList);
         }
@@ -138,40 +130,37 @@ int sendBinaryFileP(int socket, char* name){
 }
 
 // HEART_BEAT CODE
-
 int setUpUDPServer() {
-    
     int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_fd < 0) {
         perror("FAILED: unable to create socket");
         return -1;
     }
-    
+
     struct sockaddr_in serverAddr;
     memset((char*)&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(9010);
-    
+
     int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
     if (status < 0) {
         perror("FAILED: unable to bind socket");
         return -1;
     }
-    
+
     return socket_fd;
 }
 
 void* listenToHeartbeat(void* keepalive) {
-    
     struct sockaddr_in clientAddr;
     memset((char*)&clientAddr, 0, sizeof(clientAddr));
     socklen_t addrlen = sizeof(clientAddr);
     int byte_received = 0;
-    
+
     int socket_fd = setUpUDPServer();
     int keep_listenning = *((int*)keepalive);
-    
+
     while(keep_listenning) {
         char buffer[50];
         byte_received = recvfrom(socket_fd, &buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddr, &addrlen);
@@ -190,13 +179,11 @@ void* listenToHeartbeat(void* keepalive) {
 
 void reportHeartbeat(char* beat_addr, double client_usage) {
     double time_received = getTime();
-    pthread_mutex_lock(&node_list_m);
     node *reported_node = searchNodeByAddr(beat_addr, workerList);
     if (reported_node) {
-        reported_node->last_beat_received_time = time_received;
-        reported_node->cur_load = client_usage;
+        set_last_beat_received_time(reported_node, time_received);
+        set_load(reported_node, client_usage);
     }
-    pthread_mutex_unlock(&node_list_m);
 }
 
 double getTime() {
@@ -209,24 +196,21 @@ void* keepNodesInCheck(void* load) {
     (void) load;  //Type casting to void to circumvent compiler warnings.
     double cur_time;
     while(runningM) {
-        pthread_mutex_lock(&node_list_m);
         node* cur = workerList; // head
         while (cur != NULL) {
             cur_time = getTime();
-            if (cur->last_beat_received_time != 0) {
-                if (cur_time - cur->last_beat_received_time > 3.0) {
-                    printf("node %s is dead\n", cur->address);
-                    cur->alive = 0;
+            if (get_last_heartbeat_time(cur) != 0) {
+                if (cur_time - get_last_heartbeat_time(cur) > 3.0) {
+                    printf("node %s is dead\n", get_address(cur));
+                    //Mark task as dead
+                    set_alive(cur, 0);
                     //Any tasks that were running on the node
                     recover_tasks(cur);
-                    //Remove the node from the list of workers
-                    removeNode(cur, &workerList);
                     break;
                 }
             }
-            cur = cur->next;
+            cur = get_next(cur);
         }
-        pthread_mutex_unlock(&node_list_m);
         sleep(2);
     }
     return NULL;
