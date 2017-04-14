@@ -3,15 +3,37 @@
 queue* tasks;
 
 //TODO let's squitch over for a task struct for clarity. We can store filenames + status of a task. See node.h.
-void schedule_task(task* task) {
+
+void schedule_task(task* work) {
     if (tasks == NULL)
         tasks = queue_create();
-    queue_push(tasks, task);
-    tasks->size++;
+    queue_push(tasks, work);
 }
 
-void distribute_task(node* workers) {
-  //TODO
+void get_task_from_queue_onto_nodes(node* workers) {
+    while (!queue_empty(tasks)) {
+        task* work = queue_pull(tasks);
+        if (distribute_task(workers, work) == 0) {
+            // TODO: figure out a better way
+            sleep(0.2);
+        }
+    }
+}
+
+int distribute_task(node* workers, task* work) {
+  node* the_one = get_least_used_worker(workers);
+  if (the_one == NULL) {
+      queue_push(tasks, work);
+      return 0;
+  } else {
+      for (size_t i=0; i<5; i++) {
+         if (the_one->tasks[i] == NULL) {
+             the_one->tasks[i] = work;
+             return 1;
+         }
+      }
+  }
+  return 0;
 }
 
 //Put any tasks the woker was working on back onto the queue
@@ -34,7 +56,7 @@ node* get_least_used_worker(node* workers) {
     double least_load_factor = 1000;
 
     while (cur != NULL) {
-        if (cur->num_of_task > 5) {
+        if (cur->num_of_task >= 5) {
             continue;
         }
         load_factor = (cur->cur_load) + (cur->num_of_task * 2);

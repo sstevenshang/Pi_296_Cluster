@@ -4,8 +4,9 @@
 #include "queue.h"
 #include "node.h"
 
-void schedule_task(task* task);
-void distribute_task(node* workers);
+void schedule_task(task* work);
+void get_task_from_queue_onto_nodes(node* workers);
+int distribute_task(node* workers);
 void recover_tasks(node* worker);
 node* get_least_used_worker(node* workers);
 void shutdown_scheduler();

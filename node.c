@@ -77,5 +77,5 @@ node* searchNodeByAddr(char* beat_addr, node *head) {
 
 void free_task(task* elem) {
     free(elem->file_name);
-    free(task);
+    free(elem);
 }
