@@ -56,7 +56,7 @@ node* get_least_used_worker(node* workers) {
     double least_load_factor = 1000;
 
     while (cur != NULL) {
-        if (cur->num_of_task >= 5) {
+        if (is_alive(cur) && cur->num_of_task >= 5) {
             continue;
         }
         load_factor = (cur->cur_load) + (cur->num_of_task * 2);
