@@ -31,10 +31,12 @@ void manageTask(node* head){
 
   node* tmp = head;
   while(tmp != NULL){
-//    puts("hitTask");
+    puts("hitTask");
     int checkVal;
     if(tmp->taskNo == 0){ //no task assigned
-      
+puts("notask");      //cheating here, fix the scheduler
+tmp->taskNo = 1;
+tmp->taskPos = 0;
     } else if(tmp->taskNo == 1){
       checkVal = handleTaskOne(tmp);
       if(checkVal == 0){puts("WORKERD!!!!!!");}
@@ -115,7 +117,7 @@ int handleTaskOne(node* task){
       case 0:{
 	puts("case0");
 	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
+puts("lol");	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
 	  return updateBuf(task, bytesRead);
 	} else {
 	  if (strcmp(RECEIVEME, task->buf) != 0){

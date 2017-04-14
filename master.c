@@ -19,15 +19,14 @@ int master_main() {
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
-    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
-    pthread_create(&node_checking_thread, NULL, keepNodesInCheck, NULL);
-
+    //pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+    //pthread_create(&node_checking_thread, NULL, keepNodesInCheck, NULL);
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);
             addAnyIncomingConnections(incomingFdClient, 1);
             pthread_mutex_lock(&node_list_m);
-	    puts("about to run manager"); sleep(1);
+  	    puts("about to run manager"); sleep(1);
             manageTask(workerList);
             pthread_mutex_unlock(&node_list_m);
         } else {
@@ -78,8 +77,8 @@ int setUpMaster(char* port){
 int addAnyIncomingConnections(int incomingFd, int mode) {
     struct sockaddr_in clientname;
     size_t size = sizeof(clientname);
-    int client_fd = accept(incomingFd, (struct sockaddr *)&clientname,
-        (socklen_t *)&size);
+    int client_fd = accept4(incomingFd, (struct sockaddr *)&clientname,
+        (socklen_t *)&size, SOCK_NONBLOCK);
     if (client_fd != -1) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);
