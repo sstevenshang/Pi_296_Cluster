@@ -12,7 +12,10 @@ void addNode(int socketFd, char *address, node **head) {
     newNode->next = NULL;
     newNode->address = address;
     newNode->last_beat_received_time = 0;
-
+    newNode->bufSize = 4096;
+    newNode->bufPos = 0;
+    newNode->buf = (void*)malloc(newNode->bufSize);
+    newNode->bufWIP = 0;
     if(*head == NULL) {
         *head = newNode;
         return;

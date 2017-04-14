@@ -45,6 +45,7 @@ int server_main() {
     while(runningC) {
 		// Wait for incoming connection
 		// Spwan thread to execute
+	puts("currently connected"); sleep(2);
     }
 
     pthread_join(heartbeat_thread, NULL);

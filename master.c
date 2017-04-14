@@ -27,6 +27,7 @@ int master_main() {
             addAnyIncomingConnections(incomingFdWorker, 0);
             addAnyIncomingConnections(incomingFdClient, 1);
             pthread_mutex_lock(&node_list_m);
+	    puts("about to run manager"); sleep(1);
             manageTask(workerList);
             pthread_mutex_unlock(&node_list_m);
         } else {
@@ -70,7 +71,7 @@ int setUpMaster(char* port){
   struct sockaddr_in *result_addr = (struct sockaddr_in*)result->ai_addr;
   void* junk = result_addr + 1;
   junk++;
-  fprintf(stdout, "socket_fd = %d\n", socket_fd);
+//  fprintf(stdout, "socket_fd = %d\n", socket_fd);
   return socket_fd;
 }
 

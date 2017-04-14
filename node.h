@@ -31,7 +31,10 @@ typedef struct node {
 	int alive;
   int taskNo;
   int taskPos;
-
+	void* buf; //for message
+	size_t bufSize; //defaults to 4096, can change
+	size_t bufPos; // start pos for writing/reading data for asyrcronous calls
+	int bufWIP; // bool if buf contains an incomplete message
 	//Current CPU usage of the node
 	double cur_load;
 
