@@ -15,12 +15,12 @@
 #define ASKSTATUS "What is your status?"
 #define DONERUNNING "Finished running."
 #define ASKFILE "Send me the file:"
-#define iEOF 0x05
-#define iBool 0x09
-#define iExe 0x11
-#define iData 0x21
-#define iStatus 0x41
-#define iErr 0x81
+#define iEOF "\x05"
+#define iBool "\x09"
+#define iExe "\x11"
+#define iData "\x21"
+#define iStatus "\x41"
+#define iErr "\x81"
 
 /*implimentation details
   every sent message will be headed with a 1byte "info" section
