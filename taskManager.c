@@ -225,7 +225,7 @@ int handleTaskZeroWorker(node* task){//startup
     case 0: {
         puts("case0");
         initateTaskBuf(task, iBool, RECEIVEME);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(task->buf) + 1 - task->bufPos);
+        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
         fprintf(stdout, "wrote %zu bytes\n", bytesWrote);if(bytesWrote != (ssize_t)(strlen(RECEIVEME) + 2 - task->bufPos)){
           return updateBuf(task, bytesWrote);
         } else {
