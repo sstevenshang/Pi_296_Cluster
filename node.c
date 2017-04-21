@@ -20,7 +20,7 @@ void addNode(int socketFd, char *address, node **head) {
     newNode->bufWIP = 0;
     newNode->num_of_task = 0;
     newNode->task_list = malloc(sizeof(task)*MAX_TASKS_PER_NODE);
-
+    newNode->fileName = (char*)malloc(1024);
     pthread_mutex_lock(&node_list_m);
 
     if(*head == NULL) {
