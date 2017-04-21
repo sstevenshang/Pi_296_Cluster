@@ -149,6 +149,10 @@ int setUpUDPServer() {
         return -1;
     }
 
+    int optval = 1;
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
+
     return socket_fd;
 }
 
