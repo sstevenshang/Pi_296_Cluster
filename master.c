@@ -16,7 +16,8 @@ int master_main() {
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
-    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat,
+            &keepalive);
     pthread_create(&node_checking_thread, NULL, keepNodesInCheck, NULL);
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
@@ -122,7 +123,9 @@ int sendBinaryFileP(int socket, char* name){
         len = read(file, buf, bufSize);
     }
     if(len == -1){
-        fprintf(stderr, "some error with reading from the fd %d, check for SIGPIPE\n", file);
+        fprintf(stderr,
+                "some error with reading from the fd %d, check for SIGPIPE\n",
+                file);
         return 0;
     }
     close(file);
@@ -141,9 +144,10 @@ int setUpUDPServer() {
     memset((char*)&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serverAddr.sin_port = htons(9010);
+    serverAddr.sin_port = htons(9111);
 
-    int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
+    int status = bind(socket_fd, (struct sockaddr*) &serverAddr,
+            sizeof(serverAddr));
     if (status < 0) {
         perror("FAILED: unable to bind socket");
         return -1;
@@ -167,13 +171,15 @@ void* listenToHeartbeat(void* keepalive) {
 
     while(keep_listenning) {
         char buffer[50];
-        byte_received = recvfrom(socket_fd, &buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddr, &addrlen);
+        byte_received = recvfrom(socket_fd, &buffer, sizeof(buffer), 0,
+                (struct sockaddr*)&clientAddr, &addrlen);
         double client_usage = atof(buffer);
         if (byte_received < 0) {
             perror("FAILED: failed to receive from client");
         } else {
             char* beat_addr = inet_ntoa(clientAddr.sin_addr);
-            printf("SUCCESS: received \"%f\" from %s\n", client_usage, beat_addr);
+            printf("SUCCESS: received \"%f\" from %s\n", client_usage,
+                    beat_addr);
             reportHeartbeat(beat_addr, client_usage);
         }
     }
@@ -219,3 +225,4 @@ void* keepNodesInCheck(void* load) {
     }
     return NULL;
 }
+
