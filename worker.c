@@ -16,15 +16,29 @@ int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_t heartbeat_thread;
 node curTask;
+size_t exec_num = 0;
+
 //Asynchronously wait on child processes
 void cleanup(int signal) {
   (void) signal;
-  while (waitpid((pid_t) (-1), 0, WNOHANG) > 0) {}
+  switch (signal) {
+    case SIGCHLD:
+      while (waitpid((pid_t) (-1), 0, WNOHANG) > 0) {}
+      break;
+    case SIGINT:
+      runningC = 0;
+      break;
+  }
+}
+
+void end_loop(int signal) {
+
 }
 
 int server_main() {
     //Asynchronously wait on any child processes
     signal(SIGCHLD, cleanup);
+    signal(SIGINT, cleanup);
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
@@ -48,8 +62,8 @@ int server_main() {
     while(runningC) {
 		// Wait for incoming connection
 		// Spwan thread to execute
-	manageTaskWorker(&curTask);
-	puts("currently connected"); sleep(2);
+	   manageTaskWorker(&curTask);
+	   puts("currently connected"); sleep(2);
     }
 
     pthread_join(heartbeat_thread, NULL);
@@ -70,7 +84,6 @@ void setupNode(){
     curTask.bufPos = 0;
     curTask.buf = (void*)malloc(curTask.bufSize);
     curTask.bufWIP = 0;
-
 }
 
 int setUpWorker(char* addr, char* port){
@@ -157,18 +170,22 @@ char* getBinaryFile(int socket, char* name){
   return name;
 }
 
+void* threadManager(void* arg){
+  pthread_detach(pthread_self());
+  char buf[4096];
+  sprintf(buf, "%s &> output%zu", (char*) arg, exec_num);
+  if (system(buf) == -1)
+    fprintf(stderr, "bad executable\n");
+  //Now we need to send this output
+  return (void*)-1;
+}
+
 void runBinaryFile(char* name){
   if(name == NULL){ fprintf(stderr, "trying to exec a null, stopping that\n"); exit(0);}
   pthread_t myThread;
   pthread_attr_t* myAttr = NULL;
+  exec_num++;
   pthread_create(&myThread, myAttr, &threadManager, (void*) name);
-}
-
-void* threadManager(void* arg){
-  pthread_detach(pthread_self());
-  if (system((char*) arg) == -1)
-    fprintf(stderr, "bad executable\n");
-  return (void*)-1;
 }
 
 void resetPipeClient(int socket){

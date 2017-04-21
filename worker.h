@@ -36,6 +36,7 @@ void runBinaryFile(char* name);
 void* threadManager(void* arg);
 void resetPipeClient(int socket);
 void setupNode();
+
 //heartbeat functions
 void* spwan_heartbeat(void* load);
 int setUpUDPClient();
