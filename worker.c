@@ -3,7 +3,6 @@
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 #define SERVER_IP4 "127.0.0.1"
-#define CONNECTION_ATTEMPTS_BEFORE_GIVING_UP 5
 /* SERVER FUNCTIONS */
 int runningC = 0;
 static char* defaultClientPort = "9001";

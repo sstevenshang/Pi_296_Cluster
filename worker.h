@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include "master.h"
 #include "node.h"
+#define CONNECTION_ATTEMPTS_BEFORE_GIVING_UP 5
 
 extern int runningC;
 extern int socketFd;

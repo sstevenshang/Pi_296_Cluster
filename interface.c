@@ -19,10 +19,11 @@ int interface_main(int argc, char const *argv[]) {
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
-    if (bytesRead == 0) {
-		fprintf(stdout, "Using default address %s\n", defaultMaster); strcpy(tempBuf, defaultMaster);
+    if (tempBuf[0] == '\n') {
+		fprintf(stdout, "Using default address %s\n", defaultMaster);
+        strcpy(tempBuf, defaultMaster);
 	} else {
-    	tempBuf[bytesRead-1] = '\0';
+    	tempBuf[bytesRead - 1] = '\0';
     	printf("Using address %s\n", tempBuf);
     }
     socketFd = setUpClient(tempBuf, defaultInterfacePort);
@@ -62,26 +63,42 @@ int wait_for_input(char const *argv[]) {
 }
 
 int setUpClient(char *addr, char *port) {
-  	int s;
-  	int socketFd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-  	struct addrinfo hints, *result;
-  	memset(&hints, 0, sizeof(struct addrinfo));
-  	hints.ai_family = AF_INET;
-  	hints.ai_socktype = SOCK_STREAM;
-  	s = getaddrinfo(addr, port, &hints, &result);
-  	fprintf(stdout, "using %s and %s\n", addr, port);
-  	if (s != 0){
-    	fprintf(stderr, "failed to find %s at port %s\n", addr, port);
-    	return -1;
-  	}
-  	if (connect(socketFd, result->ai_addr, result->ai_addrlen)==-1){
-    	if (errno != EINPROGRESS){
-      		perror("connect");
-      		return -1;
-    	}
-  	}
-  	fprintf(stdout, "Found connection on fd %d\n", socketFd);
-  	return socketFd;
+    int s;
+    int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    int p = 1;
+    s = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *) &p, sizeof(p));
+    struct addrinfo hints, *result;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    s = getaddrinfo(addr, port, &hints, &result);
+    if (s != 0) {
+        fprintf(stderr, "failed to find %s at port %s\n", addr, port);
+        return -1;
+    }
+    if(connect(socket_fd, result->ai_addr, result->ai_addrlen) == -1) {
+        if(errno != EINPROGRESS){
+            perror("connect");
+            return -1;
+        }
+        int i = 0;
+        while (i++ < CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){
+            int checkVal;
+            struct timeval tv; tv.tv_sec = 1; tv.tv_usec = 0;
+            fd_set rfd; FD_ZERO(&rfd); FD_SET(socket_fd, &rfd);
+            checkVal =select(socket_fd + 1, NULL, &rfd, NULL, &tv);
+            fprintf(stdout, "checkVal is %d wit hsock %d\n", checkVal,
+                    socket_fd);
+            if (checkVal == -1) { return -1;}
+            if (checkVal > 0) { break; }
+            if (i == CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){
+                fprintf(stderr, "failed to find connection\n");
+                return -1;
+            }
+        }
+    }
+    fprintf(stdout, "Found connection on fd %d\n", socket_fd);
+    return socket_fd;
 }
 
 int cleanUpClient(int socket) {
@@ -89,3 +106,4 @@ int cleanUpClient(int socket) {
   	close(socket);
   	return 0;
 }
+
