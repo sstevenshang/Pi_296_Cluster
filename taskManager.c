@@ -110,7 +110,7 @@ int updateBuf(node* task, ssize_t bytes){
 void taskDone(node* task){
   task->bufPos = 0;
   task->taskPos = 0;
-  task->taskNo = 0;
+  task->taskNo = 5;
 }
 
 void initateTaskBuf(node* task, char* info, char* message){
@@ -190,42 +190,33 @@ int handleTaskThree(node* task){
         puts("case0");
 	if(task->bufWIP == 0){
 	  //task->bufWIP = 1;
-        initateTaskBuf(task, iData, task->task_list[0]->file_name);
+        initateTaskBuf(task, iData, task->tmpTask->file_name);
     fprintf(stdout, "%s is buf\n", task->buf);
-	  task->task_list[0]->file_stream = fopen(task->task_list[0]->file_name, "rb");
-	  if(task->task_list[0]->file_stream == NULL){ perror("bad file name given for task 3\n"); return -1;}
+	  task->tmpTask->file_stream = fopen(task->tmpTask->file_name, "rb");
+	  if(task->tmpTask->file_stream == NULL){ perror("bad file name given for task 3\n"); return -1;}
 	  task->bufWIP = 1;
 	} else { 
 	char* tmp = "";
 	 initateTaskBuf(task, iData, tmp);
 	}
 	puts("writing");
-	ssize_t startPos = strlen(task->buf);
+	ssize_t startPos = strlen(task->buf) +1;
 	
 
-	int len = read(fileno(task->task_list[0]->file_stream), task->buf + startPos, task->bufSize - startPos);
+	int len = read(fileno(task->tmpTask->file_stream), task->buf + startPos, task->bufSize - startPos);
+	fprintf(stdout, "len is %d\n", len);
 	if(len == -1){
 		fprintf(stderr, "error reading fd in task three"); return -1;
 	} else if( len == 0){
 	  resetHelper(task);
 	} else {
-	  ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf, task->bufSize - len);
+	fprintf(stdout, "writing %s\n", task->buf+1);
+	  ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf+1, len + startPos-1);
 	  return updateBuf(task, bytesWrote);
 	}
 
 	}case 1:{
-		initateTaskBuf(task, iBool, ASKSTATUS);
-    fprintf(stdout, "%s is buf\n", task->buf);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(ASKSTATUS) + 2 - task->bufPos);
-
-        if(bytesWrote != (ssize_t)(strlen(ASKSTATUS) +2- task->bufPos)){
-          return updateBuf(task, bytesWrote);
-        } else {
-          resetHelper(task);
-        }
-
-	}case 2:{
-        puts("case2");
+        puts("case1");
 	
         ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
         if(bytesRead != (ssize_t)(strlen(READY) +2 - task->bufPos)){
