@@ -35,7 +35,7 @@ void manageTaskMaster(node* head){
     int checkVal;
     if(tmp->taskNo == 0){ //no task assigned
 puts("notask");      //cheating here, fix the scheduler
-tmp->taskNo = 1;
+tmp->taskNo = 3;
 tmp->taskPos = 0;
     } else if(tmp->taskNo == 1){
       checkVal = handleTaskOne(tmp);
@@ -166,10 +166,7 @@ fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(byte
 	taskDone(task);
 	
       }
-    }
-
-
-  
+    }  
   //expects a message RECEIVEME
   
   //sends RECEIVED
@@ -181,8 +178,69 @@ int handleTaskTwo(node* task){
   return 0;
 }
 int handleTaskThree(node* task){
+  //info is 1 byte, size is 4 bytes, name is null terminated
+
+  //case 0, send, case1: read
+  int pos = task->taskPos;
+    switch(pos){
+      case 0:{
+        puts("case0");
+	if(task->bufWIP == 0){
+	  task->bufWIP = 1;
+        initateTaskBuf(task, iData, task->task_list[0]->file_name);
+    fprintf(stdout, "%s is buf\n", task->buf);
+	  task->task_list[0]->file_stream = fopen(task->task_list[0]->file_name, "rb");
+	  if(task->task_list[0]->file_stream == NULL){ perror("bad file name given for task 3\n"); return -1;}
+	} else {
+	 initateTaskBuf(task, iData, '\0');
+	}
+	puts("made it");
+	ssize_t startPos = strlen(task->buf);
+	
+	int len = read(task->task_list[0]->file_stream, buf + startPos, task->bufSize - startPos);
+	if(len == -1){
+		fprintf(stderr, "error reading fd in task three"); return -1;
+	} else if( len == 0){
+	  resetHelper(task);
+	} else {
+	  ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf, task->bufSize - len);
+	  return updateBuf(task, bytesRead);
+	}
+
+        //ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + startPos, task->buf - startPos);
+	
+
+        if(bytesWrote != (ssize_t)(strlen(RECEIVED) +2- task->bufPos)){
+          return updateBuf(task, bytesWrote);
+        } else {
+          resetHelper(task);
+        }
+
+      }case 1:{
+        puts("case1");
+        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+        if(bytesRead != (ssize_t)(strlen(READY) +2 - task->bufPos)){
+          return updateBuf(task, bytesRead);
+        } else {
+          if (strcmp(READY, (task->buf+1)) != 0){
+            fprintf(stderr, "didn't receive correct value, reseting node");
+            return -1;
+          } else {
+            resetHelper(task);
+          }
+        }
+        taskDone(task);
+
+      }
+    }
+  //expects a message RECEIVEME
+
+  //sends RECEIVED
+  //recieves READY
   return 0;
 }
+
+
 int handleTaskFour(node* task){
   return 0;
 }
@@ -280,3 +338,4 @@ int handleTaskThreeWorker(node* task){
 int handleTaskFourWorker(node* task){
   return 0;
 }
+

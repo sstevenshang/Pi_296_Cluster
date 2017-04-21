@@ -28,6 +28,7 @@ typedef struct task {
 	char* file_name;
 	//See the list of macros for status of a task
 	char status;
+	FILE* file_stream;
 } task;
 
 typedef struct node {
