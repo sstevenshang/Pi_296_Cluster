@@ -141,7 +141,7 @@ int setUpUDPServer() {
     memset((char*)&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serverAddr.sin_port = htons(9010);
+    serverAddr.sin_port = htons(9111);
 
     int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
     if (status < 0) {
