@@ -223,11 +223,13 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
-  struct addrinfo hints, *result;
-  memset(&hints, 0, sizeof(struct addrinfo));
-  hints.ai_family = AF_INET;
-  hints.ai_socktype = SOCK_DGRAM;
-  int s = getaddrinfo(NULL, destinationAddr, &hints, &result);
+  struct hostent *he;
+  he = gethostbyname(destinationAddr);
+  if (he == NULL) {
+      printf("ur bad\n");
+  }
+  struct in_addr **addr_list = (struct in_addr**)he->h_addr_list;
+  char* ip = inet_ntoa(*addr_list[0]);
 
   double cpu_usage = get_local_usage();
   char message[50];
@@ -236,10 +238,7 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
   struct sockaddr_in serverAddr;
   memset((char*)&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family = AF_INET;
-
-  //serverAddr.sin_addr.s_addr = inet_addr();
-  serverAddr.sin_addr = ((sockaddr_in*)(hints.ai_addr))->sin_addr;
-
+  serverAddr.sin_addr.s_addr = inet_addr(ip);
   serverAddr.sin_port = htons(9111);
 
   printf("sending to %s:%s\n", destinationAddr, destinationPort);
