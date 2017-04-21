@@ -124,7 +124,7 @@ int handleTaskOne(node* task){
     switch(pos){
       case 0:{
 	puts("case0");
-	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
+	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
 fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
 	  return updateBuf(task, bytesRead);
 	} else {
@@ -143,6 +143,7 @@ fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(byte
 	initateTaskBuf(task, iBool, RECEIVED);
     fprintf(stdout, "%s is buf\n", task->buf);
 	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+
 	if(bytesWrote != (ssize_t)(strlen(RECEIVED) +2- task->bufPos)){
 	  return updateBuf(task, bytesWrote);
 	} else {
@@ -223,7 +224,7 @@ int handleTaskZeroWorker(node* task){//startup
 
     case 0: {
         puts("case0");
-        initateTaskBuf(task, iBool, RECEIVED);
+        initateTaskBuf(task, iBool, RECEIVEME);
         ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(task->buf) + 1 - task->bufPos);
         fprintf(stdout, "wrote %zu bytes\n", bytesWrote);if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 2 - task->bufPos)){
           return updateBuf(task, bytesWrote);
