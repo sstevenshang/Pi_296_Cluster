@@ -236,7 +236,7 @@ int handleTaskZeroWorker(node* task){//startup
     } case 1: {
 puts("case1");
 	
-        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
+        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
         if(bytesRead != (ssize_t)(strlen(RECEIVED) +2 - task->bufPos)){
           return updateBuf(task, bytesRead);
         } else {
@@ -252,7 +252,7 @@ puts("case1");
 puts("case2");
        
         initateTaskBuf(task, iStatus, READY);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize);
+        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
         if(bytesWrote != (ssize_t)(strlen(READY) + 2 - task->bufPos)){
           return updateBuf(task, bytesWrote);
         } else {
