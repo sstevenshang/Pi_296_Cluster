@@ -79,17 +79,17 @@ int getMessageType(char* header){
 }
 
 void addInfo(void* info, void* buf, size_t bufSize){ //assumes buf has space
-  void* tmp = (void*)malloc(bufSize);
-  
+/*  void* tmp = (void*)malloc(bufSize);
+  //memset(buf, '\0', bufSize);
   if((*(int*)info) != ((int)iData) && (*(int*)info) != ((int)iExe)){
-  memmove(info, tmp, 1);
+  memmove(info, buf, 1);
   memmove(buf, tmp+1, bufSize-1);
   } else {
     puts("FIXME"); return;
   }
   free(buf);
   buf = tmp;
-
+*/
 }
 
 void resetHelper(node* task){
@@ -110,6 +110,13 @@ void taskDone(node* task){
   task->taskNo = 0;
 }
 
+void initateTaskBuf(node* task, char* info, char* message){
+    void* myBuf = task->buf;
+    memset(myBuf, '\0', task->bufSize);
+    strcpy(myBuf, info);
+    strcat(myBuf, message);
+}
+
 int handleTaskOne(node* task){
   
     
@@ -121,7 +128,7 @@ int handleTaskOne(node* task){
 fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +1 - task->bufPos)){
 	  return updateBuf(task, bytesRead);
 	} else {
-	  if (strcmp(RECEIVEME, task->buf) != 0){
+	  if (strcmp(RECEIVEME, (task->buf+1)) != 0){
 	    fprintf(stderr, "didn't receive correct value, reseting node");
 	    return -1;
  	  } else {
@@ -131,9 +138,10 @@ fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(byte
 	
       }case 1:{
 	puts("case1");
-	strcpy(task->buf, RECEIVED);
-	int info = iBool;
-        addInfo( &info, task->buf, task->bufSize);
+	//strcpy(task->buf, RECEIVED);
+
+	initateTaskBuf(task, iBool, RECEIVED);
+    fprintf(stdout, "%s is buf\n", task->buf);
 	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
 	if(bytesWrote != (ssize_t)(strlen(RECEIVED) +1- task->bufPos)){
 	  return updateBuf(task, bytesWrote);
@@ -217,8 +225,8 @@ int handleTaskZeroWorker(node* task){//startup
         puts("lol");
         if(task->bufWIP == 0){
         strcpy(task->buf, RECEIVEME);
-        int info = iBool;
-        addInfo( &info, task->buf, task->bufSize); task->bufWIP = 1;
+        //int info = iBool;
+        //addInfo( &info, task->buf, task->bufSize); task->bufWIP = 1;
         }
         ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(task->buf) + 1 - task->bufPos);
         fprintf(stdout, "wrote %zu bytes\n", bytesWrote);if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 1 - task->bufPos)){
@@ -242,9 +250,9 @@ int handleTaskZeroWorker(node* task){//startup
         }
 
     } case 2: {
-       strcpy(task->buf, READY);
-        int info = iStatus;
-        addInfo( &info, task->buf, task->bufSize);
+       //strcpy(task->buf, READY);
+        //int info = iStatus;
+        //addInfo( &info, task->buf, task->bufSize);
         ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize);
         if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 1 - task->bufPos)){
           return updateBuf(task, bytesWrote);
