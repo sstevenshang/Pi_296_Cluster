@@ -16,5 +16,6 @@ int cleanUpClient(int socket);
 int sendBinaryFile(int socket, char *name);
 ssize_t my_write(int socket, void *buffer, size_t count);
 void write_binary_data(FILE *f, int sockFd, char *buffer);
+int interface_main(int argc, char const *argv[]);
 
 #endif

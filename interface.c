@@ -1,4 +1,16 @@
 #include "interface.h"
+#define BUF_SIZE 1024
+/*
+int wait_for_input();
+void print_usage();
+int setUpClient(char *addr, char *port);
+int cleanUpClient(int socket);
+int sendBinaryFile(int socket, char *name);
+ssize_t my_write(int socket, void *buffer, size_t count);
+void write_binary_data(FILE *f, int sockFd, char *buffer);
+*/
+static char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
+static char master_addr[1024];
 
 int interface_main(int argc, char const *argv[]) {
     printf("In client\n");
@@ -32,7 +44,7 @@ void print_usage(char const *argv[]) {
 
 int wait_for_input(char const *argv[], int sockFd) {
     char buffer[16];
-    char fileBuffer[1024];
+    char fileBuffer[BUF_SIZE];
     size_t numExec = 0;
     printf("Enter number of executable(s): ");
     scanf("%zu", &numExec);
@@ -44,7 +56,7 @@ int wait_for_input(char const *argv[], int sockFd) {
 	        //execute(buffer);
 	        //printf("executing %s\n", buffer);
             FILE *f = fopen(buffer, "r");
-            write_binary_file(f, sockFd, fileBuffer);
+            write_binary_data(f, sockFd, fileBuffer);
 	    } else {
 	        print_usage(argv);
 	    }
