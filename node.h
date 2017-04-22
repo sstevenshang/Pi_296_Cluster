@@ -45,7 +45,7 @@ typedef struct node {
 	FILE* tmpFS;
 	//Last recieved heartbeat
 	double last_beat_received_time;
-
+        int tmpFP;
 	//Ip address of the node
 	char* address;
 	char* fileName;

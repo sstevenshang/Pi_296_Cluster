@@ -263,8 +263,9 @@ void manageTaskWorker(node* task){
     if(task->taskNo == 0){ //startup
       checkVal =handleTaskThreeWorker(task); 
       if(checkVal == 0){puts("WORKED");}
-      int runExec = 0;
-      if(runExec == 1){ runBinaryFileT(task->fileName);}
+      int runExec = 1;
+      if(runExec == 1 && checkVal == 0){ runBinaryFileT(task->fileName);}
+      //task->taskNo = 4;
     } else if(task->taskNo == 1){  //get file
       handleTaskOneWorker(task);
     } else if(task->taskNo == 2){  //send file
@@ -348,21 +349,22 @@ int handleTaskThreeWorker(node* task){
 		char temp[1024];
 		task->fileName = strcpy(temp, task->buf);
 		fprintf(stdout, "gotten filename is %s\n", task->fileName);
-		task->tmpFS = fopen(temp, "wb+");
-		if(task->tmpFS == NULL){ perror("tmpFS NULL"); return -1;}
+		//task->tmpFS = fopen(temp, "wb+");
+		task->tmpFP = open(task->fileName, O_CREAT | O_RDWR, S_IRWXG | S_IRWXU);
+		//if(task->tmpFS == NULL){ perror("tmpFS NULL"); return -1;}
 		task->bufPos = bytesRead;
 		task->taskPos = 1;
 		task->bufWIP = 1;
 	
-        write(fileno(task->tmpFS), task->buf + nameLen + 2, bytesRead-2 - nameLen);
+        write(task->tmpFP, task->buf + nameLen + 2, bytesRead-2 - nameLen);
 	}	
     } case 1: {
 puts("case1");
-
+        task->bufPos = 0;
         ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
         if(bytesRead != 0){
 		puts("reading more data"); puts(task->buf);
-		write(fileno(task->tmpFS), task->buf +1, bytesRead - 1);
+		write(task->tmpFP, task->buf +1, bytesRead - 1);
 		return 1;
 	}
 	resetHelper(task);

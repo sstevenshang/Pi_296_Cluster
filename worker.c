@@ -52,7 +52,7 @@ int server_main() {
     setupNode();
 
 	  // Spwan thread for heartbeat
-    pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
+    //pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
 
     while(runningC) {
 		// Wait for incoming connection
