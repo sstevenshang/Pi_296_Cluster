@@ -16,8 +16,8 @@ int master_main() {
     int incomingFdWorker = setUpMaster(defaultMasterPort);
     int incomingFdClient = setUpMaster(defaultInterfacePort);
     runningM = 1;
-//    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
-  //  pthread_create(&node_checking_thread, NULL, keepNodesInCheck, NULL);
+    pthread_create(&heart_beat_lister_thread, NULL, listenToHeartbeat, &keepalive);
+    pthread_create(&node_checking_thread, NULL, keepNodesInCheck, NULL);
     while (runningM == 1) {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);

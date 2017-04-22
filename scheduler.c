@@ -40,13 +40,26 @@ int distribute_task(node* workers, task* work) {
 //Put any tasks the woker was working on back onto the queue
 //"Recover" the tasks
 void recover_tasks(node* worker) {
-    task** cur = worker->task_list;
-    while (*cur != NULL) {
-        queue_push(tasks, *cur);
-        *cur = NULL;
-        cur++;
-    }
+  if (!worker)
+    return;
+    
+  for (int i = 0; i < MAX_TASKS_PER_NODE; i++) {
+      queue_push(tasks, worker->task_list[i]);
+      return;
+  }
+}
 
+
+void remove_tasks(node* worker, task* work) {
+  if (!worker)
+    return;
+
+  for (int i = 0; i < MAX_TASKS_PER_NODE; i++) {
+    if (worker->task_list[i] == work) {
+      worker->task_list[i] = NULL;
+      return;
+    }
+  }
 }
 
 //Returns the worker node that is least used

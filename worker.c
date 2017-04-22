@@ -30,14 +30,10 @@ void cleanup(int signal) {
   }
 }
 
-void end_loop(int signal) {
-
-}
-
 int server_main() {
     //Asynchronously wait on any child processes
     signal(SIGCHLD, cleanup);
-    signal(SIGINT, cleanup);
+    // signal(SIGINT, cleanup);
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
@@ -56,7 +52,7 @@ int server_main() {
     setupNode();
 
 	  // Spwan thread for heartbeat
-    //pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
+    pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
 
     while(runningC) {
 		// Wait for incoming connection
@@ -176,7 +172,7 @@ void* threadManager(void* arg){
   if (system(buf) == -1)
     fprintf(stderr, "bad executable\n");
   //Now we need to send this output
-  return (void*)-1;
+  return NULL;
 }
 
 void runBinaryFile(char* name){

@@ -19,7 +19,7 @@ void addNode(int socketFd, char *address, node **head) {
     newNode->buf = (void*)malloc(newNode->bufSize);
     newNode->bufWIP = 0;
     newNode->num_of_task = 0;
-    newNode->task_list = malloc(sizeof(task)*MAX_TASKS_PER_NODE);
+    newNode->task_list = calloc(MAX_TASKS_PER_NODE,sizeof(task*));
 
     pthread_mutex_lock(&node_list_m);
 

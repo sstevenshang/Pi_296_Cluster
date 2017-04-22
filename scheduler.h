@@ -10,6 +10,7 @@ void get_task_from_queue_onto_nodes(node* workers);
 int distribute_task(node* workers, task* work);
 void recover_tasks(node* worker);
 node* get_least_used_worker(node* workers);
+void remove_tasks(node* worker, task* work);
 void shutdown_scheduler();
 
 #endif
