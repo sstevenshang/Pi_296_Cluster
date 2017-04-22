@@ -11,6 +11,11 @@ void write_binary_data(FILE *f, int sockFd, char *buffer);
 */
 static char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 static char master_addr[1024];
+char buffer[4096];
+size_t bufferSize;
+int pos;
+int socketFd;
+int tmpFP;
 
 int interface_main(int argc, char const *argv[]) {
     printf("In client\n");
@@ -32,9 +37,38 @@ int interface_main(int argc, char const *argv[]) {
         return 0;
     }
 
-	wait_for_input(argv);
+    wait_for_input(argv, socketFd);
 
     cleanUpClient(socketFd);
+    return 0;
+}
+
+int handleData() {
+    char tempBuf[1024];
+    switch (pos) {
+    case 0: {
+        puts("case0");
+	ssize_t bytesRead = read(socketFd, buffer, bufferSize);
+	size_t nameLen = strlen(buffer);
+	if (nameLen <= 1) { return -1; }
+        strcpy(tempBuf, buffer);
+        fprintf(stdout, "gotten filename is %s\n", tempBuf);
+	//tmpFP = fopen(tempBuf, "wb+");
+	tmpFP = open(tempBuf, O_CREAT | O_RDWR, S_IWGRP | S_IWUSR);
+	if (tmpFP == -1) { return -1; }
+	pos = 1;
+        write(tmpFP, buffer + nameLen + 1, bytesRead - 1 - nameLen);
+    } case 1: {
+puts("case1");
+        ssize_t bytesRead = readSocketIntoBuf(socketFd, buffer, bufferSize);
+        if(bytesRead != 0){
+	    puts("reading more data");
+	    puts(buffer);
+	    write(tmpFP, buffer, bytesRead);
+	    return 1;
+	}
+    }
+    }
     return 0;
 }
 
@@ -50,18 +84,19 @@ int wait_for_input(char const *argv[], int sockFd) {
     scanf("%zu", &numExec);
     printf("%zu executable(s).\nEnter executable name: ", numExec);
     for (size_t i = 0; i < numExec; i++) {
-	    scanf("%s", buffer);
-	    printf("You entered: %s\n", buffer);
-	    if (access(buffer, X_OK) == 0) {
-	        //execute(buffer);
-	        //printf("executing %s\n", buffer);
+        scanf("%s", buffer);
+	printf("You entered: %s\n", buffer);
+	if (access(buffer, X_OK) == 0) {
+	    //execute(buffer);
+	    //printf("executing %s\n", buffer);
             FILE *f = fopen(buffer, "r");
             write_binary_data(f, sockFd, fileBuffer);
-	    } else {
-	        print_usage(argv);
-	    }
-	    printf("Enter executable name: ");
+	} else {
+	    print_usage(argv);
+	}
+	printf("Enter executable name: ");
     }
+    handleData();
     return 0;
 }
 
@@ -69,7 +104,8 @@ int setUpClient(char *addr, char *port) {
     int s;
     int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
     int p = 1;
-    s = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *) &p, sizeof(p));
+    s = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *) &p,
+      sizeof(p));
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
@@ -105,9 +141,9 @@ int setUpClient(char *addr, char *port) {
 }
 
 int cleanUpClient(int socket) {
-  	shutdown(socket, SHUT_WR);
-  	close(socket);
-  	return 0;
+    shutdown(socket, SHUT_WR);
+    close(socket);
+    return 0;
 }
 
 ssize_t my_write(int socket, void *buffer, size_t count) {
@@ -136,3 +172,4 @@ void write_binary_data(FILE *f, int sockFd, char *buffer) {
         }
     }
 }
+
