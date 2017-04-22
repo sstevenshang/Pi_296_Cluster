@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 // #include "server.h"
-#include "interface.c"
+#include "interface.h"
 //Need to write server.h, server.c, and this function server_main somewhere
 /*void server_main(node* n) {
 	(void) n;

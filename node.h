@@ -28,6 +28,7 @@ typedef struct task {
 	char* file_name;
 	//See the list of macros for status of a task
 	char status;
+	FILE* file_stream;
 } task;
 
 typedef struct node {
@@ -47,10 +48,10 @@ typedef struct node {
 
 	//Ip address of the node
 	char* address;
-
+	char* fileName;
 	//List of tasks running on the node, removed when task is completed
 	task** task_list;
-
+	task* tmpTask;
 	int num_of_task;
 
 	struct node* next;

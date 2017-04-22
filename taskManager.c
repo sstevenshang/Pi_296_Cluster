@@ -35,8 +35,11 @@ void manageTaskMaster(node* head){
     int checkVal;
     if(tmp->taskNo == 0){ //no task assigned
 puts("notask");      //cheating here, fix the scheduler
-tmp->taskNo = 1;
+tmp->taskNo = 3;
 tmp->taskPos = 0;
+task* tmpTask = malloc(sizeof(task));
+tmp->tmpTask = tmpTask;
+tmpTask->file_name = "./testFiles/test1.txt";
     } else if(tmp->taskNo == 1){
       checkVal = handleTaskOne(tmp);
       if(checkVal == 0){puts("WORKERD!!!!!!");}
@@ -107,7 +110,7 @@ int updateBuf(node* task, ssize_t bytes){
 void taskDone(node* task){
   task->bufPos = 0;
   task->taskPos = 0;
-  task->taskNo = 0;
+  task->taskNo = 5;
 }
 
 void initateTaskBuf(node* task, char* info, char* message){
@@ -124,7 +127,7 @@ int handleTaskOne(node* task){
     switch(pos){
       case 0:{
 	puts("case0");
-	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
+	ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
 fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(bytesRead != (ssize_t)(strlen(RECEIVEME) +2 - task->bufPos)){
 	  return updateBuf(task, bytesRead);
 	} else {
@@ -142,7 +145,8 @@ fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(byte
 
 	initateTaskBuf(task, iBool, RECEIVED);
     fprintf(stdout, "%s is buf\n", task->buf);
-	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(RECEIVED) + 2 - task->bufPos);
+
 	if(bytesWrote != (ssize_t)(strlen(RECEIVED) +2- task->bufPos)){
 	  return updateBuf(task, bytesWrote);
 	} else {
@@ -165,10 +169,7 @@ fprintf(stdout, "bytes read : %zu, cur buf %s\n", bytesRead, task->buf);	if(byte
 	taskDone(task);
 	
       }
-    }
-
-
-  
+    }  
   //expects a message RECEIVEME
   
   //sends RECEIVED
@@ -180,8 +181,66 @@ int handleTaskTwo(node* task){
   return 0;
 }
 int handleTaskThree(node* task){
+  //info is 1 byte, size is 4 bytes, name is null terminated
+
+  //case 0, send, case1: read
+  int pos = task->taskPos;
+    switch(pos){
+      case 0:{
+        puts("case0");
+	if(task->bufWIP == 0){
+	  //task->bufWIP = 1;
+        initateTaskBuf(task, iData, task->tmpTask->file_name);
+    fprintf(stdout, "%s is buf\n", task->buf);
+	  task->tmpTask->file_stream = fopen(task->tmpTask->file_name, "rb");
+	  if(task->tmpTask->file_stream == NULL){ perror("bad file name given for task 3\n"); return -1;}
+	  task->bufWIP = 1;
+	} else { 
+	char* tmp = "";
+	 initateTaskBuf(task, iData, tmp);
+	}
+	puts("writing");
+	ssize_t startPos = strlen(task->buf) +1;
+	
+
+	int len = read(fileno(task->tmpTask->file_stream), task->buf + startPos, task->bufSize - startPos);
+	fprintf(stdout, "len is %d\n", len);
+	if(len == -1){
+		fprintf(stderr, "error reading fd in task three"); return -1;
+	} else if( len == 0){
+	  resetHelper(task);
+	} else {
+	fprintf(stdout, "writing %s\n", task->buf+1);
+	  ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf+1, len + startPos-1);
+	  return updateBuf(task, bytesWrote);
+	}
+
+	}case 1:{
+        puts("case1");
+	
+        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+        if(bytesRead != (ssize_t)(strlen(READY) +2 - task->bufPos)){
+          return updateBuf(task, bytesRead);
+        } else {
+          if (strcmp(READY, (task->buf+1)) != 0){
+            fprintf(stderr, "didn't receive correct value, reseting node");
+            return -1;
+          } else {
+            resetHelper(task);
+          }
+        }
+        taskDone(task);
+
+      }
+    }
+  //expects a message RECEIVEME
+
+  //sends RECEIVED
+  //recieves READY
   return 0;
 }
+
+
 int handleTaskFour(node* task){
   return 0;
 }
@@ -223,9 +282,9 @@ int handleTaskZeroWorker(node* task){//startup
 
     case 0: {
         puts("case0");
-        initateTaskBuf(task, iBool, RECEIVED);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(task->buf) + 1 - task->bufPos);
-        fprintf(stdout, "wrote %zu bytes\n", bytesWrote);if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 2 - task->bufPos)){
+        initateTaskBuf(task, iBool, RECEIVEME);
+        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(RECEIVEME) + 2 - task->bufPos);
+        fprintf(stdout, "wrote %zu bytes\n", bytesWrote);if(bytesWrote != (ssize_t)(strlen(RECEIVEME) + 2 - task->bufPos)){
           return updateBuf(task, bytesWrote);
         } else {
           resetHelper(task);
@@ -235,8 +294,8 @@ int handleTaskZeroWorker(node* task){//startup
     } case 1: {
 puts("case1");
 	
-        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-        if(bytesRead != (ssize_t)(strlen(READY) +2 - task->bufPos)){
+        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+        if(bytesRead != (ssize_t)(strlen(RECEIVED) +2 - task->bufPos)){
           return updateBuf(task, bytesRead);
         } else {
           if (strcmp(RECEIVED, (task->buf+1)) != 0){
@@ -251,8 +310,8 @@ puts("case1");
 puts("case2");
        
         initateTaskBuf(task, iStatus, READY);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, task->bufSize);
-        if(bytesWrote != (ssize_t)(strlen(RECEIVED) + 2 - task->bufPos)){
+        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(READY)+2 - task->bufPos);
+        if(bytesWrote != (ssize_t)(strlen(READY) + 2 - task->bufPos)){
           return updateBuf(task, bytesWrote);
         } else {
           resetHelper(task);
@@ -274,8 +333,58 @@ int handleTaskTwoWorker(node* task){
   return 0;
 }
 int handleTaskThreeWorker(node* task){
+  int pos = task->taskPos;
+  switch(pos){
+
+    case 0: {
+        puts("case0");
+	ssize_t bytesRead = 0;
+        if(task->bufWIP == 0){
+	  	bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+		size_t nameLen = strlen(task->buf);
+		if(nameLen <= 1){ return -1;}
+		task->fileName = strcpy(task->fileName, task->buf+1);
+		fprintf(stdout, "gotten filename is %s\n", task->fileName);
+		task->bufWIP = 1;
+	}
+        
+
+    } case 1: {
+puts("case1");
+
+        ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
+        if(bytesRead != (ssize_t)(strlen(ASKSTATUS) +2 - task->bufPos)){
+          return updateBuf(task, bytesRead);
+        } else {
+          if (strcmp(ASKSTATUS, (task->buf+1)) != 0){
+            fprintf(stderr, "didn't receive correct value, reseting node");
+            return -1;
+          } else {
+            resetHelper(task);
+          }
+        }
+
+    } case 2: {
+puts("case2");
+
+        initateTaskBuf(task, iStatus, READY);
+        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(READY)+2 - task->bufPos);
+        if(bytesWrote != (ssize_t)(strlen(READY) + 2 - task->bufPos)){
+          return updateBuf(task, bytesWrote);
+        } else {
+          resetHelper(task);
+        }
+        task->taskNo = 4;
+        return 0;
+    }
+  }
+
+
+
+
   return 0;
 }
 int handleTaskFourWorker(node* task){
   return 0;
 }
+

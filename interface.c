@@ -1,21 +1,20 @@
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include "node.h"
-#include "master.h"
-#include "worker.h"
-
+#include "interface.h"
+#define BUF_SIZE 1024
+/*
 int wait_for_input();
 void print_usage();
 int setUpClient(char *addr, char *port);
 int cleanUpClient(int socket);
 int sendBinaryFile(int socket, char *name);
+ssize_t my_write(int socket, void *buffer, size_t count);
+void write_binary_data(FILE *f, int sockFd, char *buffer);
+*/
+static char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
+static char master_addr[1024];
 
 int interface_main(int argc, char const *argv[]) {
     printf("In client\n");
 
-	char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
@@ -26,10 +25,11 @@ int interface_main(int argc, char const *argv[]) {
     	tempBuf[bytesRead - 1] = '\0';
     	printf("Using address %s\n", tempBuf);
     }
+    strcpy(master_addr, tempBuf);
     socketFd = setUpClient(tempBuf, defaultInterfacePort);
     if (socketFd == -1) {
-      fprintf(stderr, "Failed connection, try again later\n");
-      return 0;
+        fprintf(stderr, "Failed connection, try again later\n");
+        return 0;
     }
 
 	wait_for_input(argv);
@@ -42,22 +42,25 @@ void print_usage(char const *argv[]) {
     printf("usage: %s [executable]\n", argv[0]);
 }
 
-int wait_for_input(char const *argv[]) {
+int wait_for_input(char const *argv[], int sockFd) {
     char buffer[16];
+    char fileBuffer[BUF_SIZE];
     size_t numExec = 0;
     printf("Enter number of executable(s): ");
     scanf("%zu", &numExec);
     printf("%zu executable(s).\nEnter executable name: ", numExec);
     for (size_t i = 0; i < numExec; i++) {
-	scanf("%s", buffer);
-	printf("You entered: %s\n", buffer);
-	if (access(buffer, X_OK) == 0) {
-	    // execute(buffer);
-	    printf("executing %s\n", buffer);
-	} else {
-	    print_usage(argv);
-	}
-	printf("Enter executable name: ");
+	    scanf("%s", buffer);
+	    printf("You entered: %s\n", buffer);
+	    if (access(buffer, X_OK) == 0) {
+	        //execute(buffer);
+	        //printf("executing %s\n", buffer);
+            FILE *f = fopen(buffer, "r");
+            write_binary_data(f, sockFd, fileBuffer);
+	    } else {
+	        print_usage(argv);
+	    }
+	    printf("Enter executable name: ");
     }
     return 0;
 }
@@ -107,3 +110,29 @@ int cleanUpClient(int socket) {
   	return 0;
 }
 
+ssize_t my_write(int socket, void *buffer, size_t count) {
+    size_t c = count;
+    int y = 0;
+    do {
+        y = write(socket, buffer, count);
+        if (y != -1) {
+            buffer += y;
+            count -= y;
+        }
+    } while ((count > 0 && 0 < y) || (y == -1 && errno == EINTR));
+    if (y == -1 && errno != EINTR) {
+        return -1;
+    }
+    return c - count;
+}
+
+void write_binary_data(FILE *f, int sockFd, char *buffer) {
+    size_t s = 1;
+    while (s != 0) {
+        buffer[0] = '\0';
+        s = fread(buffer, 1, BUF_SIZE, f);
+        if (s != 0) {
+            my_write(sockFd, buffer, s);
+        }
+    }
+}

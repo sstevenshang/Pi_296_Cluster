@@ -6,7 +6,7 @@
 /* SERVER FUNCTIONS */
 int runningC = 0;
 static char* defaultClientPort = "9001";
-static char* heartbeat_port_listener = "9010";
+static char* heartbeat_port_listener = "9111";
 static char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 static int alive = 1;
 //Buffer to hold master name/ IP
@@ -219,6 +219,14 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
+  struct hostent *he;
+  he = gethostbyname(destinationAddr);
+  if (he == NULL) {
+      printf("ur bad\n");
+  }
+  struct in_addr **addr_list = (struct in_addr**)he->h_addr_list;
+  char* ip = inet_ntoa(*addr_list[0]);
+
   double cpu_usage = get_local_usage();
   char message[50];
   sprintf(message, "%f", cpu_usage);
@@ -226,8 +234,8 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
   struct sockaddr_in serverAddr;
   memset((char*)&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family = AF_INET;
-  serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
-  serverAddr.sin_port = htons(9010);
+  serverAddr.sin_addr.s_addr = inet_addr(ip);
+  serverAddr.sin_port = htons(9111);
 
   printf("sending to %s:%s\n", destinationAddr, destinationPort);
   int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
