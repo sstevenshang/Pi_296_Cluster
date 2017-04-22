@@ -4,6 +4,24 @@ queue* tasks;
 
 //TODO let's squitch over for a task struct for clarity. We can store filenames + status of a task. See node.h.
 
+void scheduler(node* workers, int fd) {
+  //Get any files, etc from interface
+  char* file_name = getBinaryFile(fd, "test");
+
+  if (! file_name)
+    return;
+
+  //Create task struct. Add file name
+  task* to_do = malloc(sizeof(task));
+  to_do->file_name = file_name;
+
+  //Schedule the task
+  schedule_task(to_do);
+
+  //See if we can distibute the task
+  get_task_from_queue_onto_nodes(workers);
+}
+
 void schedule_task(task* work) {
     if (tasks == NULL)
         tasks = queue_create();
@@ -14,8 +32,7 @@ void get_task_from_queue_onto_nodes(node* workers) {
     while (!queue_empty(tasks)) {
         task* work = queue_pull(tasks);
         if (distribute_task(workers, work) == 0) {
-            // TODO: figure out a better way
-            usleep(0.2*1000);
+            break;
         }
     }
 }
@@ -42,7 +59,7 @@ int distribute_task(node* workers, task* work) {
 void recover_tasks(node* worker) {
   if (!worker)
     return;
-    
+
   for (int i = 0; i < MAX_TASKS_PER_NODE; i++) {
       queue_push(tasks, worker->task_list[i]);
       return;
@@ -56,6 +73,7 @@ void remove_tasks(node* worker, task* work) {
 
   for (int i = 0; i < MAX_TASKS_PER_NODE; i++) {
     if (worker->task_list[i] == work) {
+      //Free task struct here
       worker->task_list[i] = NULL;
       return;
     }

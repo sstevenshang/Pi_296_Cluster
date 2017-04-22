@@ -23,6 +23,7 @@ int master_main() {
         if (incomingFdWorker != -1 && incomingFdClient != -1) {
             addAnyIncomingConnections(incomingFdWorker, 0);
             addAnyIncomingConnections(incomingFdClient, 1);
+            scheduler(workerList, incomingFdClient);
             puts("about to run manager"); sleep(1);
             manageTaskMaster(workerList);
         } else {
@@ -34,6 +35,7 @@ int master_main() {
     pthread_join(node_checking_thread, NULL);
     cleanUpMaster(incomingFdWorker);
     cleanUpMaster(incomingFdClient);
+    shutdown_scheduler();
     return 0;
 }
 
@@ -72,8 +74,13 @@ int setUpMaster(char* port){
 int addAnyIncomingConnections(int incomingFd, int mode) {
     struct sockaddr_in clientname;
     size_t size = sizeof(clientname);
-    int client_fd = accept4(incomingFd, (struct sockaddr *)&clientname,
-                            (socklen_t *)&size, SOCK_NONBLOCK);
+    int client_fd;
+    if (! mode)
+      client_fd = accept4(incomingFd, (struct sockaddr *)&clientname,
+                          (socklen_t *)&size, SOCK_NONBLOCK);
+    else 
+      client_fd = accept4(incomingFd, (struct sockaddr *)&clientname,
+                          (socklen_t *)&size, 0);
     if (client_fd != -1) {
         char *client_address = strdup(inet_ntoa(clientname.sin_addr));
         fprintf(stdout, "got incoming connection from %s\n", client_address);

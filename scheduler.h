@@ -3,6 +3,7 @@
 #define _SCHEDULER_H_
 #include "queue.h"
 #include "node.h"
+#include "networkManager.h"
 #include <unistd.h>
 
 void schedule_task(task* work);
@@ -12,5 +13,5 @@ void recover_tasks(node* worker);
 node* get_least_used_worker(node* workers);
 void remove_tasks(node* worker, task* work);
 void shutdown_scheduler();
-
+void scheduler(node* workerList, int fd);
 #endif
