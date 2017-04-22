@@ -263,6 +263,8 @@ void manageTaskWorker(node* task){
     if(task->taskNo == 0){ //startup
       checkVal =handleTaskThreeWorker(task); 
       if(checkVal == 0){puts("WORKED");}
+      int runExec = 0;
+      if(runExec == 1){ runBinaryFileT(task->fileName);}
     } else if(task->taskNo == 1){  //get file
       handleTaskOneWorker(task);
     } else if(task->taskNo == 2){  //send file
@@ -388,3 +390,17 @@ int handleTaskFourWorker(node* task){
   return 0;
 }
 
+
+void runBinaryFileT(char* name){
+    if(name == NULL){fprintf(stderr, "trying ot exec a null\n"); exit(0);}
+    pthread_t myThread;
+    pthread_attr_t* myAttr = NULL;
+    pthread_create(&myThread, myAttr, &threadManagerT, (void*)name);
+    pthread_join(myThread, NULL);
+}
+
+void* threadManagerT(void* arg){
+    execlp((char*)arg, (char*)arg, NULL);
+    fprintf(stderr, "exec returned");
+    return (void*)-1;
+}
