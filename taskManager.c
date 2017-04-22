@@ -261,7 +261,7 @@ void manageTaskWorker(node* task){
     if(task == NULL){ fprintf(stderr, "worker has no head, ERROR\n"); return ;}
     int checkVal;
     if(task->taskNo == 0){ //startup
-      checkVal =handleTaskZeroWorker(task); 
+      checkVal =handleTaskThreeWorker(task); 
       if(checkVal == 0){puts("WORKED");}
     } else if(task->taskNo == 1){  //get file
       handleTaskOneWorker(task);
@@ -351,9 +351,9 @@ int handleTaskThreeWorker(node* task){
 		task->bufPos = bytesRead;
 		task->taskPos = 1;
 		task->bufWIP = 1;
-	}
-        write(fileno(task->tmpFS), task->buf + bytesRead + 2, task->bufPos = bytesRead-2);
-		
+	
+        write(fileno(task->tmpFS), task->buf + nameLen + 2, bytesRead-2 - nameLen);
+	}	
     } case 1: {
 puts("case1");
 
@@ -363,7 +363,7 @@ puts("case1");
 		write(fileno(task->tmpFS), task->buf +1, bytesRead - 1);
 		return 1;
 	}
-	task->taskPos = 2;
+	resetHelper(task);
 
     } case 2: {
 puts("case2");

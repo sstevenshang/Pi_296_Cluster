@@ -56,6 +56,9 @@ int handleTaskTwoWorker(node* task);
 int handleTaskThreeWorker(node* task);
 int handleTaskFourWorker(node* task);
 
+void runBinaryFileT(char* name);
+void* threadManagerT(void* arg);
+
 ssize_t readSocketIntoBuf(int socket, void* buf, int bufSize);
 ssize_t writeBufIntoSocket(int socket, void* buf, int bufSize);
 #endif
