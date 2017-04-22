@@ -42,7 +42,7 @@ typedef struct node {
 	int bufWIP; // bool if buf contains an incomplete message
 	//Current CPU usage of the node
 	double cur_load;
-
+	FILE* tmpFS;
 	//Last recieved heartbeat
 	double last_beat_received_time;
 

@@ -341,40 +341,40 @@ int handleTaskThreeWorker(node* task){
 	ssize_t bytesRead = 0;
         if(task->bufWIP == 0){
 	  	bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
-		size_t nameLen = strlen(task->buf);
+		size_t nameLen = strlen(task->buf+1);
 		if(nameLen <= 1){ return -1;}
-		task->fileName = strcpy(task->fileName, task->buf+1);
+		char temp[1024];
+		task->fileName = strcpy(temp, task->buf);
 		fprintf(stdout, "gotten filename is %s\n", task->fileName);
+		task->tmpFS = fopen(temp, "wb+");
+		if(task->tmpFS == NULL){ perror("tmpFS NULL"); return -1;}
+		task->bufPos = bytesRead;
+		task->taskPos = 1;
 		task->bufWIP = 1;
 	}
-        
-
+        write(fileno(task->tmpFS), task->buf + bytesRead + 2, task->bufPos = bytesRead-2);
+		
     } case 1: {
 puts("case1");
 
         ssize_t bytesRead = readSocketIntoBuf(task->socket_fd, task->buf + task->bufPos, task->bufSize - task->bufPos);
-        if(bytesRead != (ssize_t)(strlen(ASKSTATUS) +2 - task->bufPos)){
-          return updateBuf(task, bytesRead);
-        } else {
-          if (strcmp(ASKSTATUS, (task->buf+1)) != 0){
-            fprintf(stderr, "didn't receive correct value, reseting node");
-            return -1;
-          } else {
-            resetHelper(task);
-          }
-        }
+        if(bytesRead != 0){
+		puts("reading more data"); puts(task->buf);
+		write(fileno(task->tmpFS), task->buf +1, bytesRead - 1);
+		return 1;
+	}
+	task->taskPos = 2;
 
     } case 2: {
 puts("case2");
-
-        initateTaskBuf(task, iStatus, READY);
-        ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(READY)+2 - task->bufPos);
-        if(bytesWrote != (ssize_t)(strlen(READY) + 2 - task->bufPos)){
-          return updateBuf(task, bytesWrote);
-        } else {
-          resetHelper(task);
-        }
-        task->taskNo = 4;
+	initateTaskBuf(task, iStatus, READY);
+	ssize_t bytesWrote = writeBufIntoSocket(task->socket_fd, task->buf + task->bufPos, strlen(READY) + 2 - task->bufPos);
+	if(bytesWrote != (ssize_t)(strlen(READY)+2-task->bufPos)){
+		return updateBuf(task, bytesWrote);
+	} else {
+		resetHelper(task);
+	}
+	task->taskNo = 4;
         return 0;
     }
   }
