@@ -3,7 +3,7 @@
 #define _SCHEDULER_H_
 #include "queue.h"
 #include "node.h"
-#include "networkManager.h"
+#include "worker.h"
 #include <unistd.h>
 
 void schedule_task(task* work);
