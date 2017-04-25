@@ -8,6 +8,7 @@
 #include "node.h"
 #include "master.h"
 #include "worker.h"
+#include "scheduler.h"
 #include "networkManager.h"
 
 int wait_for_input();

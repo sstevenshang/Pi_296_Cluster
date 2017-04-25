@@ -14,4 +14,5 @@ node* get_least_used_worker(node* workers);
 void remove_tasks(node* worker, task* work);
 void shutdown_scheduler();
 void scheduler(node* workerList, int fd);
+ssize_t write_all_from_socket_to_fd(int socket, int fd, ssize_t size);
 #endif

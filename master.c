@@ -78,7 +78,7 @@ int addAnyIncomingConnections(int incomingFd, int mode) {
     if (! mode)
       client_fd = accept4(incomingFd, (struct sockaddr *)&clientname,
                           (socklen_t *)&size, SOCK_NONBLOCK);
-    else 
+    else
       client_fd = accept4(incomingFd, (struct sockaddr *)&clientname,
                           (socklen_t *)&size, 0);
     if (client_fd != -1) {
