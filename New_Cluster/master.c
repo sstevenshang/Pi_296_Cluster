@@ -137,6 +137,8 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 		}
     char *connected_ip= inet_ntoa(new_addr.sin_addr);
 
+    printf("Accepted connection from %s on file descriptor %i\n", connected_ip, new_fd);
+
     int flags = fcntl(new_fd, F_GETFL, 0);
     fcntl(new_fd, F_SETFL, flags | O_NONBLOCK);
 
@@ -178,6 +180,7 @@ void handle_data(struct epoll_event *e) {
           return;
         case DONE_SENDING:
           curr->status = NEED_SIZE;
+          printf("Succesfully got the header: %s\n", curr->command);
           break;
         default:
           fprintf(stderr, "There was a failure in parsing the header!\n");
@@ -189,6 +192,7 @@ void handle_data(struct epoll_event *e) {
         case NOT_DONE_SENDING:
           return;
         case DONE_SENDING:
+          printf("Got the size of the file to be %zu\n", curr->file_size);
           curr->status = RECIEVING_DATA;
           break;
         default:
@@ -199,6 +203,7 @@ void handle_data(struct epoll_event *e) {
       check = get_binary_data(curr);
       switch (check) {
         case NOT_DONE_SENDING:
+          printf("Finished recieving binary data...\n");
           return;
         case DONE_SENDING:
           curr->status = FORWARD_DATA;
@@ -208,6 +213,7 @@ void handle_data(struct epoll_event *e) {
       }
     }
     if (curr->status == FORWARD_DATA) {
+      printf("Interfacing with the scheduler\n");
       //If the request is from the interface, forward the data to a worker
       if (e->data.fd == interface_fd) {
         task* new_task = make_task(curr);
@@ -221,8 +227,11 @@ void handle_data(struct epoll_event *e) {
       curr->status = FORWARDING_DATA;
     }
     if (curr->status == FORWARDING_DATA) {
-      do_put(curr->fd_to_send_to, curr);
+      printf("Forwarding data...\n");
+      ssize_t s = do_put(curr->fd_to_send_to, curr);
       reset_worker_for_parsing(curr);
+      if (s != BIG_FAILURE)
+        printf("Succesfully handled task\n");
       curr->status = START;
     }
 }
