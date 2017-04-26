@@ -12,19 +12,9 @@
 #include <unistd.h>
 #include "vector.h"
 
-#define HEADER_BUFFER_SIZE 4096
-#define RECIEVING_HEADER 1
-#define RECEIVED_HEADER 2
-#define RECIEVING_DATA 3
 #define DONE_SENDING -7
 #define NOT_DONE_SENDING -8
-#define INVALID_COMMAND -11
-#define GETTING_VERB -12
-#define HAVE_VERB -13
-#define HAVE_FILENAME -14
-#define HAVE_SIZE -15
 #define WRONG_DATA_SIZE -16
-#define SEND_RESPONSE -18
 
 typedef enum { INTERFACE_PUT, PUT} verb;
 

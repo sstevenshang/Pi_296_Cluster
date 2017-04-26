@@ -23,14 +23,14 @@ static char* temp_directory;
 static int interface_fd = -1;
 static vector* worker_list;
 
-void close_server() { close_master = 1; }
+void kill_master() { close_master = 1; }
 
 void ignore() { }
 
-void set_up_signals() {
+void setSignalHandlers() {
   struct sigaction act;
   memset(&act, '\0', sizeof(act));
-  act.sa_handler = close_server;
+  act.sa_handler = kill_master;
   if (sigaction(SIGINT, &act, NULL) < 0) {
     perror("sigaction");
     exit(1);
@@ -44,10 +44,6 @@ void set_up_signals() {
   }
 }
 
-void set_up_worker_list(){
-  worker_list = vector_create(NULL, NULL, NULL);
-}
-
 void create_worker(int fd){
   worker* newWorker = (worker*)malloc(sizeof(worker));
   newWorker->alive = 1;
@@ -58,16 +54,14 @@ void create_worker(int fd){
 }
 
 size_t find_worker_pos(int fd){
-
   size_t i = 0;
-  iwhile(i < vector_size(worker_list)){
+  while(i < vector_size(worker_list)){
     if((vector_get(worker_list, i))->worker_fd == fd){
       return i;
     }
     i++
   }
   return -1;
-
 }
 
 void clean_up_globals() {
@@ -82,11 +76,14 @@ void clean_up_globals() {
 void set_up_gloabls(char* port) {
   sock_fd = set_up_server(port);
 	epoll_fd = epoll_create(1);
+  worker_list = vector_create(NULL, NULL, NULL);
+
 	if(epoll_fd == -1) {
     clean_up_globals();
     perror("epoll_create()");
     exit(1);
   }
+
 	struct epoll_event event;
 	event.data.fd = sock_fd;
 	event.events = EPOLLIN | EPOLLET;
@@ -95,6 +92,7 @@ void set_up_gloabls(char* port) {
     perror("epoll_ctl()");
     exit(1);
 	}
+
   char dummy[] = "./master_tempXXXXXX";
   temp_directory = strdup(mkdtemp(dummy));
   print_temp_directory(temp_directory);
@@ -159,9 +157,8 @@ int main(int argc, char** argv) {
     exit(1);
   }
 
-  set_up_signals();
-
-  set_up_gloabls(argv[1]);
+  setSignalHandlers();
+  setUpGlobals(argv[1]);
 
 	// Event loop
 	while(!close_master) {

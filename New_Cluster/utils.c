@@ -94,7 +94,7 @@ int get_filename(int sfd, task* to_do) {
 }
 
 int get_verb(task* to_do) {
-  
+
       if (strncmp(to_do->header, "INTERFACE_PUT", 13) == 0) {
         return 1;
       } else if (strncmp(to_do->header, "MASTER_TO_WORKER_PUT", 20) == 0) {
@@ -102,7 +102,7 @@ int get_verb(task* to_do) {
       } else if (strncmp(to_do->header, "WORKER_TO_MASTER_PUT", 20) == 0) {
         return 3;
       }
-        
+
   return -1;
 }
 
