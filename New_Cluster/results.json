@@ -1,0 +1,1682 @@
+[
+  {
+    "testcases": [
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "e0678d85e9cf16ff4b7a3d977cb9070bcbe3296c  client.c\n1fd05f9c0e6ceb6cc2418f64e1f62b7ab4db930e  common.c\n6c31668815ac20f3075a01d38f176ab1febcfb4a  common.h\n",
+    "timestamp": "2017-04-14 22:33:26.422527",
+    "revision": "77483"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\nclient.c:14:14: warning: unused parameter 'argc' [-Wunused-parameter]\nint main(int argc, char **argv) {\n             ^\nclient.c:14:27: warning: unused parameter 'argv' [-Wunused-parameter]\nint main(int argc, char **argv) {\n                          ^\nclient.c:44:13: error: implicit declaration of function 'toupper' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    *temp = toupper((unsigned char)*temp);\n            ^\n2 warnings and 1 error generated.\nmake: *** [.objs/client-release.o] Error 1\n",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "e0678d85e9cf16ff4b7a3d977cb9070bcbe3296c  client.c\n1fd05f9c0e6ceb6cc2418f64e1f62b7ab4db930e  common.c\n6c31668815ac20f3075a01d38f176ab1febcfb4a  common.h\n",
+    "timestamp": "2017-04-15 14:56:09.690603",
+    "revision": "77608"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==31808== Memcheck, a memory error detector\n==31808== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==31808== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==31808== Command: ./client 127.0.0.1:49582 PUT testfile.c common.c\n==31808== \n==31808== \n==31808== HEAP SUMMARY:\n==31808==     in use at exit: 552 bytes in 1 blocks\n==31808==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==31808== \n==31808== LEAK SUMMARY:\n==31808==    definitely lost: 0 bytes in 0 blocks\n==31808==    indirectly lost: 0 bytes in 0 blocks\n==31808==      possibly lost: 0 bytes in 0 blocks\n==31808==    still reachable: 552 bytes in 1 blocks\n==31808==         suppressed: 0 bytes in 0 blocks\n==31808== Reachable blocks (those to which a pointer was found) are not shown.\n==31808== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==31808== \n==31808== For counts of detected and suppressed errors, rerun with: -v\n==31808== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\nd03787a11d9cc47a31119986f7d6d6455c7005d6  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-15 17:00:00.947032",
+    "revision": "77953"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==3787== Memcheck, a memory error detector\n==3787== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==3787== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==3787== Command: ./client 127.0.0.1:49582 PUT testfile.c common.c\n==3787== \n==3787== \n==3787== HEAP SUMMARY:\n==3787==     in use at exit: 552 bytes in 1 blocks\n==3787==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==3787== \n==3787== LEAK SUMMARY:\n==3787==    definitely lost: 0 bytes in 0 blocks\n==3787==    indirectly lost: 0 bytes in 0 blocks\n==3787==      possibly lost: 0 bytes in 0 blocks\n==3787==    still reachable: 552 bytes in 1 blocks\n==3787==         suppressed: 0 bytes in 0 blocks\n==3787== Reachable blocks (those to which a pointer was found) are not shown.\n==3787== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==3787== \n==3787== For counts of detected and suppressed errors, rerun with: -v\n==3787== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\nd03787a11d9cc47a31119986f7d6d6455c7005d6  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-16 00:00:01.740274",
+    "revision": "78416"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==9195== Memcheck, a memory error detector\n==9195== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==9195== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==9195== Command: ./client 127.0.0.1:49582 PUT testfile.c common.c\n==9195== \n==9195== \n==9195== HEAP SUMMARY:\n==9195==     in use at exit: 552 bytes in 1 blocks\n==9195==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==9195== \n==9195== LEAK SUMMARY:\n==9195==    definitely lost: 0 bytes in 0 blocks\n==9195==    indirectly lost: 0 bytes in 0 blocks\n==9195==      possibly lost: 0 bytes in 0 blocks\n==9195==    still reachable: 552 bytes in 1 blocks\n==9195==         suppressed: 0 bytes in 0 blocks\n==9195== Reachable blocks (those to which a pointer was found) are not shown.\n==9195== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==9195== \n==9195== For counts of detected and suppressed errors, rerun with: -v\n==9195== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n2ffae0fe85e9977b4fddb1552ffb905c115294de  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-16 11:08:35.735997",
+    "revision": "78512"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==13774== Memcheck, a memory error detector\n==13774== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==13774== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==13774== Command: ./client 127.0.0.1:49582 PUT testfile.c common.c\n==13774== \n==13774== \n==13774== HEAP SUMMARY:\n==13774==     in use at exit: 552 bytes in 1 blocks\n==13774==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==13774== \n==13774== LEAK SUMMARY:\n==13774==    definitely lost: 0 bytes in 0 blocks\n==13774==    indirectly lost: 0 bytes in 0 blocks\n==13774==      possibly lost: 0 bytes in 0 blocks\n==13774==    still reachable: 552 bytes in 1 blocks\n==13774==         suppressed: 0 bytes in 0 blocks\n==13774== Reachable blocks (those to which a pointer was found) are not shown.\n==13774== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==13774== \n==13774== For counts of detected and suppressed errors, rerun with: -v\n==13774== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-16 17:00:00.896015",
+    "revision": "78759"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==30898== Memcheck, a memory error detector\n==30898== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==30898== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==30898== Command: ./client 127.0.0.1:49582 \n==30898== \n==30898== \n==30898== HEAP SUMMARY:\n==30898==     in use at exit: 552 bytes in 1 blocks\n==30898==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==30898== \n==30898== LEAK SUMMARY:\n==30898==    definitely lost: 0 bytes in 0 blocks\n==30898==    indirectly lost: 0 bytes in 0 blocks\n==30898==      possibly lost: 0 bytes in 0 blocks\n==30898==    still reachable: 552 bytes in 1 blocks\n==30898==         suppressed: 0 bytes in 0 blocks\n==30898== Reachable blocks (those to which a pointer was found) are not shown.\n==30898== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==30898== \n==30898== For counts of detected and suppressed errors, rerun with: -v\n==30898== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-16 22:30:46.633910",
+    "revision": "79070"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==29368== Memcheck, a memory error detector\n==29368== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==29368== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==29368== Command: ./client 127.0.0.1:49582 \n==29368== \n==29368== \n==29368== HEAP SUMMARY:\n==29368==     in use at exit: 552 bytes in 1 blocks\n==29368==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==29368== \n==29368== LEAK SUMMARY:\n==29368==    definitely lost: 0 bytes in 0 blocks\n==29368==    indirectly lost: 0 bytes in 0 blocks\n==29368==      possibly lost: 0 bytes in 0 blocks\n==29368==    still reachable: 552 bytes in 1 blocks\n==29368==         suppressed: 0 bytes in 0 blocks\n==29368== Reachable blocks (those to which a pointer was found) are not shown.\n==29368== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==29368== \n==29368== For counts of detected and suppressed errors, rerun with: -v\n==29368== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 01:00:00.755325",
+    "revision": "79350"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==1934== Memcheck, a memory error detector\n==1934== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==1934== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==1934== Command: ./client 127.0.0.1:49582 \n==1934== \n==1934== \n==1934== HEAP SUMMARY:\n==1934==     in use at exit: 552 bytes in 1 blocks\n==1934==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==1934== \n==1934== LEAK SUMMARY:\n==1934==    definitely lost: 0 bytes in 0 blocks\n==1934==    indirectly lost: 0 bytes in 0 blocks\n==1934==      possibly lost: 0 bytes in 0 blocks\n==1934==    still reachable: 552 bytes in 1 blocks\n==1934==         suppressed: 0 bytes in 0 blocks\n==1934== Reachable blocks (those to which a pointer was found) are not shown.\n==1934== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==1934== \n==1934== For counts of detected and suppressed errors, rerun with: -v\n==1934== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 05:00:01.477935",
+    "revision": "79520"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==11301== Memcheck, a memory error detector\n==11301== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==11301== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==11301== Command: ./client 127.0.0.1:49582 \n==11301== \n==11301== \n==11301== HEAP SUMMARY:\n==11301==     in use at exit: 552 bytes in 1 blocks\n==11301==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==11301== \n==11301== LEAK SUMMARY:\n==11301==    definitely lost: 0 bytes in 0 blocks\n==11301==    indirectly lost: 0 bytes in 0 blocks\n==11301==      possibly lost: 0 bytes in 0 blocks\n==11301==    still reachable: 552 bytes in 1 blocks\n==11301==         suppressed: 0 bytes in 0 blocks\n==11301== Reachable blocks (those to which a pointer was found) are not shown.\n==11301== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==11301== \n==11301== For counts of detected and suppressed errors, rerun with: -v\n==11301== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 10:00:01.509821",
+    "revision": "79601"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==16544== Memcheck, a memory error detector\n==16544== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==16544== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==16544== Command: ./client 127.0.0.1:49582 \n==16544== \n==16544== \n==16544== HEAP SUMMARY:\n==16544==     in use at exit: 552 bytes in 1 blocks\n==16544==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==16544== \n==16544== LEAK SUMMARY:\n==16544==    definitely lost: 0 bytes in 0 blocks\n==16544==    indirectly lost: 0 bytes in 0 blocks\n==16544==      possibly lost: 0 bytes in 0 blocks\n==16544==    still reachable: 552 bytes in 1 blocks\n==16544==         suppressed: 0 bytes in 0 blocks\n==16544== Reachable blocks (those to which a pointer was found) are not shown.\n==16544== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==16544== \n==16544== For counts of detected and suppressed errors, rerun with: -v\n==16544== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "f3231ed631578b3613cf6f8ad848b748b844e3b7  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 13:30:01.390928",
+    "revision": "79885"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==23903== Memcheck, a memory error detector\n==23903== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==23903== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==23903== Command: ./client 127.0.0.1:49582 \n==23903== \n==23903== \n==23903== HEAP SUMMARY:\n==23903==     in use at exit: 552 bytes in 1 blocks\n==23903==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==23903== \n==23903== LEAK SUMMARY:\n==23903==    definitely lost: 0 bytes in 0 blocks\n==23903==    indirectly lost: 0 bytes in 0 blocks\n==23903==      possibly lost: 0 bytes in 0 blocks\n==23903==    still reachable: 552 bytes in 1 blocks\n==23903==         suppressed: 0 bytes in 0 blocks\n==23903== Reachable blocks (those to which a pointer was found) are not shown.\n==23903== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==23903== \n==23903== For counts of detected and suppressed errors, rerun with: -v\n==23903== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "a2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 17:00:01.384465",
+    "revision": "80345"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "valid_list_test",
+        "description": "Tests that we can LIST files (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nFAILED TO COMPILE!\ncommon.c:115:5: error: implicit declaration of function 'print_recieved_too_much_data' is invalid in C99 [-Werror,-Wimplicit-function-declaration]\n    print_recieved_too_much_data();\n    ^\ncommon.c:115:5: note: did you mean 'print_received_too_much_data'?\n./format.h:19:6: note: 'print_received_too_much_data' declared here\nvoid print_received_too_much_data();\n     ^\n1 error generated.\nmake: *** [.objs/common-release.o] Error 1\n",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "a2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 20:30:01.487332",
+    "revision": "80868"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==15173== Memcheck, a memory error detector\n==15173== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==15173== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==15173== Command: ./client 127.0.0.1:49582 \n==15173== \n==15173== \n==15173== HEAP SUMMARY:\n==15173==     in use at exit: 552 bytes in 1 blocks\n==15173==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==15173== \n==15173== LEAK SUMMARY:\n==15173==    definitely lost: 0 bytes in 0 blocks\n==15173==    indirectly lost: 0 bytes in 0 blocks\n==15173==      possibly lost: 0 bytes in 0 blocks\n==15173==    still reachable: 552 bytes in 1 blocks\n==15173==         suppressed: 0 bytes in 0 blocks\n==15173== Reachable blocks (those to which a pointer was found) are not shown.\n==15173== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==15173== \n==15173== For counts of detected and suppressed errors, rerun with: -v\n==15173== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can LIST files (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "a2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-17 22:00:00.789892",
+    "revision": "81146"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_delete_test",
+        "description": "Tests that we cannot delete invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "invalid_get_test",
+        "description": "Tests that we cannot get invalid files",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==18206== Memcheck, a memory error detector\n==18206== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==18206== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==18206== Command: ./client 127.0.0.1:49582 PUT testfile.c testcommon.c\n==18206== \n==18206== \n==18206== HEAP SUMMARY:\n==18206==     in use at exit: 552 bytes in 1 blocks\n==18206==   total heap usage: 5 allocs, 4 frees, 5,312 bytes allocated\n==18206== \n==18206== LEAK SUMMARY:\n==18206==    definitely lost: 0 bytes in 0 blocks\n==18206==    indirectly lost: 0 bytes in 0 blocks\n==18206==      possibly lost: 0 bytes in 0 blocks\n==18206==    still reachable: 552 bytes in 1 blocks\n==18206==         suppressed: 0 bytes in 0 blocks\n==18206== Reachable blocks (those to which a pointer was found) are not shown.\n==18206== To see them, rerun with: --leak-check=full --show-leak-kinds=all\n==18206== \n==18206== For counts of detected and suppressed errors, rerun with: -v\n==18206== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_data_test",
+        "description": "Tests that we recognize when there is not enough data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_data_test",
+        "description": "Tests that we recognize when there is too much data sent (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_delete_test",
+        "description": "Tests that we can delete valid files (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 3.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_get_test",
+        "description": "Tests that we can get valid files from the server (requires PUT to work)",
+        "ptsPossible": 3.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_list_test",
+        "description": "Tests that we can LIST files (requires PUT to work)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "valid_put_test",
+        "description": "Tests that we can put valid files",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "a2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-18 10:51:38.127432",
+    "revision": "81750"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "very_many_client_put_test",
+        "description": "Tests very many clients PUT a small file with your server (DOES NOT COUNT FOR PART 2 GRADE)",
+        "ptsPossible": 0.0
+      }
+    ],
+    "checksum": "58d7eea19904b487e54cdffe4e6525e7464d248f  server.c\na2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-21 00:00:02.216039",
+    "revision": "84043"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Did not print_temp_directory :(",
+        "name": "very_many_client_put_test",
+        "description": "Tests very many clients PUT a small file with your server (DOES NOT COUNT FOR PART 2 GRADE)",
+        "ptsPossible": 0.0
+      }
+    ],
+    "checksum": "58d7eea19904b487e54cdffe4e6525e7464d248f  server.c\na2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n7c9263c425355416a104c612aef1531c9cc75d7e  common.c\naeec8af93d2899f84479c6898e3dc88b75eecf4c  common.h\n",
+    "timestamp": "2017-04-21 14:00:01.378694",
+    "revision": "84309"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect malformed request(s)",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==13166== Memcheck, a memory error detector\n==13166== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==13166== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==13166== Command: ./socket_hook ./server 49582\n==13166== ",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "735b7adf402e33d8140203085be75d26d12ed0f7  server.c\na2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\nebae292b3aa7a807816803183e1c6d0d8d33c5f6  common.c\n2a92d7ef8c99f5711a51f0c4b80347d3c347f374  common.h\n",
+    "timestamp": "2017-04-21 22:13:11.756889",
+    "revision": "84619"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nTimeout :(\nDid not detect malformed request(s)",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==15420== Memcheck, a memory error detector\n==15420== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==15420== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==15420== Command: ./socket_hook ./server 49582\n==15420== ",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "0459e93a9899d9679b3bd2302510b58cc54682e9  server.c\na2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\n27f16a5d23d56d669784866813af5fddc5504c71  common.c\n8a5410ecc858239d79a75343e82f9b18f6f49cb9  common.h\n",
+    "timestamp": "2017-04-22 14:00:00.693787",
+    "revision": "84940"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect malformed request(s)",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==17026== Memcheck, a memory error detector\n==17026== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==17026== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==17026== Command: ./socket_hook ./server 49582\n==17026== ",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "2e4cf97691a89bb1a25678952eed8558d517bcf3  server.c\na2b0f2c51600a40ca854bc4225c426b30717e7e8  client.c\ne1e4590bf7b23c56b38b33a1e9daa37da962a73f  common.c\nbfe622b94bc3dd9e6af86c733952f61f0e667321  common.h\n",
+    "timestamp": "2017-04-22 22:00:01.976461",
+    "revision": "85508"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect malformed request(s)",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==27077== Memcheck, a memory error detector\n==27077== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==27077== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==27077== Command: ./socket_hook ./server 49582\n==27077== ",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect too little data",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect too much data",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nUploaded file content does not match original",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "c28fda08538b5ef02549963f1ca847484bdd93f8  server.c\na492bd38d647728816993fa55cbb3eb54685a6cc  client.c\nfd67f64730b50dd4579a4e5c59cdce5ef1157874  common.c\nbfe622b94bc3dd9e6af86c733952f61f0e667321  common.h\n",
+    "timestamp": "2017-04-23 14:00:02.097363",
+    "revision": "86067"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect malformed request(s)",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 6.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==6758== Memcheck, a memory error detector\n==6758== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==6758== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==6758== Command: ./socket_hook ./server 49582\n==6758== ",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 4.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "6414bbf3aeeb4de5485aa4b1d88a3ec66b781555  server.c\nab2a0ace43662d28d1a0fa33b98f37d97357bca7  client.c\n04b250151609d47241dd6ea028844142f33ecc54  common.c\nfe879841d407ed225adc6910b4613481cede91a5  common.h\n",
+    "timestamp": "2017-04-23 22:00:04.287781",
+    "revision": "86737"
+  },
+  {
+    "testcases": [
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "epoll_test",
+        "description": "Tests that epoll is being used in the server",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "large_put_test",
+        "description": "Tests that we can PUT large files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 0.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\nDid not detect malformed request(s)",
+        "name": "malformed_test",
+        "description": "Tests that your server detects malformed requests (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 6.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "many_client_put_test",
+        "description": "Tests that we can PUT files with many clients (your server + AG client)",
+        "ptsPossible": 6.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..\n==9483== Memcheck, a memory error detector\n==9483== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\n==9483== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\n==9483== Command: ./socket_hook ./server 49582\n==9483== ",
+        "name": "memory_test",
+        "description": "Tests for no memory errors (depends on: PUT)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "small_put_test",
+        "description": "Tests that we can PUT small files (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_little_test",
+        "description": "Tests that your server detects too little errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "too_much_test",
+        "description": "Tests that your server detects too much errors on PUT (your server + AG client)",
+        "ptsPossible": 2.0
+      },
+      {
+        "ptsEarned": 4.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "two_client_put_test",
+        "description": "Tests that we can PUT large files with two clients (your server + AG client)",
+        "ptsPossible": 4.0
+      },
+      {
+        "ptsEarned": 2.0,
+        "log": "Trying to compile your code...\nSuccessfully compiled your code..",
+        "name": "very_large_put_test",
+        "description": "Tests that we can PUT very large files (your server + AG client)",
+        "ptsPossible": 2.0
+      }
+    ],
+    "checksum": "6414bbf3aeeb4de5485aa4b1d88a3ec66b781555  server.c\nab2a0ace43662d28d1a0fa33b98f37d97357bca7  client.c\n04b250151609d47241dd6ea028844142f33ecc54  common.c\nfe879841d407ed225adc6910b4613481cede91a5  common.h\n",
+    "timestamp": "2017-04-24 14:00:02.462220",
+    "revision": "87298"
+  }
+]
