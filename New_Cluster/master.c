@@ -81,6 +81,7 @@ void reset_worker_for_parsing(worker* newWorker) {
   if (newWorker->temp_file_name)
     free(newWorker->temp_file_name);
   newWorker->temp_file_name = NULL;
+  newWorker->file_buffer_pos = 0;
 }
 
 worker* create_worker(int fd, char* IP){
@@ -179,7 +180,7 @@ void handle_data(struct epoll_event *e) {
           curr->status = NEED_SIZE;
           break;
         default:
-          fprintf(stderr, "There was a catastrophic failure!\n");
+          fprintf(stderr, "There was a failure in parsing the header!\n");
       }
     }
     if (curr->status == NEED_SIZE) {
@@ -191,7 +192,7 @@ void handle_data(struct epoll_event *e) {
           curr->status = RECIEVING_DATA;
           break;
         default:
-          fprintf(stderr, "There was a catastrophic failure!\n");
+          fprintf(stderr, "There was a failure in getting the size!\n");
       }
     }
     if (curr->status == RECIEVING_DATA) {
@@ -203,22 +204,24 @@ void handle_data(struct epoll_event *e) {
           curr->status = FORWARD_DATA;
           break;
         default:
-          fprintf(stderr, "There was a catastrophic failure!\n");
+          fprintf(stderr, "There was a failure recieving data!\n");
       }
     }
     if (curr->status == FORWARD_DATA) {
-      int fd_to_send_to;
       //If the request is from the interface, forward the data to a worker
       if (e->data.fd == interface_fd) {
         task* new_task = make_task(curr);
-        fd_to_send_to = schedule(new_task, worker_list);
+        curr->fd_to_send_to = schedule(new_task, worker_list);
       }
       //If this is a response from a worker, forward the data to interface
       else {
         scheduler_remove_task(curr->worker_fd, curr->temp_file_name, worker_list);
-        fd_to_send_to = interface_fd;
+        curr->fd_to_send_to  = interface_fd;
       }
-      do_put(fd_to_send_to, curr);
+      curr->status = FORWARDING_DATA;
+    }
+    if (curr->status == FORWARDING_DATA) {
+      do_put(curr->fd_to_send_to, curr);
       reset_worker_for_parsing(curr);
       curr->status = START;
     }
@@ -252,37 +255,6 @@ int master_main(int argc, char** argv) {
   MASTER_UTILS
 */
 
-ssize_t transfer_fds(int socket, int fd, worker* t) {
-  char buffer[4096];
-  ssize_t curr_read;
-  ssize_t total_read = 0;
-  errno = 0;
-  while (1) {
-    curr_read = read(socket, buffer, 4096);
-    if (curr_read == -1) {
-      if (errno == EINTR)
-        continue;
-      else if (errno == EWOULDBLOCK || errno == EAGAIN || errno == 11){
-        return NOT_DONE_SENDING;
-      }
-      return -1;
-    } else if (curr_read == 0) {
-        break;
-    }
-
-    ssize_t written = write_all_to_socket(fd, buffer, curr_read);
-    t->file_size -= curr_read;
-    total_read += curr_read;
-
-    if (written == - 1 && errno == EPIPE)
-      return -1;
-  }
-  if (t->file_size != 0 || read(socket, buffer, 1) > 0) {
-    return WRONG_DATA_SIZE;
-  }
-  return DONE_SENDING;
-}
-
 //TODO dummy for now
 int schedule(task* t, vector* worker_list) {
   (void) t;
@@ -296,31 +268,136 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
   return;
 }
 
-void do_put(int fd, worker* w) {
-  (void) fd;
-  (void) w;
+ssize_t do_put(int fd_to_send_to, worker* w) {
+  int src_fd = w->temp_fd;
+  size_t file_size = get_file_size(w->temp_file_name);
+  char buff[4096];
+  sprintf(buff, "PUT %s\n", w->temp_file_name);
+  //Send the header
+  if (write_all_to_socket(fd_to_send_to, buff, strlen(buff)) != (ssize_t) strlen(buff)) {
+    fprintf(stderr, "There was an issue sending the header\n");
+    return BIG_FAILURE;
+  }
+  //Send the size
+  if (write_all_to_socket(fd_to_send_to, (char*) &file_size, sizeof(size_t)) != (ssize_t) sizeof(size_t)) {
+    fprintf(stderr, "There was an issue sending the file size\n");
+    return BIG_FAILURE;
+  }
+
+  lseek(src_fd, 0, SEEK_SET);
+
+  ssize_t ret;
+  while (file_size) {
+    ret = (file_size < 4096) ? read(src_fd, buff, file_size) : read(src_fd, buff, 4096);
+    if (ret == -1) {
+      if (errno == EINTR)
+        continue;
+      else if (errno == EWOULDBLOCK || errno == EAGAIN) {
+        fprintf(stderr, "There was an error (blocking) reading the file: %s\n", w->temp_file_name);
+        return BIG_FAILURE;
+      }
+      perror(NULL);
+      fprintf(stderr, "There was an unknown error reading the file: %s\n", w->temp_file_name);
+      return BIG_FAILURE;
+    } else if (ret == 0) {
+      fprintf(stderr, "There was an error (read 0) reading the file: %s\n", w->temp_file_name);
+      return BIG_FAILURE;
+    }
+
+    ssize_t check_write = write_all_to_socket(fd_to_send_to, buff, ret);
+    if (check_write == -1 || !check_write || check_write != ret) {
+      fprintf(stderr, "There was an error writing the file over the network: %s\n", w->temp_file_name);
+      return BIG_FAILURE;
+    }
+    file_size -= ret;
+  }
+
+  return DONE_SENDING;
 }
 
 //Frees a task
 void free_task(task* t) {
-  (void) t;
+  free(t->file_name);
+  free(t);
 }
 
 //Makes a task with the given parsing information in the worker
 task* make_task(worker* w) {
-  (void) w;
-  return NULL;
+  task* t = malloc(sizeof(task));
+  t->file_name = strdup(w->temp_file_name);
+  return t;
+}
+
+int open_with_all_permission(char* filename) {
+  return open(filename, O_CREAT | O_RDWR | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
 }
 
 //Retrieves the given data and puts it into the file_name
 ssize_t get_binary_data(worker* curr) {
-  (void) curr;
+  //If we haven't opened a file descriptor of this file, open one
+  if (curr->temp_fd == -1) {
+    curr->temp_fd = open_with_all_permission(curr->temp_file_name);
+  }
+
+  int fd = curr->worker_fd;
+  ssize_t ret;
+  char buff[4096];
+
+  while (curr->file_size > 0) {
+    ret = (curr->file_size < 4096) ? read(fd, buff, curr->file_size) : read(fd, buff, 4096);
+    if (ret == -1) {
+      if (errno == EWOULDBLOCK || errno == EAGAIN)
+        return NOT_DONE_SENDING;
+      else if (errno == EINTR)
+        continue;
+      perror(NULL);
+      fprintf(stderr, "There was an unknown issue in recieving data!\n");
+      return BIG_FAILURE;
+    } else if (ret == 0) {
+      fprintf(stderr, "There was an issue (not enough bytes) in recieving data!\n");
+      return BIG_FAILURE;
+    }
+
+    ssize_t check_write = write_all_to_socket(curr->temp_fd, buff, ret);
+    if (check_write == -1 || !check_write) {
+      fprintf(stderr, "There was an issue in writing recieved data to disk!\n");
+      return BIG_FAILURE;
+    }
+    curr->file_size -= ret;
+  }
+
   return DONE_SENDING;
 }
+
 //Retrieves the size, setting the file_size
-ssize_t get_size(worker* curr) {
-  (void) curr;
-  return DONE_SENDING;
+ssize_t get_size(worker* w) {
+  int fd = w->worker_fd;
+  char* filesize = (char*) &w->file_size;
+  ssize_t ret;
+  char buff;
+
+  while (1) {
+      ret = read(fd, &buff, 1);
+      if (ret == -1) {
+        if (errno == EWOULDBLOCK || errno == EAGAIN)
+          return NOT_DONE_SENDING;
+        else if (errno == EINTR)
+          continue;
+        perror(NULL);
+        fprintf(stderr, "%s\n", "There was an unknown error reading for the size!\n");
+        return BIG_FAILURE;
+      } else if (ret == 0) {
+        fprintf(stderr, "%s\n", "There was an error (not enough bytes) reading for the size!\n");
+        return BIG_FAILURE;
+      }
+
+      filesize[w->size_buffer_pos++] = buff;
+
+      //Watch for buffer overflow
+      if (w->size_buffer_pos == sizeof(size_t)) {
+        return DONE_SENDING;
+      }
+  }
 }
 
 //Gets the header up until '\n'. Sets the char* temp_file_name and command to_do.
@@ -334,8 +411,13 @@ ssize_t get_command(worker* w) {
       if (ret == -1) {
         if (errno == EWOULDBLOCK || errno == EAGAIN)
           return NOT_DONE_SENDING;
+        else if (errno == EINTR)
+          continue;
+        perror(NULL);
+        fprintf(stderr, "%s\n", "There was an unknown error reading the header\n");
         return BIG_FAILURE;
       } else if (ret == 0) {
+        fprintf(stderr, "%s\n", "There was an error (not enough) reading the header!\n");
         return BIG_FAILURE;
       }
       if (buff == '\n')
@@ -344,6 +426,7 @@ ssize_t get_command(worker* w) {
 
       //Watch for buffer overflow
       if (w->command_size > 1025) {
+        fprintf(stderr, "%s\n", "There was an error (too many characters before reading newline) reading the header!\n");
         return BIG_FAILURE;
       }
   }
@@ -353,6 +436,7 @@ ssize_t get_command(worker* w) {
   } else if (strncmp("PUT", w->command, 3) == 0) {
     w->to_do = PUT;
   } else {
+    fprintf(stderr, "Invalid Header: %s\n", w->command);
     return BIG_FAILURE;
   }
 
@@ -364,7 +448,12 @@ ssize_t get_command(worker* w) {
     }
   }
 
-  w->temp_file_name = strdup(w->command+1);
+  w->temp_file_name = strdup(w->command+idx);
+
+  if (strlen(w->temp_file_name) == 0){
+    fprintf(stderr, "Invalid Header: %s\n", w->command);
+    return BIG_FAILURE;
+  }
 
   return DONE_SENDING;
 }
@@ -441,25 +530,6 @@ void shutdown_further_writes(int socket) {
 
 void shutdown_further_reads(int socket) {
   shutdown(socket, SHUT_RD);
-}
-
-ssize_t read_all_from_socket(int socket, char *buffer, size_t count) {
-    ssize_t curr_read;
-    ssize_t total_read = 0;
-    errno = 0;
-    while(count) {
-      curr_read = read(socket, buffer, count);
-      if (curr_read == -1) {
-        if (errno == EINTR)
-          continue;
-        return -1;
-      } else if (curr_read == 0)
-        break;
-      count -= curr_read;
-      total_read += curr_read;
-      buffer += curr_read;
-    }
-    return total_read;
 }
 
 size_t get_file_size(char* file_name) {

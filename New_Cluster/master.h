@@ -25,8 +25,8 @@
 #define HAVE_SIZE -10
 #define RECIEVING_DATA -11
 #define FORWARD_DATA -12
+#define FORWARDING_DATA -13
 #define BIG_FAILURE -3
-
 
 #define WRONG_DATA_SIZE -16
 #define COMMAND_BUF_SIZE 1024
@@ -34,8 +34,6 @@
 typedef enum { INTERFACE_PUT, PUT} command;
 
 typedef struct task {
-  int executable_fd;
-  int output_fd;
   char* file_name;
 } task;
 
@@ -57,8 +55,10 @@ typedef struct worker {
 
   size_t file_size;
   int size_buffer_pos;
-  
+
   int temp_fd;
+  int fd_to_send_to;
+  size_t file_buffer_pos;
 } worker;
 
 /*
@@ -75,12 +75,13 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list);
 /*
   Helper functions central to master's functionality.
 */
-task* make_task(worker* w);
 ssize_t get_command(worker* to_do);
 ssize_t get_size(worker* curr);
+int open_with_all_permission(char* filename);
 ssize_t get_binary_data(worker* curr);
-ssize_t transfer_fds(int fd1, int fd2, worker* t);
-void do_put(int fd, worker* w);
+task* make_task(worker* w);
+
+ssize_t do_put(int fd_to_send_to, worker* w);
 
 int set_up_server(char* port);
 int connect_to_server(const char *host, const char *port);
