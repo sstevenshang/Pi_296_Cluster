@@ -80,13 +80,24 @@ void setUpGlobals(char* port) {
   chdir(temp_directory);
 }
 
+void reset_worker_for_parsing(worker* newWorker) {
+  newWorker->temp_fd = -1;
+  for (int i = 0; i < COMMAND_BUF_SIZE; i++)
+    newWorker->command[i] = 0;
+  newWorker->command_size = 0;
+  newWorker->size_buffer_pos = 0;
+  newWorker->status = START;
+  newWorker->temp_fd = -1;
+  newWorker->file_size = 0;
+}
+
 worker* create_worker(int fd, char* IP){
   worker* newWorker = (worker*)malloc(sizeof(worker));
   newWorker->alive = 1;
   newWorker->tasks = vector_create(NULL, NULL, NULL);
   newWorker->worker_fd = fd;
-  newWorker->status = START;
   newWorker->IP = strdup(IP);
+  reset_worker_for_parsing(newWorker);
   return newWorker;
 }
 
@@ -152,7 +163,7 @@ void handle_data(struct epoll_event *e) {
 
     if (vector_pos != -1)
       curr = vector_get(worker_list, vector_pos);
-    else
+    else if (vector_pos == -1 || )
       curr = interface;
 
     if(interface_fd == -1){
@@ -162,7 +173,43 @@ void handle_data(struct epoll_event *e) {
     }
 
     if (curr->status == START) {
-      check = parse_command(e->data.fd, curr);
+      check = get_command(e->data.fd, curr);
+      switch (check) {
+        case NOT_DONE_SENDING:
+          return;
+        case DONE_SENDING:
+          curr->state = NEED_SIZE;
+          break;
+        default:
+          fprintf(stderr, "There was a catastrophic failure!\n");
+      }
+    }
+    if (curr->status == NEED_SIZE) {
+      check = get_size(e->data.fd, curr);
+      switch (check) {
+        case NOT_DONE_SENDING:
+          return;
+        case DONE_SENDING:
+          curr->state = RECIEVING_DATA;
+          break;
+        default:
+          fprintf(stderr, "There was a catastrophic failure!\n");
+      }
+    }
+    if (curr->status == RECIEVING_DATA) {
+      check = get_binary_data(e->data.fd, curr);
+      switch (check) {
+        case NOT_DONE_SENDING:
+          return;
+        case DONE_SENDING:
+          curr->state = FORWARD_DATA;
+          break;
+        default:
+          fprintf(stderr, "There was a catastrophic failure!\n");
+      }
+    }
+    if (curr->status == FORWARD_DATA) {
+
     }
 
 

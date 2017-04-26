@@ -15,7 +15,13 @@
 #define START -1
 #define DONE_SENDING -7
 #define NOT_DONE_SENDING -8
+#define NEED_SIZE -9
+#define HAVE_SIZE -10
+#define RECIEVING_DATA -11
+#define FORWARD_DATA -12
+
 #define WRONG_DATA_SIZE -16
+#define COMMAND_BUF_SIZE 1024
 
 typedef enum { INTERFACE_PUT, PUT} command;
 
@@ -35,15 +41,16 @@ typedef struct worker {
   char* IP;
   //Vector of tasks that the worker is working on
   vector* tasks;
-  int status;
-  //Stuff used to parse
+  //Usage stat
+  double CPU_usage;
   //Used for parsing and state tracking
   command to_do;
   int status;
   size_t file_size;
   int size_buffer_pos;
-  char header[HEADER_BUFFER_SIZE];
-  int head_size;
+  char command[COMMAND_BUF_SIZE];
+  int command_size;
+  int temp_fd;
 } worker;
 
 ssize_t get_message_length_s(int socket, task* curr);
