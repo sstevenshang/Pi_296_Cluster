@@ -21,6 +21,7 @@ static int epoll_fd;
 static char* temp_directory;
 
 static int interface_fd = -1;
+static worker* interface = NULL;
 static vector* worker_list;
 
 void kill_master() { close_master = 1; }
@@ -84,7 +85,7 @@ worker* create_worker(int fd, char* IP){
   newWorker->alive = 1;
   newWorker->tasks = vector_create(NULL, NULL, NULL);
   newWorker->worker_fd = fd;
-  newWorker->status = -1;
+  newWorker->status = START;
   newWorker->IP = strdup(IP);
   return newWorker;
 }
@@ -97,7 +98,7 @@ void free_worker(worker* to_free) {
   to_free = NULL;
 }
 
-size_t find_worker_pos(int fd){
+ssize_t find_worker_pos(int fd){
   size_t i = 0;
   while(i < vector_size(worker_list)){
     if((vector_get(worker_list, i))->worker_fd == fd){
@@ -145,18 +146,25 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 }
 
 void handle_data(struct epoll_event *e) {
-    worker* curr = vector_get(worker_list,find_worker_pos(e->data.fd));
-          if(interface_fd == -1){
+    int vector_pos = find_worker_pos(e->data.fd);
+    worker* curr;
+    ssize_t check;
+
+    if (vector_pos != -1)
+      curr = vector_get(worker_list, vector_pos);
+    else
+      curr = interface;
+
+    if(interface_fd == -1){
 	    interface_fd = curr->worker_fd;
 	    interface = curr;
-	    vector_remove(worker_list,find_worker_pos(e->data.fd));
-          }
-	  if(interface_fd == curr-> worker_fd){
-	    schedule();
-	//TODO
-   	  }
-	  int type = get_command(curr);
-   	  if(type == -1 || type == 1){return ;}//bad verb (1 shoudl be handled by scheduler
+	    vector_erase(worker_list,find_worker_pos(e->data.fd));
+    }
+
+    if (curr->status == START) {
+      check = parse_command(e->data.fd, curr);
+    }
+
 
 }
 

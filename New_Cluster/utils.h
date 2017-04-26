@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include "vector.h"
 
+#define START -1
 #define DONE_SENDING -7
 #define NOT_DONE_SENDING -8
 #define WRONG_DATA_SIZE -16
@@ -23,14 +24,6 @@ typedef struct task {
   int executable_fd;
   int output_fd;
   char* file_name;
-
-  //Used for parsing and state tracking
-  command to_do;
-  int status;
-  size_t file_size;
-  int size_buffer_pos;
-  char header[HEADER_BUFFER_SIZE];
-  int head_size;
 } task;
 
 typedef struct worker {
@@ -43,6 +36,14 @@ typedef struct worker {
   //Vector of tasks that the worker is working on
   vector* tasks;
   int status;
+  //Stuff used to parse
+  //Used for parsing and state tracking
+  command to_do;
+  int status;
+  size_t file_size;
+  int size_buffer_pos;
+  char header[HEADER_BUFFER_SIZE];
+  int head_size;
 } worker;
 
 ssize_t get_message_length_s(int socket, task* curr);
