@@ -20,7 +20,13 @@ static int endSession = 0;
 static int epoll_fd;
 static char* temp_directory;
 static ssize_t ret;
+<<<<<<< HEAD
+static int interface_fd = -1;
+worker* interface;
+vector* worker_list;
+=======
 
+>>>>>>> fddc220e71c815064475eb7a57213e3f3909c342
 void close_server() { endSession = 1; }
 
 void ignore() { }
@@ -42,6 +48,35 @@ void set_up_signals() {
   }
 }
 
+<<<<<<< HEAD
+void set_up_worker_list(){
+  worker_list = vector_create(NULL, NULL, NULL);
+}
+
+void create_worker(int fd){
+  worker* newWorker = (worker*)malloc(sizeof(worker));
+  newWorker->alive = 1;
+  newWorker->tasks = vector_create(NULL, NULL, NULL);
+  newWorker->worker_fd = fd;
+  newWorker->status = -1;
+  return newWorker;
+}
+
+size_t find_worker_pos(int fd){
+  
+  size_t i = 0;
+  iwhile(i < vector_size(worker_list)){
+    if((vector_get(worker_list, i))->worker_fd == fd){
+      return i;
+    }
+    i++
+  }
+  return -1;
+
+}
+
+=======
+>>>>>>> fddc220e71c815064475eb7a57213e3f3909c342
 void clean_up_globals() {
   //Cleanup directory
   for (unsigned i = 0; i < vector_size(files); i++)
@@ -127,6 +162,25 @@ void accept_connections(struct epoll_event *e,int epoll_fd)
 
 void handle_data(struct epoll_event *e)
 {
+<<<<<<< HEAD
+    //task* curr = dictionary_get(dick, &e->data.fd);
+    worker* curr = vector_get(worker_list,find_worker_pos(e->data.fd));
+          if(interface_fd == -1){ 
+	    interface_fd = curr->worker_fd; 
+	    interface = curr;
+	    vector_remove(worker_list,find_worker_pos(e->data.fd));
+          }
+	  if(interface_fd == curr-> worker_fd){
+	    schedule();
+	//TODO
+   	  }
+	  int type = get_verb(curr);
+   	  if(type == -1 || type == 1){return ;}//bad verb (1 shoudl be handled by scheduler
+	  
+
+
+
+=======
     task* curr = dictionary_get(dick, &e->data.fd);
     if (curr->status == GETTING_VERB) {
       // printf("GETTING verb..\n");
@@ -149,6 +203,7 @@ void handle_data(struct epoll_event *e)
         case DELETE:
         case PUT:
           // printf("Do PUT_get filename!\n");
+>>>>>>> fddc220e71c815064475eb7a57213e3f3909c342
           ret = get_filename(e->data.fd, curr);
           // printf("ret is %zi\n", ret);
           if (ret && ret != INVALID_COMMAND){
