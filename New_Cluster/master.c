@@ -72,16 +72,11 @@ size_t find_worker_pos(int fd){
 
 void clean_up_globals() {
   //Cleanup directory
-  for (unsigned i = 0; i < vector_size(files); i++)
-    remove((char*) vector_get(files, i));
   chdir("..");
-  // printf("Removing %s\n", temp_directory);
-  rmdir(temp_directory);
   free(temp_directory);
   //Close file descriptors
   close(epoll_fd);
   close(sock_fd);
-  vector_destroy(files);
 }
 
 void set_up_gloabls(char* port) {
