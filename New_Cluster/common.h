@@ -56,6 +56,7 @@ typedef struct worker {
   char* IP;
   //Vector of tasks that the worker is working on
   vector* tasks;
+  int status;
 } worker;
 
 ssize_t get_message_length_s(int socket, task* curr);

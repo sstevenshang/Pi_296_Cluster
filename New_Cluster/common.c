@@ -104,54 +104,17 @@ int get_filename(int sfd, task* to_do) {
   return 1;
 }
 
-//return 1 on fail, 0 on success
-int get_verb(int sfd, task* to_do) {
-  char b;
-  int idx = 0;
-  ssize_t read;
-
-  for (;idx < HEADER_BUFFER_SIZE; idx++)
-    if (!idx)
-      break;
-
-  while ( (read = read_all_from_socket(sfd, &b, 1)) != -1) {
-    if (idx > 1024)
-      return INVALID_COMMAND;
-
-    to_do->header[idx++] = b;
-    to_do->head_size++;
-    if (to_do->head_size > 1024) {
-      return INVALID_COMMAND;
-    }
-    // printf("%s\n%i\n",to_do->header, idx);
-    if (idx > 3) {
-      if (strncmp(to_do->header, "PUT ", 4) == 0) {
-        to_do->to_do = PUT;
-        return 0;
-      } else if (strncmp(to_do->header, "GET ", 4) == 0) {
-        to_do->to_do = GET;
-        return 0;
+int get_verb(task* to_do) {
+  
+      if (strncmp(to_do->header, "INTERFACE_PUT", 13) == 0) {
+        return 1;
+      } else if (strncmp(to_do->header, "MASTER_TO_WORKER_PUT", 20) == 0) {
+        return 2;
+      } else if (strncmp(to_do->header, "WORKER_TO_MASTER_PUT", 20) == 0) {
+        return 3;
       }
-      if (idx > 4) {
-        if (strncmp(to_do->header, "LIST\n", 5) == 0) {
-          to_do->to_do = LIST;
-          return 0;
-        }
-        if (idx > 6) {
-          if (strncmp(to_do->header, "DELETE ", 7) == 0) {
-            to_do->to_do = DELETE;
-            return 0;
-          } else {
-            return INVALID_COMMAND;
-          }
-        }
-      }
-    }
-  }
-  if (! read) {
-    return INVALID_COMMAND;
-  }
-  return 1;
+        
+  return -1;
 }
 
 task set_up_blank_task() {
