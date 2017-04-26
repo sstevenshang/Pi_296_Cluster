@@ -12,8 +12,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "common.h"
-#include "dictionary.h"
 #include "callbacks.h"
+#include "vector.h"
 
 static int sock_fd;
 static int endSession = 0;
