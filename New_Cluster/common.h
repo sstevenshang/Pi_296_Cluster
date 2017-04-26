@@ -58,17 +58,6 @@ typedef struct worker {
   vector* tasks;
 } worker;
 
-
-ssize_t send_file_list(int fd, vector* files);
-
-void respond_no_such_file(int fd);
-
-void respond_bad_file_size(int fd);
-
-void respond_bad_request(int fd);
-
-void reset_header_buffer(task* curr);
-
 ssize_t get_message_length_s(int socket, task* curr);
 
 void respond_ok(int fd);
