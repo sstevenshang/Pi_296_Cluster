@@ -158,6 +158,7 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 }
 
 void handle_data(struct epoll_event *e) {
+    printf("Have a task coming in on file descriptor %i\n", e->data.fd);
     int vector_pos = find_worker_pos(e->data.fd);
     worker* curr;
     ssize_t check;

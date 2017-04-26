@@ -64,10 +64,14 @@ typedef struct worker {
 /*
   TODO:
   Schedule returns the fd of the worker to send the task to while interally
-  updating it's vector of current tasks.
+  updating it's vector of current tasks. Doesn't manipulate any files. Used for
+  bookeeping purposes to tell what tasks are allocated to what nodes as well as
+  telling the main event loop how to allocate work.
 
   Scheduler remove task removes a given task from a given worker's list of
-  tasks (implicitly indicating the task as satisfied)
+  tasks (implicitly indicating the task as satisfied). Doesn't manipulate any
+  files. Simply used for bookeeping purposes to take a task off of a worker's
+  task list.
 */
 int schedule(task* t, vector* worker_list);
 void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list);
