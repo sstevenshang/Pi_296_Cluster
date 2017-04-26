@@ -26,7 +26,7 @@
 #define WRONG_DATA_SIZE -16
 #define SEND_RESPONSE -18
 
-typedef enum { INTERFACE_PUT, MASTER_TO_WORKER_PUT, WORKER_TO_MASTER_PUT} verb;
+typedef enum { INTERFACE_PUT, PUT} verb;
 
 typedef struct task {
   //Used for tracking files and book keeping
