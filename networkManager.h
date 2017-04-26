@@ -24,7 +24,6 @@
 
   at any one time, exactly two bits, one being bit0, must be present for any message to go through and be processed
   if exactly no bits are presents, it "should" be a basic ping.
-  
 */
 
 //code only code? (useable by both)
@@ -32,19 +31,19 @@ int getMessageType(char* header);
 
 
 //client only code
-int getFdForWriteFile(char* name);
-int setUpClient(char* addr, char* port);
-int cleanUpClient(int socket);
-char* getBinaryFile(int socket, char* name);
-void runBinaryFile(char* name);
-void* threadManager(void* arg);
+// int getFdForWriteFile(char* name);
+// int setUpClient(char* addr, char* port);
+// int cleanUpClient(int socket);
+// char* getBinaryFile(int socket, char* name);
+// void runBinaryFile(char* name);
+// void* threadManager(void* arg);
 void resetPipeClient(int socket);
 //server only code
-int addAnyIncomingConnections();
-void slaveManager();
-int getFdForReadFile(char* name);
-int setUpServer(char* addr, char* port);
-int cleanUpServer(int socket);
+// int addAnyIncomingConnections();
+// void slaveManager();
+// int getFdForReadFile(char* name);
+// int setUpServer(char* addr, char* port);
+// int cleanUpServer(int socket);
 int sendBinaryFile(int socket, char* name);
 void resetPipeServer(int socket);
 #endif

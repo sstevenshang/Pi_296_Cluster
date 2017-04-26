@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include "master.h"
 #include "node.h"
+#define CONNECTION_ATTEMPTS_BEFORE_GIVING_UP 5
 
 extern int runningC;
 extern int socketFd;
@@ -36,6 +37,7 @@ void runBinaryFile(char* name);
 void* threadManager(void* arg);
 void resetPipeClient(int socket);
 void setupNode();
+
 //heartbeat functions
 void* spwan_heartbeat(void* load);
 int setUpUDPClient();

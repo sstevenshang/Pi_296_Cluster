@@ -3,11 +3,10 @@
 #define BUFSIZE 1024
 #define SERVER_PORT 1153
 #define SERVER_IP4 "127.0.0.1"
-#define CONNECTION_ATTEMPTS_BEFORE_GIVING_UP 5
 /* SERVER FUNCTIONS */
 int runningC = 0;
 static char* defaultClientPort = "9001";
-static char* heartbeat_port_listener = "9010";
+static char* heartbeat_port_listener = "9111";
 static char* defaultMaster = "sp17-cs241-005.cs.illinois.edu";
 static int alive = 1;
 //Buffer to hold master name/ IP
@@ -16,15 +15,25 @@ int socketFd = -1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_t heartbeat_thread;
 node curTask;
+size_t exec_num = 0;
+
 //Asynchronously wait on child processes
 void cleanup(int signal) {
   (void) signal;
-  while (waitpid((pid_t) (-1), 0, WNOHANG) > 0) {}
+  switch (signal) {
+    case SIGCHLD:
+      while (waitpid((pid_t) (-1), 0, WNOHANG) > 0) {}
+      break;
+    case SIGINT:
+      runningC = 0;
+      break;
+  }
 }
 
 int server_main() {
     //Asynchronously wait on any child processes
     signal(SIGCHLD, cleanup);
+    // signal(SIGINT, cleanup);
     char tempBuf[1024];
     fprintf(stdout, "Type address to connect (press enter to connect to default master: %s)\n", defaultMaster);
     size_t bytesRead = read(fileno(stdin), tempBuf, 1023);
@@ -41,15 +50,15 @@ int server_main() {
     }
     runningC = 1;
     setupNode();
-    
+
 	  // Spwan thread for heartbeat
     //pthread_create(&heartbeat_thread, 0, spwan_heartbeat, NULL);
 
     while(runningC) {
 		// Wait for incoming connection
 		// Spwan thread to execute
-	manageTaskWorker(&curTask);
-	puts("currently connected"); sleep(2);
+	   manageTaskWorker(&curTask);
+	   puts("currently connected"); sleep(2);
     }
 
     pthread_join(heartbeat_thread, NULL);
@@ -64,13 +73,12 @@ void setupNode(){
     curTask.taskNo = 0;
     curTask.taskPos = 0;
     curTask.next = NULL;
-    
+
     curTask.last_beat_received_time = 0;
     curTask.bufSize = 4096;
     curTask.bufPos = 0;
     curTask.buf = (void*)malloc(curTask.bufSize);
     curTask.bufWIP = 0;
-
 }
 
 int setUpWorker(char* addr, char* port){
@@ -100,13 +108,13 @@ int setUpWorker(char* addr, char* port){
       struct timeval tv; tv.tv_sec = 1; tv.tv_usec = 0;
       fd_set rfd; FD_ZERO(&rfd); FD_SET(socket_fd, &rfd);
       checkVal =select(socket_fd + 1, NULL, &rfd, NULL, &tv);fprintf(stdout, "checkVal is %d wit hsock %d\n", checkVal, socket_fd);
-      if(checkVal == -1){ return -1;} 
+      if(checkVal == -1){ return -1;}
       if(checkVal > 0){ break;}
       if( i == CONNECTION_ATTEMPTS_BEFORE_GIVING_UP){ fprintf(stderr, "failed to find connection\n"); return -1;}
-      
+
     }
-      
-    
+
+
   }
   fprintf(stdout, "Found connection on fd %d\n", socket_fd);
 //  resetPipeClient(socket_fd);
@@ -157,19 +165,22 @@ char* getBinaryFile(int socket, char* name){
   return name;
 }
 
+void* threadManager(void* arg){
+  pthread_detach(pthread_self());
+  char buf[4096];
+  sprintf(buf, "%s &> output%zu", (char*) arg, exec_num);
+  if (system(buf) == -1)
+    fprintf(stderr, "bad executable\n");
+  //Now we need to send this output
+  return NULL;
+}
+
 void runBinaryFile(char* name){
   if(name == NULL){ fprintf(stderr, "trying to exec a null, stopping that\n"); exit(0);}
   pthread_t myThread;
   pthread_attr_t* myAttr = NULL;
+  exec_num++;
   pthread_create(&myThread, myAttr, &threadManager, (void*) name);
-  // pthread_join(myThread, NULL);
-}
-
-void* threadManager(void* arg){
-  pthread_detach(pthread_self());
-  execlp((char*) arg, (char*)arg, NULL,(char*)NULL);
-  fprintf(stderr, "exec returned (bad)\n");
-  return (void*)-1;
 }
 
 void resetPipeClient(int socket){
@@ -189,6 +200,7 @@ int setUpUDPClient() {
 }
 
 void* spwan_heartbeat(void* load) {
+  (void) load;
   heartbeat(master_addr, heartbeat_port_listener, &alive);
   return NULL;
 }
@@ -207,6 +219,14 @@ void heartbeat(char* destinationAddr, char* destinationPort, int* alive) {
 
 int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
 
+  struct hostent *he;
+  he = gethostbyname(destinationAddr);
+  if (he == NULL) {
+      printf("ur bad\n");
+  }
+  struct in_addr **addr_list = (struct in_addr**)he->h_addr_list;
+  char* ip = inet_ntoa(*addr_list[0]);
+
   double cpu_usage = get_local_usage();
   char message[50];
   sprintf(message, "%f", cpu_usage);
@@ -214,8 +234,8 @@ int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort) {
   struct sockaddr_in serverAddr;
   memset((char*)&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family = AF_INET;
-  serverAddr.sin_addr.s_addr = inet_addr(destinationAddr);
-  serverAddr.sin_port = htons(9010);
+  serverAddr.sin_addr.s_addr = inet_addr(ip);
+  serverAddr.sin_port = htons(9111);
 
   printf("sending to %s:%s\n", destinationAddr, destinationPort);
   int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*) &serverAddr, sizeof(serverAddr));

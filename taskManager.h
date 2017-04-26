@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <string.h>
 #define READY "Ready for work."
 #define RECEIVEME "Do you receive me?"
@@ -15,12 +18,12 @@
 #define ASKSTATUS "What is your status?"
 #define DONERUNNING "Finished running."
 #define ASKFILE "Send me the file:"
-#define iEOF 0x05
-#define iBool 0x09
-#define iExe 0x11
-#define iData 0x21
-#define iStatus 0x41
-#define iErr 0x81
+#define iEOF "\x05"
+#define iBool "\x09"
+#define iExe "\x11"
+#define iData "\x21"
+#define iStatus "\x41"
+#define iErr "\x81"
 
 /*implimentation details
   every sent message will be headed with a 1byte "info" section
@@ -55,6 +58,9 @@ int handleTaskOneWorker(node* task);
 int handleTaskTwoWorker(node* task);
 int handleTaskThreeWorker(node* task);
 int handleTaskFourWorker(node* task);
+
+void runBinaryFileT(char* name);
+void* threadManagerT(void* arg);
 
 ssize_t readSocketIntoBuf(int socket, void* buf, int bufSize);
 ssize_t writeBufIntoSocket(int socket, void* buf, int bufSize);
