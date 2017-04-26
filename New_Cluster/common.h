@@ -13,21 +13,17 @@
 #include "vector.h"
 
 #define HEADER_BUFFER_SIZE 4096
-
 #define RECIEVING_HEADER 1
 #define RECEIVED_HEADER 2
 #define RECIEVING_DATA 3
 #define DONE_SENDING -7
 #define NOT_DONE_SENDING -8
-#define CANT_WRITE_ALL -9
-#define GOT_EPIPE -10
 #define INVALID_COMMAND -11
 #define GETTING_VERB -12
 #define HAVE_VERB -13
 #define HAVE_FILENAME -14
 #define HAVE_SIZE -15
-#define TOO_LITTLE_DATA -16
-#define TOO_MUCH_DATA -17
+#define WRONG_DATA_SIZE -16
 #define SEND_RESPONSE -18
 
 typedef enum { INTERFACE_PUT, MASTER_TO_WORKER_PUT, WORKER_TO_MASTER_PUT} verb;
@@ -92,16 +88,5 @@ void shutdown_further_writes(int socket);
 void shutdown_further_reads(int socket);
 
 ssize_t read_all_from_socket(int socket, char *buffer, size_t count);
-
-ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size);
-
-//1 on fail, 0 on succss
-int validate_server_response(int socket);
-
-//Print the error message if the response given is ERROR
-void new_print_error_message(int socket);
-
-//Get the length of message response. (GET or LIST)
-size_t get_message_length(int socket);
 
 size_t get_file_size(char* file_name);

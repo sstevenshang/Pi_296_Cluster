@@ -22,7 +22,6 @@ ssize_t get_message_length_s(int socket, task* curr) {
       if (rd != -1)
         break;
   }
-
   if (rd > 0) {
     curr->size_buffer_pos += rd;
     if (curr->size_buffer_pos == sizeof(size_t))
@@ -39,38 +38,28 @@ ssize_t transfer_fds(int socket, int fd, task* t) {
   ssize_t curr_read;
   ssize_t total_read = 0;
   errno = 0;
-
   while (1) {
     curr_read = read(socket, buffer, 4096);
-    // printf("curr_read is %zi\n", curr_read);
     if (curr_read == -1) {
-      // printf("%s\n", strerror(errno));
       if (errno == EINTR)
         continue;
       else if (errno == EWOULDBLOCK || errno == EAGAIN || errno == 11){
-        // printf("They aren't done sending. %zi bytes left\n", t->file_size);
         return NOT_DONE_SENDING;
       }
       return -1;
     } else if (curr_read == 0) {
         break;
     }
-
-    // ssize_t written = write_all_to_socket(fd, buffer, curr_read);
     ssize_t written = write(fd, buffer, curr_read);
-    // printf("Wrote %zi bytes!\n", written);
     t->file_size -= curr_read;
     total_read += curr_read;
 
     if (written == - 1 && errno == EPIPE)
       return -1;
   }
-  // printf("File size is %zu\n",t->file_size);
   if (t->file_size != 0 || read(socket, buffer, 1) > 0) {
-    // printf("BAD DATA SIZE\n");
-    return TOO_LITTLE_DATA;
+    return WRONG_DATA_SIZE;
   }
-
   return DONE_SENDING;
 }
 
@@ -130,14 +119,9 @@ void *string_copy_constructor(void *elem) {
   return strdup(str);
 }
 
-// This is the destructor function for string element.
-// Use this as destructor callback in vector.
 void string_destructor(void *elem) { free(elem); }
 
-// This is the default constructor function for string element.
-// Use this as a default constructor callback in vector.
 void *string_default_constructor(void) {
-  // A single null byte
   return calloc(1, sizeof(char));
 }
 
@@ -146,14 +130,6 @@ vector* string_vector_create() {
 }
 
 void* task_copy_constructor(void* elem) {
-  task* to_copy = elem;
-  task* new_task = malloc(sizeof(task));
-  new_task->request = to_copy->request;
-  new_task->to_do = to_copy->to_do;
-  new_task->status = to_copy->status;
-  new_task->file_size = to_copy->file_size;
-  new_task->size_buffer_pos = to_copy->size_buffer_pos;
-  new_task->head_size = to_copy->head_size;
   return new_task;
 }
 
@@ -163,68 +139,48 @@ void task_destructor(void* elem) {
 
 int set_up_server(char* port) {
   int s;
-  // Create the socket as a nonblocking socket
   int sock_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-
   struct addrinfo hints, *result = NULL;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE;
-
   s = getaddrinfo(NULL, port, &hints, &result);
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
     exit(1);
   }
-
   int optval = 1;
   setsockopt(sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
-
   if (bind(sock_fd, result->ai_addr, result->ai_addrlen) != 0 ) {
         perror("bind()");
         exit(1);
   }
-
   if (listen(sock_fd, 10) != 0 ) {
     perror("listen()");
     exit(1);
   }
-
-  // struct sockaddr_in sin;
-  // socklen_t socklen = sizeof(sin);
-  // if (getsockname(sock_fd, (struct sockaddr *)&sin, &socklen) == -1)
-  //   perror("getsockname");
-  // else
-  //   printf("Listening on port number %d\n", ntohs(sin.sin_port));
-
   return sock_fd;
 }
 
 
 int connect_to_server(const char *host, const char *port) {
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET; //IPv4 Only
     hints.ai_socktype = SOCK_STREAM; //TCP
-
     int addr_info_error = getaddrinfo(host, port, &hints, &result);
     if (addr_info_error) {
       fprintf(stderr, "%s\n", gai_strerror(addr_info_error));
       return -1;
     }
-
     if (connect(socket_fd, result->ai_addr, result->ai_addrlen)) {
       perror(NULL);
       freeaddrinfo(result);
       return -1;
     }
-
-    //Free the data allocated by getaddrinfo
     freeaddrinfo(result);
-
     return socket_fd;
 }
 
@@ -246,7 +202,6 @@ ssize_t write_all_to_socket(int socket, const char *buffer, size_t count) {
       total_write += curr_write;
       buffer += curr_write;
     }
-
     return total_write;
 }
 
@@ -262,7 +217,6 @@ ssize_t read_all_from_socket(int socket, char *buffer, size_t count) {
     ssize_t curr_read;
     ssize_t total_read = 0;
     errno = 0;
-
     while(count) {
       curr_read = read(socket, buffer, count);
       if (curr_read == -1) {
@@ -275,100 +229,7 @@ ssize_t read_all_from_socket(int socket, char *buffer, size_t count) {
       total_read += curr_read;
       buffer += curr_read;
     }
-
     return total_read;
-}
-
-ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size) {
-  char buffer[4096];
-  ssize_t curr_read;
-  ssize_t total_read = 0;
-  errno = 0;
-  ssize_t initial = size;
-  while (size) {
-    curr_read = (4096 < size || initial == -1) ? read_all_from_socket(socket, buffer, 4096) : read_all_from_socket(socket, buffer, size);
-    // printf("curr_read is %zi\n", curr_read);
-    if (curr_read == -1) {
-      // printf("%s\n", strerror(errno));
-      if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)
-        continue;
-      // else if (errno == EWOULDBLOCK || errno == EAGAIN)
-      //   return NOT_DONE_SENDING;
-      return -1;
-    } else if (curr_read == 0) {
-        break;
-    }
-    size -= curr_read;
-    total_read += curr_read;
-
-    ssize_t written = write_all_to_socket(fd, buffer, curr_read);
-
-    if (written == - 1 && errno == EPIPE)
-      return -1;
-  }
-
-  if (total_read < initial && initial != -1) {
-    print_too_little_data();
-  }
-
-  if (initial != -1) {
-    int flags = fcntl(socket, F_GETFL, 0);
-    fcntl(socket, F_SETFL, flags | O_NONBLOCK);
-  }
-
-  if (read(socket, buffer, 1) && initial != -1) {
-    print_recieved_too_much_data();
-  }
-  // printf("Wrote %zi\n", total_read);
-  if (initial == -1) {
-    return DONE_SENDING;
-  }
-
-  return total_read;
-}
-
-//Gets the error message is error
-void new_print_error_message(int socket) {
-  int flags = fcntl(socket, F_GETFL, 0);
-  fcntl(socket, F_SETFL, flags | O_NONBLOCK);
-  char buf;
-
-  while (read(socket, &buf, 1)) {
-    printf("%c", buf);
-  }
-}
-
-//0 on success, 1 on fail
-int validate_server_response(int socket) {
-  // char buffer[6];
-  // ssize_t count = read_all_from_socket(socket, buffer, 3);
-  // if (count < 3) {
-  //   print_invalid_response();
-  //   return 1;
-  // }
-  // if (strncmp("OK\n", buffer, 3) != 0) {
-  //   //Bring us to the start of the error message
-  //   count = read_all_from_socket(socket, buffer+3, 3);
-  //   //Make sure the response says error
-  //   if (count < 3 || strncmp("ERROR\n", buffer, 6) != 0) {
-  //     print_invalid_response();
-  //     return 1;
-  //   }
-  //   new_print_error_message(socket);
-  //   return 1;
-  // }
-  write_all_from_socket_to_fd(socket, STDOUT_FILENO, -1);
-  return 0;
-}
-
-size_t get_message_length(int socket) {
-  size_t message_length;
-  ssize_t count = read_all_from_socket(socket, (char*) &message_length, sizeof(size_t));
-  if (count < (ssize_t) sizeof(size_t)) {
-    print_invalid_response();
-    return 0;
-  }
-  return message_length;
 }
 
 size_t get_file_size(char* file_name) {

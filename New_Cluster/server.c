@@ -12,17 +12,21 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "common.h"
-#include "dictionary.h"
 #include "callbacks.h"
+#include "vector.h"
 
 static int sock_fd;
 static int endSession = 0;
 static int epoll_fd;
 static char* temp_directory;
 static ssize_t ret;
+<<<<<<< HEAD
 static int interface_fd = -1;
 worker* interface;
 vector* worker_list;
+=======
+
+>>>>>>> fddc220e71c815064475eb7a57213e3f3909c342
 void close_server() { endSession = 1; }
 
 void ignore() { }
@@ -44,6 +48,7 @@ void set_up_signals() {
   }
 }
 
+<<<<<<< HEAD
 void set_up_worker_list(){
   worker_list = vector_create(NULL, NULL, NULL);
 }
@@ -70,6 +75,8 @@ size_t find_worker_pos(int fd){
 
 }
 
+=======
+>>>>>>> fddc220e71c815064475eb7a57213e3f3909c342
 void clean_up_globals() {
   //Cleanup directory
   for (unsigned i = 0; i < vector_size(files); i++)
@@ -138,12 +145,9 @@ void accept_connections(struct epoll_event *e,int epoll_fd)
     fcntl(new_fd, F_SETFL, flags | O_NONBLOCK);
 
     // printf("connection on fd %i\n", new_fd);
-    worker* tmpWorker = create_worker(new_fd);
-    vector_push(worker_list,tmpWorker);
+
     //Add to our dictionary
     task to_do = (task) set_up_blank_task();
-    // to_do.request = fopen("request", "a+");
-    //dictionary_set(dick, &new_fd, &to_do);
 
     //Connection to epoll
     struct epoll_event event;
@@ -158,6 +162,7 @@ void accept_connections(struct epoll_event *e,int epoll_fd)
 
 void handle_data(struct epoll_event *e)
 {
+<<<<<<< HEAD
     //task* curr = dictionary_get(dick, &e->data.fd);
     worker* curr = vector_get(worker_list,find_worker_pos(e->data.fd));
           if(interface_fd == -1){ 
@@ -175,6 +180,30 @@ void handle_data(struct epoll_event *e)
 
 
 
+=======
+    task* curr = dictionary_get(dick, &e->data.fd);
+    if (curr->status == GETTING_VERB) {
+      // printf("GETTING verb..\n");
+      ret = get_verb(e->data.fd, curr);
+
+      if (ret && ret != INVALID_COMMAND)
+        return;
+      if (ret == INVALID_COMMAND) {
+        //TODO send error message
+        // printf("Made it here!\n");
+        return;
+      }
+      curr->status = HAVE_VERB;
+      //Reset header buffer
+      reset_header_buffer(curr);
+    }
+    if (curr->status == HAVE_VERB) {
+      switch (curr->to_do) {
+        case GET:
+        case DELETE:
+        case PUT:
+          // printf("Do PUT_get filename!\n");
+>>>>>>> fddc220e71c815064475eb7a57213e3f3909c342
           ret = get_filename(e->data.fd, curr);
           // printf("ret is %zi\n", ret);
           if (ret && ret != INVALID_COMMAND){
@@ -270,7 +299,7 @@ int main(int argc, char** argv) {
   }
 
   set_up_signals();
-  set_up_worker_list();
+
   set_up_gloabls(argv[1]);
 
 	// Event loop
