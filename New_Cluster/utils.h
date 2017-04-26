@@ -51,6 +51,7 @@ typedef struct worker {
   char command[COMMAND_BUF_SIZE];
   int command_size;
   int temp_fd;
+  char* temp_file_name;
 } worker;
 
 ssize_t get_message_length_s(int socket, task* curr);
