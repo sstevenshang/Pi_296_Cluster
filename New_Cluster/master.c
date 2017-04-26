@@ -89,6 +89,9 @@ void reset_worker_for_parsing(worker* newWorker) {
   newWorker->status = START;
   newWorker->temp_fd = -1;
   newWorker->file_size = 0;
+  if (newWorker->temp_file_name)
+    free(newWorker->temp_file_name)
+  newWorker->temp_file_name = NULL;
 }
 
 worker* create_worker(int fd, char* IP){
@@ -97,6 +100,7 @@ worker* create_worker(int fd, char* IP){
   newWorker->tasks = vector_create(NULL, NULL, NULL);
   newWorker->worker_fd = fd;
   newWorker->IP = strdup(IP);
+  newWorker->temp_file_name = NULL;
   reset_worker_for_parsing(newWorker);
   return newWorker;
 }
@@ -209,6 +213,7 @@ void handle_data(struct epoll_event *e) {
       }
     }
     if (curr->status == FORWARD_DATA) {
+
 
     }
 
