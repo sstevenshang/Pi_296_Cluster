@@ -41,7 +41,7 @@ void* sending(void* nothing);
 void* tasking(void* nothing);
 int create_output_file(char* input_filename, char** output_filename);
 void read_file(char* local_path);
-char* get_filename(char* header, size_t header_size, size_t verb_size);
+char* get_filename_from_header(char* header, size_t header_size, size_t verb_size);
 ssize_t write_size_to_socket(int socket_fd, size_t size);
 ssize_t write_file_to_socket(int socket_fd, int local_file_fd, size_t local_file_size);
 ssize_t write_to_socket(int socket_fd, char* buffer, ssize_t count);

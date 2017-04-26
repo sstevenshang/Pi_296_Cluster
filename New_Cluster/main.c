@@ -4,7 +4,7 @@
 
 int main(int argc, char const *argv[]) {
 
-    master_main(argc, argv);
+    master_main(argc, (char**)argv);
 
     // interface_main(argc, argv);        UNCOMMENT TO DEBUG YOUR CODE
     // worker_main("127.0.0.1", "9999");

@@ -178,7 +178,7 @@ void read_file(char* local_path) {
     close(local_file_fd);
 }
 
-char* get_filename(char* header, size_t header_size, size_t verb_size) {
+char* get_filename_from_header(char* header, size_t header_size, size_t verb_size) {
 
     ssize_t name_size = header_size - verb_size - 2;
     if (name_size < 0) {
