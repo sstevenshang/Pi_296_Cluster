@@ -1,9 +1,9 @@
 OBJS_DIR = .objs
 
-EXE_SERVER = server
+EXE_SERVER = master
 EXES_STUDENT = $(EXE_CLIENT) $(EXE_SERVER)
 
-OBJS_SERVER = $(EXE_SERVER).o format.o common.o
+OBJS_SERVER = $(EXE_SERVER).o utils.o
 
 CC = clang
 WARNINGS = -Wall -Wextra -Werror -Wno-error=unused-parameter
