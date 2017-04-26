@@ -1,10 +1,8 @@
 OBJS_DIR = .objs
 
-EXE_CLIENT = client
 EXE_SERVER = server
 EXES_STUDENT = $(EXE_CLIENT) $(EXE_SERVER)
 
-OBJS_CLIENT = $(EXE_CLIENT).o format.o common.o client.o
 OBJS_SERVER = $(EXE_SERVER).o format.o common.o
 
 CC = clang
@@ -64,15 +62,6 @@ $(EXE_SERVER)-debug: $(OBJS_SERVER:%.o=$(OBJS_DIR)/%-debug.o)
 	$(LD) $^ $(LDFLAGS) -o $@
 
 $(EXE_SERVER)-tsan: $(OBJS_SERVER:%.o=$(OBJS_DIR)/%-tsan.o)
-	$(LD) $^ $(LDFLAGS_TSAN) -o $@
-
-$(EXE_CLIENT): $(OBJS_CLIENT:%.o=$(OBJS_DIR)/%-release.o)
-	$(LD) $^ $(LDFLAGS) -o $@
-
-$(EXE_CLIENT)-debug: $(OBJS_CLIENT:%.o=$(OBJS_DIR)/%-debug.o)
-	$(LD) $^ $(LDFLAGS) -o $@
-
-$(EXE_CLIENT)-tsan: $(OBJS_CLIENT:%.o=$(OBJS_DIR)/%-tsan.o)
 	$(LD) $^ $(LDFLAGS_TSAN) -o $@
 
 .PHONY: clean

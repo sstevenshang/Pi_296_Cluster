@@ -17,8 +17,6 @@
 
 static int sock_fd;
 static int endSession = 0;
-static dictionary* dick;
-static vector* files;
 static int epoll_fd;
 static char* temp_directory;
 static ssize_t ret;
@@ -44,25 +42,6 @@ void set_up_signals() {
   }
 }
 
-void discard_task(int fd) {
-  task* t = dictionary_get(dick, &fd);
-  if (t->request)
-    fclose(t->request);
-  t->request = NULL;
-  shutdown_further_writes(fd);
-  shutdown_further_reads(fd);
-  dictionary_remove(dick, &fd);
-  epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-  close(fd);
-}
-
-void discard_and_delete_file(int fd, task* curr) {
-  char* file_name = strdup(curr->header);
-  discard_task(fd);
-  remove(file_name);
-  free(file_name);
-}
-
 void clean_up_globals() {
   //Cleanup directory
   for (unsigned i = 0; i < vector_size(files); i++)
@@ -74,13 +53,11 @@ void clean_up_globals() {
   //Close file descriptors
   close(epoll_fd);
   close(sock_fd);
-  dictionary_destroy(dick);
   vector_destroy(files);
 }
 
 void set_up_gloabls(char* port) {
   sock_fd = set_up_server(port);
-  dick = dictionary_create(int_hash_function, int_compare, int_copy_constructor, int_destructor, task_copy_constructor, task_destructor);
   files = string_vector_create();
 
 	//setup epoll
@@ -162,8 +139,6 @@ void handle_data(struct epoll_event *e)
       if (ret == INVALID_COMMAND) {
         //TODO send error message
         // printf("Made it here!\n");
-        respond_bad_request(e->data.fd);
-        discard_task(e->data.fd);
         return;
       }
       curr->status = HAVE_VERB;
@@ -198,11 +173,9 @@ void handle_data(struct epoll_event *e)
           // printf("DO LIST!\n");
           ret = send_file_list(e->data.fd, files);
           if (ret == -1) {
-            discard_task(e->data.fd);
             return;
           } else if (ret == NOT_DONE_SENDING)
             break;
-          discard_task(e->data.fd);
           return;
           break;
       }
@@ -220,19 +193,15 @@ void handle_data(struct epoll_event *e)
             return;
           } else if (ret == INVALID_COMMAND) {
             //TODO send error message, remove from dictionary, discard of file descriptor
-            respond_bad_request(e->data.fd);
-            discard_task(e->data.fd);
             return;
           }
           break;
         case GET:
           printf("DO GET!\n");
-          discard_task(e->data.fd);
           return;
           break;
         case DELETE:
           printf("DO DELETE!\n");
-          discard_task(e->data.fd);
           return;
           break;
         default:
@@ -250,26 +219,18 @@ void handle_data(struct epoll_event *e)
       ssize_t written = transfer_fds(e->data.fd, fileno(curr->request), curr);
       if (written == -1) {
         //TODO send error message
-        respond_bad_file_size(e->data.fd);
-        discard_and_delete_file(e->data.fd, curr);
         return;
       } else if (written == TOO_MUCH_DATA || written == TOO_LITTLE_DATA) {
         //Send error mesage TODO
-        respond_bad_file_size(e->data.fd);
-        discard_and_delete_file(e->data.fd, curr);
         return;
       } else if (written == NOT_DONE_SENDING){
-        // dictionary_set(dick, &e->data.fd, curr);
         return;
       } else if (written == DONE_SENDING)
         curr->status = SEND_RESPONSE;
     }
     if (curr->status == SEND_RESPONSE) {
-      // printf("Ready to send response!\n");
       switch (curr->to_do) {
         case PUT:
-          respond_ok(e->data.fd);
-          discard_task(e->data.fd);
           return;
         default:
           return;

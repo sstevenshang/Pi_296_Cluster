@@ -1,11 +1,6 @@
-/**
- * Networking
- * CS 241 - Spring 2017
- */
 #pragma once
 #include <errno.h>
 #include <fcntl.h>
-#include "format.h"
 #include <netdb.h>
 #include <signal.h>
 #include <stddef.h>
@@ -16,11 +11,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "vector.h"
-
-#define SLOW 0
-#define SEND_TOO_LITTLE 0
-#define SEND_TOO_MUCH 0
-#define MALFORMED 0
 
 #define HEADER_BUFFER_SIZE 4096
 

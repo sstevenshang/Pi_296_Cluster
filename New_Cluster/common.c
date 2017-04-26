@@ -1,90 +1,4 @@
-/**
- * Networking
- * CS 241 - Spring 2017
- */
 #include "common.h"
-
-ssize_t last_open_idx(char* buff) {
-  for (int i = 0; i < HEADER_BUFFER_SIZE; i++) {
-    if (i > 1024) {
-      return -1;
-    }
-    if (! buff[i])
-      return i;
-  }
-  return -1;
-}
-
-ssize_t parse_header(int fd, char* header) {
-  char buff;
-  int idx = last_open_idx(header);
-  int value;
-  while ((value = read_all_from_socket(fd, &buff, 1)) != -1 && buff != '\n') {
-    header[idx++] = buff;
-  }
-  if (buff == '\n') {
-    return 0;
-  }
-  if (! value) {
-    return INVALID_COMMAND;
-  }
-  return NOT_DONE_SENDING;
-}
-
-int already_contains(vector* v, char* file, unsigned idx) {
-  for (unsigned i = 0; i < idx; i++) {
-    char* t_file = vector_get(v, i);
-    if (strcmp(file, t_file) == 0)
-      return 1;
-  }
-  return 0;
-}
-
-ssize_t send_file_list(int fd, vector* files) {
-  size_t message_length = 0;
-  for (unsigned i = 0; i < vector_size(files); i++)
-    if (access((char*) vector_get(files, i), F_OK) == 0)
-      message_length += strlen((char*) vector_get(files, i)) + 1;
-
-  char buffer[message_length];
-  int idx = 0;
-
-  for (unsigned i = 0; i < vector_size(files); i++){
-    if (access((char*) vector_get(files, i), F_OK) == 0 && !already_contains(files, vector_get(files, i), i)) {
-      char* filename = (char*) vector_get(files, i);
-      for (unsigned i = 0; i < strlen(filename); i++) {
-        buffer[idx++] = filename[i];
-      }
-      buffer[idx++] = '\n';
-    }
-  }
-  buffer[idx] = 0;
-  message_length = strlen(buffer);
-
-  write_all_to_socket(fd, "OK\n", 3);
-  write_all_to_socket(fd, (char*)&message_length, sizeof(size_t));
-  write_all_to_socket(fd, (char*)&buffer, message_length);
-
-  return DONE_SENDING;
-}
-
-void respond_bad_request(int fd) {
-  char buf[strlen("ERROR\n")+strlen(err_bad_request)];
-  sprintf(buf, "ERROR\n%s", err_bad_request);
-  write_all_to_socket(fd, buf, strlen(buf));
-}
-
-void respond_bad_file_size(int fd) {
-  char buf[strlen("ERROR\n")+strlen(err_bad_file_size)];
-  sprintf(buf, "ERROR\n%s", err_bad_file_size);
-  write_all_to_socket(fd, buf, strlen(buf));
-}
-
-void respond_no_such_file(int fd) {
-  char buf[strlen("ERROR\n")+strlen(err_no_such_file)];
-  sprintf(buf, "ERROR\n%s", err_no_such_file);
-  write_all_to_socket(fd, buf, strlen(buf));
-}
 
 void reset_header_buffer(task* curr) {
   for (int i = 0; i < HEADER_BUFFER_SIZE; i++)
@@ -127,7 +41,6 @@ ssize_t transfer_fds(int socket, int fd, task* t) {
   errno = 0;
 
   while (1) {
-    // curr_read = (4096 < t->file_size) ? read_all_from_socket(socket, buffer, 4096) : read_all_from_socket(socket, buffer, t->file_size);
     curr_read = read(socket, buffer, 4096);
     // printf("curr_read is %zi\n", curr_read);
     if (curr_read == -1) {
@@ -282,10 +195,6 @@ void* task_copy_constructor(void* elem) {
 }
 
 void task_destructor(void* elem) {
-  // task* to_delete = elem;
-  // if (to_delete->request)
-  //   fclose(to_delete->request);
-  // to_delete->request = NULL;
   free(elem);
 }
 
@@ -358,7 +267,6 @@ int connect_to_server(const char *host, const char *port) {
 
 
 ssize_t write_all_to_socket(int socket, const char *buffer, size_t count) {
-    // Your Code Here
     ssize_t curr_write;
     ssize_t total_write = 0;
     errno = 0;
@@ -388,7 +296,6 @@ void shutdown_further_reads(int socket) {
 }
 
 ssize_t read_all_from_socket(int socket, char *buffer, size_t count) {
-    // Your Code Here
     ssize_t curr_read;
     ssize_t total_read = 0;
     errno = 0;
@@ -430,9 +337,6 @@ ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size) {
     }
     size -= curr_read;
     total_read += curr_read;
-
-    if (SLOW)
-      sleep(1);
 
     ssize_t written = write_all_to_socket(fd, buffer, curr_read);
 
