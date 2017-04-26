@@ -16,7 +16,7 @@
 #define NOT_DONE_SENDING -8
 #define WRONG_DATA_SIZE -16
 
-typedef enum { INTERFACE_PUT, PUT} verb;
+typedef enum { INTERFACE_PUT, PUT} command;
 
 typedef struct task {
   //Used for tracking files and book keeping
@@ -25,7 +25,7 @@ typedef struct task {
   char* file_name;
 
   //Used for parsing and state tracking
-  verb to_do;
+  command to_do;
   int status;
   size_t file_size;
   int size_buffer_pos;
@@ -53,7 +53,7 @@ ssize_t transfer_fds(int fd1, int fd2, task* t);
 
 int get_filename(int sfd, task* to_do);
 
-int get_verb(int sfd, task* to_do);
+int get_command(int sfd, task* to_do);
 
 task set_up_blank_task();
 

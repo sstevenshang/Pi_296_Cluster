@@ -15,7 +15,7 @@
 #include "callbacks.h"
 #include "vector.h"
 
-static int sock_fd;
+static int server_socket;
 static int close_master = 0;
 static int epoll_fd;
 static char* temp_directory;
@@ -44,13 +44,57 @@ void setSignalHandlers() {
   }
 }
 
-void create_worker(int fd){
+void cleanGlobals() {
+  //Cleanup directory
+  chdir("..");
+  free(temp_directory);
+  //Close file descriptors
+  close(epoll_fd);
+  close(server_socket);
+}
+
+void setUpGlobals(char* port) {
+  server_socket = set_up_server(port);
+	epoll_fd = epoll_create(1);
+  worker_list = vector_create(NULL, NULL, NULL);
+
+	if(epoll_fd == -1) {
+    clean_up_globals();
+    perror("epoll_create()");
+    exit(1);
+  }
+
+	struct epoll_event event;
+	event.data.fd = server_socket;
+	event.events = EPOLLIN | EPOLLET;
+	if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event)) {
+    clean_up_globals();
+    perror("epoll_ctl()");
+    exit(1);
+	}
+
+  char dummy[] = "./master_tempXXXXXX";
+  temp_directory = strdup(mkdtemp(dummy));
+  print_temp_directory(temp_directory);
+  chdir(temp_directory);
+}
+
+worker* create_worker(int fd, char* IP){
   worker* newWorker = (worker*)malloc(sizeof(worker));
   newWorker->alive = 1;
   newWorker->tasks = vector_create(NULL, NULL, NULL);
   newWorker->worker_fd = fd;
   newWorker->status = -1;
+  newWorker->IP = strdup(IP);
   return newWorker;
+}
+
+//Make sure you shutdown + close worker_fd before calling.
+void free_worker(worker* to_free) {
+  vector_destroy(to_free->tasks);
+  free(to_free->IP);
+  free(to_free);
+  to_free = NULL;
 }
 
 size_t find_worker_pos(int fd){
@@ -62,41 +106,6 @@ size_t find_worker_pos(int fd){
     i++
   }
   return -1;
-}
-
-void clean_up_globals() {
-  //Cleanup directory
-  chdir("..");
-  free(temp_directory);
-  //Close file descriptors
-  close(epoll_fd);
-  close(sock_fd);
-}
-
-void set_up_gloabls(char* port) {
-  sock_fd = set_up_server(port);
-	epoll_fd = epoll_create(1);
-  worker_list = vector_create(NULL, NULL, NULL);
-
-	if(epoll_fd == -1) {
-    clean_up_globals();
-    perror("epoll_create()");
-    exit(1);
-  }
-
-	struct epoll_event event;
-	event.data.fd = sock_fd;
-	event.events = EPOLLIN | EPOLLET;
-	if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sock_fd, &event)) {
-    clean_up_globals();
-    perror("epoll_ctl()");
-    exit(1);
-	}
-
-  char dummy[] = "./master_tempXXXXXX";
-  temp_directory = strdup(mkdtemp(dummy));
-  print_temp_directory(temp_directory);
-  chdir(temp_directory);
 }
 
 void accept_connections(struct epoll_event *e,int epoll_fd) {
@@ -115,11 +124,14 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 				exit(1);
 			}
 		}
+    char *connected_ip= inet_ntoa(new_addr.sin_addr);
 
     int flags = fcntl(new_fd, F_GETFL, 0);
     fcntl(new_fd, F_SETFL, flags | O_NONBLOCK);
 
-    //TODO set up worker struct. Add to list
+    //Set up worker struct. Add to list
+    worker* newWorker = create_worker(new_fd, connected_ip);
+    vector_push_back(worker_list, newWorker);
 
     //Connection to epoll
     struct epoll_event event;
@@ -132,9 +144,7 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 	}
 }
 
-void handle_data(struct epoll_event *e)
-{
-    //task* curr = dictionary_get(dick, &e->data.fd);
+void handle_data(struct epoll_event *e) {
     worker* curr = vector_get(worker_list,find_worker_pos(e->data.fd));
           if(interface_fd == -1){
 	    interface_fd = curr->worker_fd;
@@ -145,7 +155,7 @@ void handle_data(struct epoll_event *e)
 	    schedule();
 	//TODO
    	  }
-	  int type = get_verb(curr);
+	  int type = get_command(curr);
    	  if(type == -1 || type == 1){return ;}//bad verb (1 shoudl be handled by scheduler
 
 }
@@ -167,14 +177,14 @@ int main(int argc, char** argv) {
 
 		if(epoll_wait(epoll_fd, &new_event, 1, -1) > 0)
 		{
-			if(sock_fd == new_event.data.fd)
+			if(server_socket == new_event.data.fd)
 				accept_connections(&new_event, epoll_fd);
 			else
 				handle_data(&new_event);
 		}
 	}
 
-  clean_up_globals();
+  cleanGlobals();
 
   return 0;
 }
