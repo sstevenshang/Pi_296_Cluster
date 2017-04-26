@@ -1,6 +1,6 @@
 OBJS_DIR = .objs
 
-EXE_SERVER = master
+EXE_SERVER = cluster
 EXES_STUDENT = $(EXE_CLIENT) $(EXE_SERVER)
 
 OBJS_SERVER = $(EXE_SERVER).o utils.o
