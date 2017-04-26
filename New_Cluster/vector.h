@@ -1,10 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdlib.h>
-
-typedef void *(*copy_constructor_type)(void *elem);
-typedef void (*destructor_type)(void *elem);
-typedef void *(*default_constructor_type)(void);
+#include "utils.h"
 
 typedef struct vector {
   copy_constructor_type copy_constructor;

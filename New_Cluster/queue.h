@@ -1,8 +1,6 @@
 #pragma once
 #include <stdlib.h>
-
-typedef void *(*copy_constructor_type)(void *elem);
-typedef void (*destructor_type)(void *elem);
+#include "utils.h"
 
 typedef struct queue_node {
   void *data;
