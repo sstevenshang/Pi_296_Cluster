@@ -25,6 +25,7 @@
 #define HAVE_SIZE -10
 #define RECIEVING_DATA -11
 #define FORWARD_DATA -12
+#define BIG_FAILURE -3
 
 
 #define WRONG_DATA_SIZE -16
@@ -46,14 +47,18 @@ typedef struct worker {
   double CPU_usage; //Usage stat
 
   //Used for parsing and state tracking
-  command to_do;
   int status;
+
   char command[COMMAND_BUF_SIZE];
   int command_size;
-  int temp_fd;
+
+  command to_do;
   char* temp_file_name;
+
   size_t file_size;
   int size_buffer_pos;
+  
+  int temp_fd;
 } worker;
 
 /*

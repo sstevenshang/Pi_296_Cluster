@@ -92,6 +92,7 @@ worker* create_worker(int fd, char* IP){
   //Note these two are essential to initialization
   newWorker->temp_file_name = NULL;
   newWorker->temp_fd = -1;
+  newWorker->CPU_usage = -1;
   reset_worker_for_parsing(newWorker);
   return newWorker;
 }
@@ -322,9 +323,49 @@ ssize_t get_size(worker* curr) {
   return DONE_SENDING;
 }
 
-//Gets the header up until '\n'. Sets the filename and command.
+//Gets the header up until '\n'. Sets the char* temp_file_name and command to_do.
 ssize_t get_command(worker* w) {
-  (void) w;
+  int fd = w->worker_fd;
+  ssize_t ret;
+  char buff;
+
+  while (1) {
+      ret = read(fd, &buff, 1);
+      if (ret == -1) {
+        if (errno == EWOULDBLOCK || errno == EAGAIN)
+          return NOT_DONE_SENDING;
+        return BIG_FAILURE;
+      } else if (ret == 0) {
+        return BIG_FAILURE;
+      }
+      if (buff == '\n')
+        break;
+      w->command[w->command_size++] = buff;
+
+      //Watch for buffer overflow
+      if (w->command_size > 1025) {
+        return BIG_FAILURE;
+      }
+  }
+
+  if (strncmp("INTERFACE_PUT", w->command, strlen("INTERFACE_PUT")) == 0) {
+    w->to_do = INTERFACE_PUT;
+  } else if (strncmp("PUT", w->command, 3) == 0) {
+    w->to_do = PUT;
+  } else {
+    return BIG_FAILURE;
+  }
+
+  unsigned idx = 0;
+  for (; idx < strlen(w->command); idx++) {
+    if (w->command[idx] == ' ') {
+      idx++;
+      break;
+    }
+  }
+
+  w->temp_file_name = strdup(w->command+1);
+
   return DONE_SENDING;
 }
 
