@@ -64,10 +64,10 @@ void allocate_buffer(char** buffer, size_t size);
 int setup_client(char* host, char* port);
 char* create_header(char* filename);
 
-int socket_fd;
+static int socket_fd;
 
-queue* task_queue;
-queue* finished_task_queue;
+static queue* task_queue;
+static queue* finished_task_queue;
 
 int main(int argc, char const *argv[]) {
     if (argc < 3) {
