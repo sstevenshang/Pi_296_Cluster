@@ -57,7 +57,7 @@ typedef struct worker {
 } worker;
 
 /*
-  TODO scheduler:
+  TODO:
   Schedule returns the fd of the worker to send the task to while interally
   updating it's vector of current tasks.
 
@@ -67,15 +67,16 @@ typedef struct worker {
 int schedule(task* t, vector* worker_list);
 void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list);
 
+/*
+  Helper functions central to master's functionality.
+*/
 task* make_task(worker* w);
 ssize_t get_command(worker* to_do);
 ssize_t get_size(worker* curr);
 ssize_t get_binary_data(worker* curr);
 ssize_t transfer_fds(int fd1, int fd2, worker* t);
-int get_filename(int sfd, task* to_do);
-vector* string_vector_create();
-void *string_default_constructor(void);
-void string_destructor(void *elem);
+void do_put(int fd, worker* w);
+
 int set_up_server(char* port);
 int connect_to_server(const char *host, const char *port);
 ssize_t write_all_to_socket(int socket, const char *buffer, size_t count);

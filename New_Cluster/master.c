@@ -74,6 +74,8 @@ void reset_worker_for_parsing(worker* newWorker) {
   newWorker->command_size = 0;
   newWorker->size_buffer_pos = 0;
   newWorker->status = START;
+  if (newWorker->temp_fd != -1)
+    close(newWorker->temp_fd);
   newWorker->temp_fd = -1;
   newWorker->file_size = 0;
   if (newWorker->temp_file_name)
@@ -87,7 +89,9 @@ worker* create_worker(int fd, char* IP){
   newWorker->tasks = vector_create(NULL, NULL, NULL);
   newWorker->worker_fd = fd;
   newWorker->IP = strdup(IP);
+  //Note these two are essential to initialization
   newWorker->temp_file_name = NULL;
+  newWorker->temp_fd = -1;
   reset_worker_for_parsing(newWorker);
   return newWorker;
 }
@@ -202,20 +206,24 @@ void handle_data(struct epoll_event *e) {
       }
     }
     if (curr->status == FORWARD_DATA) {
-      //If the request is from the interface, forward the data to a worker
       int fd_to_send_to;
+      //If the request is from the interface, forward the data to a worker
       if (e->data.fd == interface_fd) {
         task* new_task = make_task(curr);
         fd_to_send_to = schedule(new_task, worker_list);
-      } else {
-
       }
-
+      //If this is a response from a worker, forward the data to interface
+      else {
+        scheduler_remove_task(curr->worker_fd, curr->temp_file_name, worker_list);
+        fd_to_send_to = interface_fd;
+      }
+      do_put(fd_to_send_to, curr);
+      reset_worker_for_parsing(curr);
+      curr->status = START;
     }
 }
 
 int master_main(int argc, char** argv) {
-
   if (argc != 2) {
     printf("Usage : ./master <port>\n");
     exit(1);
@@ -226,9 +234,7 @@ int master_main(int argc, char** argv) {
 
 	// Event loop
 	while(!close_master) {
-
 		struct epoll_event new_event;
-
 		if(epoll_wait(epoll_fd, &new_event, 1, -1) > 0)
 		{
 			if(server_socket == new_event.data.fd)
@@ -237,9 +243,7 @@ int master_main(int argc, char** argv) {
 				handle_data(&new_event);
 		}
 	}
-
   cleanGlobals();
-
   return 0;
 }
 
@@ -280,13 +284,20 @@ ssize_t transfer_fds(int socket, int fd, worker* t) {
 
 //TODO dummy for now
 int schedule(task* t, vector* worker_list) {
+  (void) t;
   worker* w = vector_get(worker_list, 0);
   return w->worker_fd;
 }
 
 //TODO dummy for now
 void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
+  (void) worker_fd; (void) filename; (void) worker_list;
   return;
+}
+
+void do_put(int fd, worker* w) {
+  (void) fd;
+  (void) w;
 }
 
 //Frees a task
@@ -296,38 +307,25 @@ void free_task(task* t) {
 
 //Makes a task with the given parsing information in the worker
 task* make_task(worker* w) {
+  (void) w;
   return NULL;
 }
 
 //Retrieves the given data and puts it into the file_name
 ssize_t get_binary_data(worker* curr) {
+  (void) curr;
   return DONE_SENDING;
 }
 //Retrieves the size, setting the file_size
 ssize_t get_size(worker* curr) {
-
+  (void) curr;
   return DONE_SENDING;
 }
 
 //Gets the header up until '\n'. Sets the filename and command.
-ssize_t get_command(worker* to_do) {
-
+ssize_t get_command(worker* w) {
+  (void) w;
   return DONE_SENDING;
-}
-
-void *string_copy_constructor(void *elem) {
-  char *str = elem;
-  return strdup(str);
-}
-
-void string_destructor(void *elem) { free(elem); }
-
-void *string_default_constructor(void) {
-  return calloc(1, sizeof(char));
-}
-
-vector* string_vector_create() {
-  return vector_create(string_copy_constructor, string_destructor, string_default_constructor);
 }
 
 int set_up_server(char* port) {
