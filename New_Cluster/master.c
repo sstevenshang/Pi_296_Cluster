@@ -37,6 +37,8 @@ void cleanGlobals() {
   //Close file descriptors
   close(epoll_fd);
   close(server_socket);
+
+  vector_destroy(worker_list);
 }
 
 void setUpGlobals(char* port) {
@@ -45,7 +47,7 @@ void setUpGlobals(char* port) {
   worker_list = vector_create(NULL, NULL, NULL);
 
 	if(epoll_fd == -1) {
-    clean_up_globals();
+    cleanGlobals();
     perror("epoll_create()");
     exit(1);
   }
@@ -54,15 +56,15 @@ void setUpGlobals(char* port) {
 	event.data.fd = server_socket;
 	event.events = EPOLLIN | EPOLLET;
 	if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event)) {
-    clean_up_globals();
+    cleanGlobals();
     perror("epoll_ctl()");
     exit(1);
 	}
 
   char dummy[] = "./master_tempXXXXXX";
   temp_directory = strdup(mkdtemp(dummy));
-  print_temp_directory(temp_directory);
   chdir(temp_directory);
+  printf("Storing files in %s\n", temp_directory);
 }
 
 void reset_worker_for_parsing(worker* newWorker) {
@@ -75,7 +77,7 @@ void reset_worker_for_parsing(worker* newWorker) {
   newWorker->temp_fd = -1;
   newWorker->file_size = 0;
   if (newWorker->temp_file_name)
-    free(newWorker->temp_file_name)
+    free(newWorker->temp_file_name);
   newWorker->temp_file_name = NULL;
 }
 
@@ -94,6 +96,8 @@ worker* create_worker(int fd, char* IP){
 void free_worker(worker* to_free) {
   vector_destroy(to_free->tasks);
   free(to_free->IP);
+  if (to_free->temp_file_name)
+    free(to_free->temp_file_name);
   free(to_free);
   to_free = NULL;
 }
@@ -101,10 +105,10 @@ void free_worker(worker* to_free) {
 ssize_t find_worker_pos(int fd){
   size_t i = 0;
   while(i < vector_size(worker_list)){
-    if((vector_get(worker_list, i))->worker_fd == fd){
+    if(((worker*)vector_get(worker_list, i))->worker_fd == fd){
       return i;
     }
-    i++
+    i++;
   }
   return -1;
 }
@@ -150,10 +154,10 @@ void handle_data(struct epoll_event *e) {
     worker* curr;
     ssize_t check;
 
-    if (vector_pos != -1)
-      curr = vector_get(worker_list, vector_pos);
-    else if (vector_pos == -1 || )
+    if (vector_pos == -1)
       curr = interface;
+    else
+      curr = vector_get(worker_list, vector_pos);
 
     if(interface_fd == -1){
 	    interface_fd = curr->worker_fd;
@@ -162,43 +166,50 @@ void handle_data(struct epoll_event *e) {
     }
 
     if (curr->status == START) {
-      check = get_command(e->data.fd, curr);
+      check = get_command(curr);
       switch (check) {
         case NOT_DONE_SENDING:
           return;
         case DONE_SENDING:
-          curr->state = NEED_SIZE;
+          curr->status = NEED_SIZE;
           break;
         default:
           fprintf(stderr, "There was a catastrophic failure!\n");
       }
     }
     if (curr->status == NEED_SIZE) {
-      check = get_size(e->data.fd, curr);
+      check = get_size(curr);
       switch (check) {
         case NOT_DONE_SENDING:
           return;
         case DONE_SENDING:
-          curr->state = RECIEVING_DATA;
+          curr->status = RECIEVING_DATA;
           break;
         default:
           fprintf(stderr, "There was a catastrophic failure!\n");
       }
     }
     if (curr->status == RECIEVING_DATA) {
-      check = get_binary_data(e->data.fd, curr);
+      check = get_binary_data(curr);
       switch (check) {
         case NOT_DONE_SENDING:
           return;
         case DONE_SENDING:
-          curr->state = FORWARD_DATA;
+          curr->status = FORWARD_DATA;
           break;
         default:
           fprintf(stderr, "There was a catastrophic failure!\n");
       }
     }
     if (curr->status == FORWARD_DATA) {
+      //If the request is from the interface, forward the data to a worker
+      int fd_to_send_to;
+      if (e->data.fd == interface_fd) {
+        task* new_task = make_task(curr);
+        fd_to_send_to = schedule(new_task, worker_list);
+      } else {
 
+      }
 
     }
 }
@@ -233,45 +244,10 @@ int master_main(int argc, char** argv) {
 }
 
 /*
-    BELOW CODE ARE FROM UTILS.H
-    SINCE ONLY USED BY MASTER.C, MOVE HERE
-    TO INCREASE CODE CLARITY
+  MASTER_UTILS
 */
 
-void reset_header_buffer(task* curr) {
-  for (int i = 0; i < HEADER_BUFFER_SIZE; i++)
-    curr->header[i] = 0;
-}
-
-void respond_ok(int fd) {
-  write_all_to_socket(fd, "OK\n", 3);
-}
-
-ssize_t get_message_length_s(int socket, task* curr) {
-  int rd = -1;
-  while (rd == -1) {
-      rd = read(socket, ((char*) &curr->file_size) + curr->size_buffer_pos, sizeof(size_t)-curr->size_buffer_pos);
-      if (rd == -1)
-        if (errno != EINTR)
-          return NOT_DONE_SENDING;
-      if (rd == 0) {
-        return INVALID_COMMAND;
-      }
-      if (rd != -1)
-        break;
-  }
-  if (rd > 0) {
-    curr->size_buffer_pos += rd;
-    if (curr->size_buffer_pos == sizeof(size_t))
-      return DONE_SENDING;
-    return NOT_DONE_SENDING;
-  } else if (rd == 0) {
-    return INVALID_COMMAND;
-  }
-  return NOT_DONE_SENDING;
-}
-
-ssize_t transfer_fds(int socket, int fd, task* t) {
+ssize_t transfer_fds(int socket, int fd, worker* t) {
   char buffer[4096];
   ssize_t curr_read;
   ssize_t total_read = 0;
@@ -288,7 +264,8 @@ ssize_t transfer_fds(int socket, int fd, task* t) {
     } else if (curr_read == 0) {
         break;
     }
-    ssize_t written = write(fd, buffer, curr_read);
+
+    ssize_t written = write_all_to_socket(fd, buffer, curr_read);
     t->file_size -= curr_read;
     total_read += curr_read;
 
@@ -301,51 +278,41 @@ ssize_t transfer_fds(int socket, int fd, task* t) {
   return DONE_SENDING;
 }
 
-//return 1 on success, 0 on failure
-int get_filename(int sfd, task* to_do) {
-  char b;
-  int idx = 0;
-  ssize_t read;
-
-  for (;idx < HEADER_BUFFER_SIZE; idx++)
-    if (!idx)
-      break;
-
-  while ( (read = read_all_from_socket(sfd, &b, 1)) != -1 && b != '\n' && read != 0) {
-    to_do->head_size++;
-    if (to_do->head_size > 1024) {
-      return INVALID_COMMAND;
-    }
-    if (b != ' ')
-      to_do->header[idx++] = b;
-  }
-  if (b == '\n'){
-    if (to_do->head_size > 1024) {
-      return INVALID_COMMAND;
-    }
-    return 0;
-  }
-  if (!read) {
-    return INVALID_COMMAND;
-  }
-  return 1;
+//TODO dummy for now
+int schedule(task* t, vector* worker_list) {
+  worker* w = vector_get(worker_list, 0);
+  return w->worker_fd;
 }
 
-int get_command(task* to_do) {
-      if (strncmp(to_do->header, "INTERFACE_PUT", 13) == 0) {
-        return 1;
-      } else if (strncmp(to_do->header, "PUT", 3) == 0) {
-        return 2;
-      }
-  return -1;
+//TODO dummy for now
+void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
+  return;
 }
 
-task set_up_blank_task() {
-  task t = (task) {.request=NULL, .to_do=GET, .status=GETTING_VERB,.file_size=0,.size_buffer_pos=0,.head_size=0};
-  for (int i = 0; i < HEADER_BUFFER_SIZE; i++) {
-    t.header[i] = 0;
-  }
-  return t;
+//Frees a task
+void free_task(task* t) {
+  (void) t;
+}
+
+//Makes a task with the given parsing information in the worker
+task* make_task(worker* w) {
+  return NULL;
+}
+
+//Retrieves the given data and puts it into the file_name
+ssize_t get_binary_data(worker* curr) {
+  return DONE_SENDING;
+}
+//Retrieves the size, setting the file_size
+ssize_t get_size(worker* curr) {
+
+  return DONE_SENDING;
+}
+
+//Gets the header up until '\n'. Sets the filename and command.
+ssize_t get_command(worker* to_do) {
+
+  return DONE_SENDING;
 }
 
 void *string_copy_constructor(void *elem) {
@@ -361,14 +328,6 @@ void *string_default_constructor(void) {
 
 vector* string_vector_create() {
   return vector_create(string_copy_constructor, string_destructor, string_default_constructor);
-}
-
-void* task_copy_constructor(void* elem) {
-  return new_task;
-}
-
-void task_destructor(void* elem) {
-  free(elem);
 }
 
 int set_up_server(char* port) {
@@ -425,7 +384,7 @@ ssize_t write_all_to_socket(int socket, const char *buffer, size_t count) {
     while(count) {
       curr_write = write(socket, buffer, count);
       if (curr_write == -1) {
-        if (errno == EINTR)
+        if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)
           continue;
         return -1;
       } else if (curr_write == 0)
