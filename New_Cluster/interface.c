@@ -1,23 +1,7 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <sys/stat.h>
-#include <errno.h>
+#include "interface.h"
 
-#define BUF_SIZE    1024
+int interface_main(int argc, char **argv) {
 
-void send_request(int sockFd, char *buffer, char *local);
-size_t get_file_size(char *filename);
-void write_binary_data(FILE *f, int sockFd, char *buffer);
-bool check_ok(int sockFd, char *buffer);
-void print_binary_data(FILE *f, int sockFd, char *buffer, size_t dataSize);
-ssize_t my_write(int socket, void *buffer, size_t count);
-ssize_t my_read(int socket, void *buffer, size_t count);
-
-int main(int argc, char **argv) {
     int sockFd = socket(AF_INET, SOCK_STREAM, 0);
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -45,7 +29,7 @@ int main(int argc, char **argv) {
     send_request(sockFd, buffer, argv[2]);
     FILE *f = fopen(argv[2], "r");
     size_t s = get_file_size(argv[2]);
-    my_write(sockFd, (void *)&s, sizeof(size_t)); 
+    my_write(sockFd, (void *)&s, sizeof(size_t));
     write_binary_data(f, sockFd, buffer);
 
     shutdown(sockFd, SHUT_WR);
@@ -149,4 +133,3 @@ ssize_t my_read(int socket, void *buffer, size_t count) {
     }
     return c - count;
 }
-
