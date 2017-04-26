@@ -254,7 +254,6 @@ ssize_t read_all_from_socket(int socket, char *buffer, size_t count) {
     ssize_t curr_read;
     ssize_t total_read = 0;
     errno = 0;
-
     while(count) {
       curr_read = read(socket, buffer, count);
       if (curr_read == -1) {
