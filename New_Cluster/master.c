@@ -634,7 +634,7 @@ void* listen_to_heartbeat(void* nothing) {
     (void) nothing;
     pthread_detach(pthread_self());
 
-    int socket_fd = setUpUDPServer();
+    int heartbeat_socket_fd = setUpUDPServer();
 
     struct sockaddr_in clientAddr;
     memset((char*)&clientAddr, 0, sizeof(clientAddr));
@@ -644,7 +644,7 @@ void* listen_to_heartbeat(void* nothing) {
     while(1) {
 
         char buffer[HEARTBEAT_SIZE];
-        byte_received = recvfrom(socket_fd, &buffer, HEARTBEAT_SIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
+        byte_received = recvfrom(heartbeat_socket_fd, &buffer, HEARTBEAT_SIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
         double client_usage = atof(buffer);
         if (byte_received < 0) {
             perror("UDP FAILED: failed to receive from client");
@@ -658,7 +658,7 @@ void* listen_to_heartbeat(void* nothing) {
         }
     }
 
-    close(socket_fd);
+    close(heartbeat_socket_fd);
     return NULL;
 }
 
@@ -691,11 +691,13 @@ void* detect_heart_failure(void* nothing) {
 
     double cur_time;
     while (keep_update) {
+
         cur_time = getTime();
         size_t num_worker = vector_size(worker_list);
         for (size_t i=0; i < num_worker; i++) {
             worker* this_worker = vector_get(worker_list, i);
-            if (this_worker->last_beat_received > 0.0) {
+            printf("Worker %d last_beat_received is %f, cur_time is %f\n", this_worker->worker_fd, this_worker->last_beat_received, this_worker->cur_time); // For debugging only, remove later
+            if (this_worker->last_beat_received > 0) {
                 if (cur_time - this_worker->last_beat_received > 3.0) {
                     this_worker->alive = 0;
                     printf("Node %d is dead on address %s\n", this_worker->worker_fd, this_worker->IP);
@@ -709,8 +711,8 @@ void* detect_heart_failure(void* nothing) {
 
 int setUpUDPServer() {
 
-    int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (socket_fd < 0) {
+    int heartbeat_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (heartbeat_socket_fd < 0) {
         perror("USP FAILED: unable to create socket");
         return -1;
     }
@@ -719,15 +721,15 @@ int setUpUDPServer() {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(MASTER_HEARTBEAT_PORT);
-    int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
+    int status = bind(heartbeat_socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
     if (status < 0) {
         perror("UDP FAILED: unable to bind socket");
         return -1;
     }
     int optval = 1;
-    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
-    return socket_fd;
+    setsockopt(heartbeat_socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    setsockopt(heartbeat_socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
+    return heartbeat_socket_fd;
 }
 
 double getTime() {
