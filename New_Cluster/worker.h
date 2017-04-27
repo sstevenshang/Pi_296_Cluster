@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #include "queue.h"
 #include "utils.h"
