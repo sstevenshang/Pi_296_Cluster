@@ -28,7 +28,7 @@ int interface_main(int argc, char **argv) {
 
     send_request(sockFd, buffer, argv[2]);
     FILE *f = fopen(argv[2], "r");
-    size_t s = get_file_size(argv[2]);
+    size_t s = get_user_file_size(argv[2]);
     my_write(sockFd, (void *)&s, sizeof(size_t));
     write_binary_data(f, sockFd, buffer);
 
@@ -54,7 +54,7 @@ void send_request(int sockFd, char *buffer, char *local) {
     my_write(sockFd, buffer, strlen(buffer));
 }
 
-size_t get_file_size(char *filename) {
+size_t get_user_file_size(char *filename) {
     struct stat buf;
     stat(filename, &buf);
     return buf.st_size;
