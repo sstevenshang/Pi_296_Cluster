@@ -16,7 +16,7 @@
 #include <signal.h>
 #include <stddef.h>
 #include <time.h>
-#include <asm/atomic.h>
+#include <atomic.h>
 #include <pthread.h>
 
 #include "vector.h"
