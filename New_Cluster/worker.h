@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <errno.h>
+#include <asm/atomic.h>
 
 #include "queue.h"
 
@@ -26,6 +27,7 @@
 #define BAD_EXEC_MESSAGE "Bad executable: "
 #define FILE_BUFFER_SIZE (4096)
 #define LINE_BUFFER_SIZE (32)
+#define MASTER_HEARTBEAT_PORT (9110);
 
 typedef struct task_t{
     char* input_filename;
@@ -52,3 +54,10 @@ ssize_t read_line_from_socket(int socket_fd, char** buffer);
 void allocate_buffer(char** buffer, size_t size);
 int setup_client(char* host, char* port);
 char* create_header(char* filename);
+
+void* heartbeat(void* master_address);
+int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info);
+double get_local_usage();
+int setUpUDPClient();
+struct sockaddr_in setupUDPDestination(char* address);
+void kill_heartbeat();

@@ -1,29 +1,25 @@
 
-// HEART_BEAT CODE
+
 int setUpUDPServer() {
+
     int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_fd < 0) {
-        perror("FAILED: unable to create socket");
+        perror("USP FAILED: unable to create socket");
         return -1;
     }
-
     struct sockaddr_in serverAddr;
     memset((char*)&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(9111);
-
-    int status = bind(socket_fd, (struct sockaddr*) &serverAddr,
-            sizeof(serverAddr));
+    int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
     if (status < 0) {
-        perror("FAILED: unable to bind socket");
+        perror("UDP FAILED: unable to bind socket");
         return -1;
     }
-
     int optval = 1;
     setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
-
     return socket_fd;
 }
 

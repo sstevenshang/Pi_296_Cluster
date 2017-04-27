@@ -5,6 +5,8 @@ static int socket_fd;
 static queue* task_queue;
 static queue* finished_task_queue;
 
+atomic_t atomic_stay_alive = ATOMIC_INIT(1)
+
 void* task_copy_constructor(void* elem) {
     task_t* new_task = malloc(sizeof(task_t));
     task_t* old_task = (task_t*)elem;
@@ -29,10 +31,12 @@ int worker_main(char* host, char* port) {
 
     pthread_t tasking_threads[NUM_THREAD];
     pthread_t sending_thread;
+    pthread_t heartbeat_thread;
     for (int i=0; i < NUM_THREAD; i++) {
         pthread_create(&tasking_threads[i], NULL, tasking, NULL);
     }
     pthread_create(&sending_thread, NULL, sending, NULL);
+    pthread_create(&heartbeat_thread, NULL, heartbeat, NULL);
 
     while(1) {
         char* request = NULL;
@@ -66,6 +70,8 @@ int worker_main(char* host, char* port) {
 
     // clean up
 
+    kill_heartbeat();
+
     task_t end = (task_t){NULL, NULL, 0};
     for (int i=0; i < NUM_THREAD; i++) {
         queue_push(task_queue, &end);
@@ -75,6 +81,7 @@ int worker_main(char* host, char* port) {
         pthread_join(tasking_threads[i], NULL);
     }
     pthread_join(sending_thread, NULL);
+    pthread_join(heartbeat_thread, NULL);
 
     queue_destroy(task_queue);
     queue_destroy(finished_task_queue);
@@ -357,4 +364,84 @@ int setup_client(char* host, char* port) {
 
     freeaddrinfo(result);
     return socket_fd;
+}
+
+
+// HEARTBEAT CODE
+
+void* heartbeat(void* master_address) {
+    int heartbeat_fd = setUpUDPClient();
+    struct sockaddr_in master_info = setupUDPDestination((char*)master_address);
+    while (atomic_read(&atomic_stay_alive)) {
+        if (send_heartbeat(heartbeat_fd, &master_info) == -1) {
+            printf("UDP FAILED: exiting heartbeat due to network failure\n");
+            break;
+        }
+        sleep(1);
+    }
+    close(heartbeat_fd);
+    return NULL;
+}
+
+int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info) {
+    double cpu_usage = get_local_usage();
+    char message[30];
+    sprintf(message, "%f", cpu_usage);
+    int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*)master_info, sizeof(struct sockaddr));
+    if (status < 0) {
+      perror("UDP FAILED: unable to send message to server");
+      return -1;
+    }
+    return 0;
+}
+
+double get_local_usage() {
+  long double a[4], b[4], loadavg;
+  FILE *fp;
+  fp = fopen("/proc/stat","r");
+  if (!fp) {
+    return -1;
+  }
+  fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&a[0],&a[1],&a[2],&a[3]);
+  fclose(fp);
+  sleep(1);
+  fp = fopen("/proc/stat","r");
+  if (!fp) {
+    return -1;
+  }
+  fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&b[0],&b[1],&b[2],&b[3]);
+  fclose(fp);
+  loadavg = ((b[0]+b[1]+b[2]) - (a[0]+a[1]+a[2])) / ((b[0]+b[1]+b[2]+b[3]) - (a[0]+a[1]+a[2]+a[3]));
+  return loadavg;
+}
+
+int setUpUDPClient() {
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_fd < 0) {
+    perror("UDP FAILED: unable to create socket");
+    return -1;
+  }
+  return socket_fd;
+}
+
+struct sockaddr_in setupUDPDestination(char* address) {
+
+    struct hostent dest;
+    dest = gethostbyname(address);
+    if (dest == NULL) {
+        printf("UDP FAILED: cannot find master: %s\n", address);
+    }
+    struct in_addr **addr_list = (struct in_addr**)he->h_addr_list;
+    char* master_ip = inet_ntoa(*addr_list[0]);
+
+    struct sockaddr_in serverAddr;
+    memset((char*)&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = inet_addr(ip);
+    serverAddr.sin_port = htons(MASTER_HEARTBEAT_PORT);
+    return serverAddr;
+}
+
+void kill_heartbeat() {
+    atomic_set(&atomic_stay_alive, 0);
 }
