@@ -51,7 +51,7 @@ int worker_main(char* host, char* port) {
             continue;
         }
         printf("Received request: %s", request);
-        char* filename = get_filename(request, byteRead, PUT_REQUEST_SIZE);
+        char* filename = get_filename_from_header(request, byteRead, PUT_REQUEST_SIZE);
         if (filename == NULL) {
             printf("Bad request\n");
             continue;
