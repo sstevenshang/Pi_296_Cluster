@@ -266,17 +266,17 @@ int master_main(int argc, char** argv) {
 */
 
 //TODO dummy for now
-int schedule(task* t, vector* worker_list) {
-  (void) t;
-  worker* w = vector_get(worker_list, 0);
-  return w->worker_fd;
-}
-
-//TODO dummy for now
-void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
-  (void) worker_fd; (void) filename; (void) worker_list;
-  return;
-}
+// int schedule(task* t, vector* worker_list) {
+//   (void) t;
+//   worker* w = vector_get(worker_list, 0);
+//   return w->worker_fd;
+// }
+//
+// //TODO dummy for now
+// void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
+//   (void) worker_fd; (void) filename; (void) worker_list;
+//   return;
+// }
 
 ssize_t do_put(int fd_to_send_to, worker* w) {
   int src_fd = w->temp_fd;
@@ -568,7 +568,7 @@ int schedule(task* t, vector* worker_list) {
         // MUTEX LOCK WHENCE INTEGRATED HEARTBEAT
         if (this_worker->alive) {
             double load_factor = this_worker->CPU_usage * 10 + vector_size(this_worker->tasks);
-            if (load_factor < min_load_factor) {
+            if (load_factor < min_load_factor && load_factor > 0) {
                 min_load_factor = load_factor;
                 best_worker = this_worker;
             }
@@ -584,7 +584,6 @@ int schedule(task* t, vector* worker_list) {
 }
 
 void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
-
     size_t num_worker = vector_size(worker_list);
     worker* target_worker = NULL;
     for (size_t i=0; i < num_worker; i++) {
@@ -603,7 +602,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     task* target_task = NULL;
     for (size_t i=0; i < num_task; i++) {
         task* this_task = vector_get(worker_tasks, i);
-        if (strncmp(this_task->file_name, filename) == 0) {
+        if (strncmp(this_task->file_name, filename, strlen(this_task->file_name)) == 0) {
             target_task = this_task;
             break;
         }
