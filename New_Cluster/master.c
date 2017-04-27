@@ -268,6 +268,8 @@ int master_main(int argc, char** argv) {
 		}
 	}
 
+    pthread_join(heartbeat_listen_thread, NULL);
+    pthread_join(heartbeat_detect_thread, NULL);
     cleanGlobals();
     return 0;
 }
@@ -632,7 +634,6 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
 
 void* listen_to_heartbeat(void* nothing) {
     (void) nothing;
-    pthread_detach(pthread_self());
 
     int heartbeat_socket_fd = setUpUDPServer();
 
@@ -687,11 +688,10 @@ void report_heartbeat(char* worker_addr, double client_usage) {
 
 void* detect_heart_failure(void* nothing) {
     (void) nothing;
-    pthread_detach(pthread_self());
 
     double cur_time;
     while (keep_update) {
-
+        printf("Detecting heart failure\n");
         cur_time = getTime();
         size_t num_worker = vector_size(worker_list);
         for (size_t i=0; i < num_worker; i++) {
