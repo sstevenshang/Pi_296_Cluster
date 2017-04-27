@@ -19,7 +19,7 @@
 #include <pthread.h>
 
 #include "vector.h"
-#include "untils.h"
+#include "utils.h"
 
 #define START -1
 #define DONE_SENDING -7

@@ -17,7 +17,7 @@
 #include <errno.h>
 
 #include "queue.h"
-#include "untils.h"
+#include "utils.h"
 
 #define PUT_REQUEST "PUT"
 #define PUT_REQUEST_SIZE (strlen(PUT_REQUEST))
