@@ -568,6 +568,8 @@ int schedule(task* t, vector* worker_list) {
         // MUTEX LOCK WHENCE INTEGRATED HEARTBEAT
         if (this_worker->alive) {
             double load_factor = this_worker->CPU_usage * 10 + vector_size(this_worker->tasks);
+            //Make sure laod factor is positive because nodes upon initialization are set to -1.
+            //First reception of the heartbeat allows a node to have work allocated to it
             if (load_factor < min_load_factor && load_factor > 0) {
                 min_load_factor = load_factor;
                 best_worker = this_worker;
@@ -575,6 +577,8 @@ int schedule(task* t, vector* worker_list) {
         }
         // MUTEX UNLOCK WHENCE INTEGRATED HEARTBEAT
     }
+    //Dummy for now until we have heartbeats sending usage stats. Remove when heartbeat implemented.
+    best_worker = vector_get(worker_list, 1);
 
     if (best_worker == NULL) {
         return -1;
@@ -604,6 +608,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
         task* this_task = vector_get(worker_tasks, i);
         if (strncmp(this_task->file_name, filename, strlen(this_task->file_name)) == 0) {
             target_task = this_task;
+            vector_erase(worker_tasks, i);
             break;
         }
     }
