@@ -172,13 +172,6 @@ void handle_data(struct epoll_event *e) {
     else
       curr = vector_get(worker_list, vector_pos);
 
-    if(interface_fd == -1){
-	    interface_fd = curr->worker_fd;
-	    interface = curr;
-        printf("THIS HAPPENED\n");
-	    vector_erase(worker_list,find_worker_pos(e->data.fd));
-    }
-
     if (curr->status == START) {
       check = get_command(curr);
       switch (check) {
@@ -187,6 +180,14 @@ void handle_data(struct epoll_event *e) {
         case DONE_SENDING:
           curr->status = NEED_SIZE;
           printf("Succesfully got the header: %s\n", curr->command);
+          if (curr->to_do == INTERFACE_PUT) {
+              if(interface_fd == -1){
+                interface_fd = curr->worker_fd;
+                interface = curr;
+                printf("Set interface_fd to %d\n", interface_fd);
+                vector_erase(worker_list,find_worker_pos(e->data.fd));
+              }
+          }
           break;
         default:
           fprintf(stderr, "There was a failure in parsing the header!\n");
