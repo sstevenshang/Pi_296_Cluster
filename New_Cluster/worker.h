@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <errno.h>
+#include <arpa/inet.h>
 
 #include "queue.h"
 #include "utils.h"

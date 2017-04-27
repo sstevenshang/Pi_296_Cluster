@@ -388,7 +388,7 @@ int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info) {
     double cpu_usage = get_local_usage();
     char message[HEARTBEAT_SIZE];
     sprintf(message, "%f", cpu_usage);
-    int status = sendto(socket_fd, &message, HEARTBEAT_SIZE, 0, (struct sockaddr*)master_info, sizeof(struct sockaddr));
+    int status = sendto(heartbeat_fd, &message, HEARTBEAT_SIZE, 0, (struct sockaddr*)master_info, sizeof(struct sockaddr));
     if (status < 0) {
       perror("UDP FAILED: unable to send message to server");
       return -1;
@@ -427,18 +427,18 @@ int setUpUDPClient() {
 
 struct sockaddr_in setupUDPDestination(char* address) {
 
-    struct hostent dest;
+    struct hostent* dest;
     dest = gethostbyname(address);
     if (dest == NULL) {
         printf("UDP FAILED: cannot find master: %s\n", address);
     }
-    struct in_addr **addr_list = (struct in_addr**)he->h_addr_list;
+    struct in_addr **addr_list = (struct in_addr**)dest->h_addr_list;
     char* master_ip = inet_ntoa(*addr_list[0]);
 
     struct sockaddr_in serverAddr;
     memset((char*)&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr(ip);
+    serverAddr.sin_addr.s_addr = inet_addr(master_ip);
     serverAddr.sin_port = htons(MASTER_HEARTBEAT_PORT);
     return serverAddr;
 }
