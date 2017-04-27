@@ -696,7 +696,7 @@ void* detect_heart_failure(void* nothing) {
         size_t num_worker = vector_size(worker_list);
         for (size_t i=0; i < num_worker; i++) {
             worker* this_worker = vector_get(worker_list, i);
-            printf("Worker %d last_beat_received is %f, cur_time is %f\n", this_worker->worker_fd, this_worker->last_beat_received, this_worker->cur_time); // For debugging only, remove later
+            printf("Worker %d last_beat_received is %f, cur_time is %f\n", this_worker->worker_fd, this_worker->last_beat_received, cur_time); // For debugging only, remove later
             if (this_worker->last_beat_received > 0) {
                 if (cur_time - this_worker->last_beat_received > 3.0) {
                     this_worker->alive = 0;
