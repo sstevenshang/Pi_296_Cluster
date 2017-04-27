@@ -61,3 +61,4 @@ double get_local_usage();
 int setUpUDPClient();
 struct sockaddr_in setupUDPDestination(char* address);
 void kill_heartbeat();
+void kill_worker();

@@ -6,6 +6,7 @@ static queue* task_queue;
 static queue* finished_task_queue;
 
 static int stay_alive;
+static int quitting;
 
 void* task_copy_constructor(void* elem) {
     task_t* new_task = malloc(sizeof(task_t));
@@ -23,7 +24,17 @@ void task_destructor(void* elem) {
     free(old_task);
 }
 
+void kill_worker() {quitting = 1;}
+
 int worker_main(char* host, char* port) {
+
+    struct sigaction act;
+    memset(&act, 0, sizeof(act));
+    act.sa_handler = kill_worker;
+    if (sigaction(SIGINT, &act, NULL) < 0) {
+      perror(NULL);
+      exit(1);
+    }
 
     socket_fd = setup_client(host, port);
     stay_alive = 1;
@@ -39,7 +50,7 @@ int worker_main(char* host, char* port) {
     pthread_create(&sending_thread, NULL, sending, NULL);
     pthread_create(&heartbeat_thread, NULL, heartbeat, host);
 
-    while(1) {
+    while(quitting == 0) {
         char* request = NULL;
 
         ssize_t byteRead = read_line_from_socket(socket_fd, &request);
@@ -366,7 +377,6 @@ int setup_client(char* host, char* port) {
     freeaddrinfo(result);
     return socket_fd;
 }
-
 
 // HEARTBEAT CODE
 
