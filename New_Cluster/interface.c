@@ -60,7 +60,7 @@ int interface_main() {
     while (running) {
       printf("Enter an executable file name:\n");
 
-      while (1) { /* skip leading whitespace */
+      while (running) { /* skip leading whitespace */
         int c = getchar();
         if (c == EOF) break; /* end of file */
         if (!isspace(c)) {
@@ -92,6 +92,7 @@ int interface_main() {
           free(name);
           free(buffer);
           freeaddrinfo(result);
+		  close(sockFd);
           exit(1);
       }
       send_request(sockFd, buffer, name);
@@ -100,7 +101,7 @@ int interface_main() {
       my_write(sockFd, (void *)&s, sizeof(size_t));
       write_binary_data(f, sockFd, buffer);
     }
-
+    pthread_cancel(child_thread);
     free(buffer);
     free(name);
     freeaddrinfo(result);

@@ -141,7 +141,7 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 		}
     char *connected_ip= inet_ntoa(new_addr.sin_addr);
 
-    printf("Accepted connection from %s on file descriptor %i\n", connected_ip, new_fd);
+//    printf("Accepted connection from %s on file descriptor %i\n", connected_ip, new_fd);
 
     int flags = fcntl(new_fd, F_GETFL, 0);
     fcntl(new_fd, F_SETFL, flags | O_NONBLOCK);
@@ -162,7 +162,7 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 }
 
 void handle_data(struct epoll_event *e) {
-    printf("Have a task coming in on file descriptor %i\n", e->data.fd);
+//    printf("Have a task coming in on file descriptor %i\n", e->data.fd);
     int vector_pos = find_worker_pos(e->data.fd);
     worker* curr;
     ssize_t check;
@@ -277,19 +277,6 @@ int master_main() {
 /*
   MASTER_UTILS
 */
-
-//TODO dummy for now
-// int schedule(task* t, vector* worker_list) {
-//   (void) t;
-//   worker* w = vector_get(worker_list, 0);
-//   return w->worker_fd;
-// }
-//
-// //TODO dummy for now
-// void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
-//   (void) worker_fd; (void) filename; (void) worker_list;
-//   return;
-// }
 
 ssize_t do_put(int fd_to_send_to, worker* w) {
   int src_fd = w->temp_fd;
