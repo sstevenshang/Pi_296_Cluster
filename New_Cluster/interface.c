@@ -34,13 +34,7 @@ void* output_reciever(void* elem) {
   pthread_exit(NULL);
 }
 
-void endSession(int signal) {
-  (void) signal;
-  running = 0;
-}
-
 int interface_main() {
-    signal(SIGINT, endSession);
     sockFd = socket(AF_INET, SOCK_STREAM, 0);
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
