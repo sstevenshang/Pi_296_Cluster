@@ -175,6 +175,7 @@ void handle_data(struct epoll_event *e) {
     if(interface_fd == -1){
 	    interface_fd = curr->worker_fd;
 	    interface = curr;
+        printf("THIS HAPPENED\n");
 	    vector_erase(worker_list,find_worker_pos(e->data.fd));
     }
 
@@ -268,8 +269,6 @@ int master_main(int argc, char** argv) {
 		}
 	}
 
-    pthread_join(heartbeat_listen_thread, NULL);
-    pthread_join(heartbeat_detect_thread, NULL);
     cleanGlobals();
     return 0;
 }
@@ -634,6 +633,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
 
 void* listen_to_heartbeat(void* nothing) {
     (void) nothing;
+    pthread_detach(pthread_self());
 
     int heartbeat_socket_fd = setUpUDPServer();
 
@@ -688,6 +688,7 @@ void report_heartbeat(char* worker_addr, double client_usage) {
 
 void* detect_heart_failure(void* nothing) {
     (void) nothing;
+    pthread_detach(pthread_self());
 
     double cur_time;
     while (keep_update) {
