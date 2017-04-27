@@ -34,8 +34,13 @@ void* output_reciever(void* elem) {
   pthread_exit(NULL);
 }
 
-int interface_main() {
+void close(int signal) {
+  (void) signal;
+  running = 0;
+}
 
+int interface_main() {
+    signal(SIGINT, close);
     sockFd = socket(AF_INET, SOCK_STREAM, 0);
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -55,15 +60,8 @@ int interface_main() {
     char *buffer = malloc(BUF_SIZE);
     int max = 1024;
     char *name = calloc(1, max);
-    // pthread_t child_thread;
-    // pthread_create(&child_thread, NULL, output_reciever, NULL);
-
-    //Remove later
-    char buff[BUF_SIZE];
-    int idx = 0;
-    char b;
-    size_t file_size = 0;
-    //end remove later
+    pthread_t child_thread;
+    pthread_create(&child_thread, NULL, output_reciever, NULL);
 
     while (running) {
       printf("Enter an executable file name:\n");
@@ -107,28 +105,6 @@ int interface_main() {
       size_t s = get_user_file_size(name);
       my_write(sockFd, (void *)&s, sizeof(size_t));
       write_binary_data(f, sockFd, buffer);
-
-      //remove later
-      do {
-        //Add parsing of filename in the future to track what requests sent out come back.
-        //^^^^^^ Central to master fault tolerance. When a filename is recieved back,
-        //remove it from the running vector of requests
-        read(sockFd, &b, 1);
-        if (b != '\n')
-          buff[idx++] = b;
-        else
-          break;
-      } while (1);
-
-      //Get the size
-      for (unsigned i = 0; i < sizeof(size_t); i++) {
-        read(sockFd, &b, 1);
-        ((char*)&file_size)[i] = b;
-      }
-      // write_all_from_socket_to_fd(sockFd, 1, -1);
-      write_all_from_socket_to_fd(sockFd, 1, file_size);
-      idx = 0;
-      //end remove later
     }
 
     free(buffer);

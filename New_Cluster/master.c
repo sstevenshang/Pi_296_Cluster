@@ -245,7 +245,7 @@ void handle_data(struct epoll_event *e) {
 }
 
 int master_main() {
-  setSignalHandlers();
+  setHandlers();
   setUpGlobals("9999");
 
 	// Event loop
