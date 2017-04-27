@@ -24,7 +24,10 @@ void task_destructor(void* elem) {
     free(old_task);
 }
 
-void kill_worker() {quitting = 1;}
+void kill_worker() {
+    close(socket_fd);
+    quitting = 1;
+}
 
 int worker_main(char* host, char* port) {
 
@@ -60,6 +63,7 @@ int worker_main(char* host, char* port) {
         }
         if (byteRead == 0) {
             printf("Master socket is closed\n");
+            close(socket_fd);
             break; // break on master failure
         }
         if (strncmp(request, PUT_REQUEST, PUT_REQUEST_SIZE) != 0) {
@@ -97,7 +101,6 @@ int worker_main(char* host, char* port) {
 
     queue_destroy(task_queue);
     queue_destroy(finished_task_queue);
-    close(socket_fd);
 
     return 0;
 }
