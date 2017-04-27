@@ -393,8 +393,6 @@ void* heartbeat(void* master_address) {
         if (send_heartbeat(heartbeat_fd, &master_info) == -1) {
             printf("UDP FAILED: exiting heartbeat due to network failure\n");
             break;
-        } else {
-            printf("Heartbeat succesfully sent\n"); // For debuggin only, uncomment once working
         }
         sleep(1);
     }

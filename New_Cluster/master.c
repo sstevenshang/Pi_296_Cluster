@@ -654,7 +654,6 @@ void* listen_to_heartbeat(void* nothing) {
             keep_update = 0;
             break;
         } else {
-            printf("Heartbeat succesfully received: %s\n", buffer); // For debuggin only, uncomment once working
             char* worker_addr = inet_ntoa(clientAddr.sin_addr);
             report_heartbeat(worker_addr, client_usage);
         }
@@ -693,7 +692,6 @@ void* detect_heart_failure(void* nothing) {
 
     double cur_time;
     while (keep_update) {
-        printf("Detecting heart failure\n");
         cur_time = getTime();
         size_t num_worker = vector_size(worker_list);
         for (size_t i=0; i < num_worker; i++) {
