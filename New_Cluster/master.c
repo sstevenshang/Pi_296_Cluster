@@ -38,9 +38,9 @@ void cleanGlobals() {
   free(temp_directory);
   //Close file descriptors
   close(epoll_fd);
-  close(server_socket);
+  // close(server_socket);
 
-  vector_destroy(worker_list);
+  // vector_destroy(worker_list);
 }
 
 void setUpGlobals(char* port) {
@@ -180,17 +180,22 @@ void handle_data(struct epoll_event *e) {
         case DONE_SENDING:
           curr->status = NEED_SIZE;
           printf("Succesfully got the header: %s\n", curr->command);
-          if (curr->to_do == INTERFACE_PUT) {
-              if(interface_fd == -1){
-                interface_fd = curr->worker_fd;
-                interface = curr;
-                printf("Set interface_fd to %d\n", interface_fd);
-                vector_erase(worker_list,find_worker_pos(e->data.fd));
-              }
+          if (curr->to_do == INTERFACE_PUT && interface_fd == -1) {
+            //Add it to the interface list (for when > 1 interface). Remove from worker_list.
+            //Later insted of checking if interface_fd is -1 we will check if its in workerlist
+            interface_fd = curr->worker_fd;
+      	    interface = curr;
+      	    vector_erase(worker_list,find_worker_pos(e->data.fd));
           }
           break;
         default:
           fprintf(stderr, "There was a failure in parsing the header!\n");
+          if (e->data.fd == interface_fd) {
+            close(interface_fd);
+            interface_fd = -1;
+            fprintf(stderr, "This means the interface quit! Waiting on a new one...\n");
+            return;
+          }
       }
     }
     if (curr->status == NEED_SIZE) {
@@ -243,20 +248,15 @@ void handle_data(struct epoll_event *e) {
     }
 }
 
-int master_main(int argc, char** argv) {
-    if (argc != 2) {
-        printf("Usage : ./master <port>\n");
-        exit(1);
-    }
+int master_main() {
+  setSignalHandlers();
+  setUpGlobals("9999");
 
-    setSignalHandlers();
-    setUpGlobals(argv[1]);
-
-    keep_update = 1;
-    pthread_t heartbeat_listen_thread;
-    pthread_t heartbeat_detect_thread;
-    pthread_create(&heartbeat_listen_thread, NULL, listen_to_heartbeat ,NULL);
-    pthread_create(&heartbeat_detect_thread, NULL, detect_heart_failure, NULL);
+  keep_update = 1;
+  pthread_t heartbeat_listen_thread;
+  pthread_t heartbeat_detect_thread;
+  pthread_create(&heartbeat_listen_thread, NULL, listen_to_heartbeat ,NULL);
+  pthread_create(&heartbeat_detect_thread, NULL, detect_heart_failure, NULL);
 
 	// Event loop
 	while(!close_master) {
@@ -298,12 +298,14 @@ ssize_t do_put(int fd_to_send_to, worker* w) {
   sprintf(buff, "PUT %s\n", w->temp_file_name);
   //Send the header
   if (write_all_to_socket(fd_to_send_to, buff, strlen(buff)) != (ssize_t) strlen(buff)) {
-    fprintf(stderr, "There was an issue sending the header\n");
+    perror(NULL);
+    fprintf(stderr, "There was an issue sending the header to fd %i\n", fd_to_send_to);
     return BIG_FAILURE;
   }
   //Send the size
   if (write_all_to_socket(fd_to_send_to, (char*) &file_size, sizeof(size_t)) != (ssize_t) sizeof(size_t)) {
-    fprintf(stderr, "There was an issue sending the file size\n");
+    perror(NULL);
+    fprintf(stderr, "There was an issue sending the file size to fd %i\n", fd_to_send_to);
     return BIG_FAILURE;
   }
 
@@ -329,7 +331,7 @@ ssize_t do_put(int fd_to_send_to, worker* w) {
 
     ssize_t check_write = write_all_to_socket(fd_to_send_to, buff, ret);
     if (check_write == -1 || !check_write || check_write != ret) {
-      fprintf(stderr, "There was an error writing the file over the network: %s\n", w->temp_file_name);
+      fprintf(stderr, "There was an error writing the file over the network: %s to fd %i\n", w->temp_file_name, fd_to_send_to);
       return BIG_FAILURE;
     }
     file_size -= ret;
@@ -505,26 +507,6 @@ int set_up_server(char* port) {
     exit(1);
   }
   return sock_fd;
-}
-
-int connect_to_server(const char *host, const char *port) {
-    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    struct addrinfo hints, *result;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET; //IPv4 Only
-    hints.ai_socktype = SOCK_STREAM; //TCP
-    int addr_info_error = getaddrinfo(host, port, &hints, &result);
-    if (addr_info_error) {
-      fprintf(stderr, "%s\n", gai_strerror(addr_info_error));
-      return -1;
-    }
-    if (connect(socket_fd, result->ai_addr, result->ai_addrlen)) {
-      perror(NULL);
-      freeaddrinfo(result);
-      return -1;
-    }
-    freeaddrinfo(result);
-    return socket_fd;
 }
 
 ssize_t write_all_to_socket(int socket, const char *buffer, size_t count) {
