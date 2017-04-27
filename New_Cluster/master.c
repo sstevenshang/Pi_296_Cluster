@@ -652,6 +652,7 @@ void* listen_to_heartbeat(void* nothing) {
             keep_update = 0;
             break;
         } else {
+            printf("Heartbeat succesfully received: %s\n", buffer); // For debuggin only, uncomment once working
             char* worker_addr = inet_ntoa(clientAddr.sin_addr);
             report_heartbeat(worker_addr, client_usage);
         }
