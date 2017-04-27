@@ -37,7 +37,7 @@ int worker_main(char* host, char* port) {
         pthread_create(&tasking_threads[i], NULL, tasking, NULL);
     }
     pthread_create(&sending_thread, NULL, sending, NULL);
-    pthread_create(&heartbeat_thread, NULL, heartbeat, NULL);
+    pthread_create(&heartbeat_thread, NULL, heartbeat, host);
 
     while(1) {
         char* request = NULL;
