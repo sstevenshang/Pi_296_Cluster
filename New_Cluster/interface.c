@@ -1,13 +1,47 @@
 #include "interface.h"
-ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size);
-int interface_main(int argc, char **argv) {
 
-    int sockFd = socket(AF_INET, SOCK_STREAM, 0);
+static int running = 1;
+static int sockFd;
+
+void* output_reciever(void* elem) {
+  pthread_detach(pthread_self());
+  char buff[BUF_SIZE];
+  int idx = 0;
+  char b;
+  size_t file_size = 0;
+
+  while(running) {
+    do {
+      //Add parsing of filename in the future to track what requests sent out come back.
+      //^^^^^^ Central to master fault tolerance. When a filename is recieved back,
+      //remove it from the running vector of requests
+      read(sockFd, &b, 1);
+      if (b != '\n')
+        buff[idx++] = b;
+      else
+        break;
+    } while (1);
+
+    //Get the size
+    for (unsigned i = 0; i < sizeof(size_t); i++) {
+      read(sockFd, &b, 1);
+      ((char*)&file_size)[i] = b;
+    }
+    // write_all_from_socket_to_fd(sockFd, 1, -1);
+    write_all_from_socket_to_fd(sockFd, 1, file_size);
+    idx = 0;
+  }
+  pthread_exit(NULL);
+}
+
+int interface_main() {
+
+    sockFd = socket(AF_INET, SOCK_STREAM, 0);
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
-    int ga = getaddrinfo(argv[1], "9999", &hints, &result);
+    int ga = getaddrinfo("127.0.0.1", "9999", &hints, &result);
     if (ga != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ga));
         freeaddrinfo(result);
@@ -19,44 +53,117 @@ int interface_main(int argc, char **argv) {
         exit(2);
     }
     char *buffer = malloc(BUF_SIZE);
-    strcpy(buffer, "INTERFACE_PUT");
-    if (access(argv[2], R_OK) != 0) {
-        free(buffer);
-        freeaddrinfo(result);
-        exit(1);
+    int max = 1024;
+    char *name = calloc(1, max);
+    // pthread_t child_thread;
+    // pthread_create(&child_thread, NULL, output_reciever, NULL);
+
+    //Remove later
+    char buff[BUF_SIZE];
+    int idx = 0;
+    char b;
+    size_t file_size = 0;
+    //end remove later
+
+    while (running) {
+      printf("Enter an executable file name:\n");
+
+      while (1) { /* skip leading whitespace */
+        int c = getchar();
+        if (c == EOF) break; /* end of file */
+        if (!isspace(c)) {
+             ungetc(c, stdin);
+             break;
+        }
+      }
+
+      int i = 0;
+      while (1) {
+        int c = getchar();
+        if (isspace(c) || c == EOF) { /* at end, add terminating zero */
+            name[i] = 0;
+            break;
+        }
+        name[i] = c;
+        i++;
+        if (i > max) {
+          fprintf(stderr, "%s\n", "Filename is larger than allowed (consider a shorter name)");
+          exit(1);
+        }
+      }
+
+      //Keep a running string vector of filenames sent out
+      //Send the request
+      strcpy(buffer, "INTERFACE_PUT");
+      if (access(name, R_OK) != 0) {
+          fprintf(stderr, "%s\n", "INVALID FILE");
+          free(name);
+          free(buffer);
+          freeaddrinfo(result);
+          exit(1);
+      }
+      send_request(sockFd, buffer, name);
+      FILE *f = fopen(name, "r");
+      size_t s = get_user_file_size(name);
+      my_write(sockFd, (void *)&s, sizeof(size_t));
+      write_binary_data(f, sockFd, buffer);
+
+      //remove later
+      do {
+        //Add parsing of filename in the future to track what requests sent out come back.
+        //^^^^^^ Central to master fault tolerance. When a filename is recieved back,
+        //remove it from the running vector of requests
+        read(sockFd, &b, 1);
+        if (b != '\n')
+          buff[idx++] = b;
+        else
+          break;
+      } while (1);
+
+      //Get the size
+      for (unsigned i = 0; i < sizeof(size_t); i++) {
+        read(sockFd, &b, 1);
+        ((char*)&file_size)[i] = b;
+      }
+      // write_all_from_socket_to_fd(sockFd, 1, -1);
+      write_all_from_socket_to_fd(sockFd, 1, file_size);
+      idx = 0;
+      //end remove later
     }
 
-    send_request(sockFd, buffer, argv[2]);
-    FILE *f = fopen(argv[2], "r");
-    size_t s = get_user_file_size(argv[2]);
-    my_write(sockFd, (void *)&s, sizeof(size_t));
-    write_binary_data(f, sockFd, buffer);
-    // shutdown(sockFd, SHUT_WR);
-    write_all_from_socket_to_fd(sockFd, 1, -1);
-    // shutdown(sockFd, SHUT_WR);
-    // if (!check_ok(sockFd, buffer)) {
-    //     freeaddrinfo(result);
-    //     exit(1);
-    // }
-    //
-    // size_t dataSize;
-    // my_read(sockFd, &dataSize, 8);
-    // print_binary_data(f, sockFd, buffer, dataSize);
-
     free(buffer);
+    free(name);
     freeaddrinfo(result);
+    close(sockFd);
     return 0;
 }
 
+bool check_ok(int sockFd, char *buffer) {
+    buffer[0] = '\0';
+    size_t s = my_read(sockFd, buffer, 1);
+    buffer[s] = '\0';
+    if (buffer[0] == 'O') { // OK
+        s = my_read(sockFd, buffer, 2);
+    } else { // ERROR
+        s = my_read(sockFd, buffer, 5);
+        buffer[0] = '\0';
+        s = my_read(sockFd, buffer, BUF_SIZE);
+        buffer[s] = '\0';
+        printf("%s", buffer);
+        free(buffer);
+        return false;
+    }
+    return true;
+}
 
-ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size) {
+
+ssize_t write_all_from_socket_to_fd(int socket, int fd, ssize_t size) {
   char buffer[4096];
   ssize_t curr_read;
   ssize_t total_read = 0;
-  errno = 0;
-  ssize_t initial = size;
+
   while (size) {
-    curr_read = (4096 < size || initial == -1) ? read(socket, buffer, 4096) : read(socket, buffer, size);
+    curr_read = (4096 < size || size < 0) ? read(socket, buffer, 4096) : read(socket, buffer, size);
     // printf("curr_read is %zi\n", curr_read);
     if (curr_read == -1) {
       // printf("%s\n", strerror(errno));
@@ -71,7 +178,6 @@ ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size) {
 
     write(fd, buffer, curr_read);
   }
-
 
   return total_read;
 }
@@ -98,29 +204,6 @@ void write_binary_data(FILE *f, int sockFd, char *buffer) {
             my_write(sockFd, buffer, s);
         }
     }
-}
-
-bool check_ok(int sockFd, char *buffer) {
-    buffer[0] = '\0';
-    // size_t s = my_read(sockFd, buffer, 1);
-    // buffer[s] = '\0';
-    // if (buffer[0] == 'O') { // OK
-    //     s = my_read(sockFd, buffer, 2);
-    // } else { // ERROR
-    //     s = my_read(sockFd, buffer, 5);
-    //     buffer[0] = '\0';
-    //     s = my_read(sockFd, buffer, BUF_SIZE);
-    //     buffer[s] = '\0';
-    //     printf("%s", buffer);
-    //     free(buffer);
-    //     return false;
-    // }
-    char b;
-    do {
-      read(sockFd, &b, 1);
-    } while (b != '\n');
-
-    return true;
 }
 
 void print_binary_data(FILE *f, int sockFd, char *buffer, size_t dataSize) {

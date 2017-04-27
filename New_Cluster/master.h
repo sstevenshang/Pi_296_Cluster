@@ -88,7 +88,6 @@ task* make_task(worker* w);
 ssize_t do_put(int fd_to_send_to, worker* w);
 
 int set_up_server(char* port);
-int connect_to_server(const char *host, const char *port);
 ssize_t write_all_to_socket(int socket, const char *buffer, size_t count);
 void shutdown_further_writes(int socket);
 void shutdown_further_reads(int socket);
@@ -106,4 +105,4 @@ void free_worker(worker* to_free);
 ssize_t find_worker_pos(int fd);
 void accept_connections(struct epoll_event *e,int epoll_fd);
 void handle_data(struct epoll_event *e);
-int master_main(int argc, char** argv);
+int master_main();
