@@ -18,6 +18,7 @@
 #include <asm/atomic.h>
 
 #include "queue.h"
+#include "untils.h"
 
 #define PUT_REQUEST "PUT"
 #define PUT_REQUEST_SIZE (strlen(PUT_REQUEST))
@@ -27,7 +28,6 @@
 #define BAD_EXEC_MESSAGE "Bad executable: "
 #define FILE_BUFFER_SIZE (4096)
 #define LINE_BUFFER_SIZE (32)
-#define MASTER_HEARTBEAT_PORT (9110);
 
 typedef struct task_t{
     char* input_filename;

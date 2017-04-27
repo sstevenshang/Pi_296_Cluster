@@ -5,7 +5,7 @@ static int socket_fd;
 static queue* task_queue;
 static queue* finished_task_queue;
 
-atomic_t atomic_stay_alive = ATOMIC_INIT(1)
+static atomic_t atomic_stay_alive = ATOMIC_INIT(1)
 
 void* task_copy_constructor(void* elem) {
     task_t* new_task = malloc(sizeof(task_t));
@@ -385,9 +385,9 @@ void* heartbeat(void* master_address) {
 
 int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info) {
     double cpu_usage = get_local_usage();
-    char message[30];
+    char message[HEARTBEAT_SIZE];
     sprintf(message, "%f", cpu_usage);
-    int status = sendto(socket_fd, &message, strlen(message), 0, (struct sockaddr*)master_info, sizeof(struct sockaddr));
+    int status = sendto(socket_fd, &message, HEARTBEAT_SIZE, 0, (struct sockaddr*)master_info, sizeof(struct sockaddr));
     if (status < 0) {
       perror("UDP FAILED: unable to send message to server");
       return -1;

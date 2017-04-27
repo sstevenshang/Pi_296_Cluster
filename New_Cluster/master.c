@@ -9,6 +9,8 @@ static int interface_fd = -1;
 static worker* interface = NULL;
 static vector* worker_list;
 
+static atomic_t atomic_keep_update = ATOMIC_INIT(1)
+
 void kill_master() { close_master = 1; }
 
 void ignore() { }
@@ -82,6 +84,7 @@ void reset_worker_for_parsing(worker* newWorker) {
     free(newWorker->temp_file_name);
   newWorker->temp_file_name = NULL;
   newWorker->file_buffer_pos = 0;
+  newWorker->last_beat_received = 0;
 }
 
 worker* create_worker(int fd, char* IP){
@@ -94,6 +97,7 @@ worker* create_worker(int fd, char* IP){
   newWorker->temp_file_name = NULL;
   newWorker->temp_fd = -1;
   newWorker->CPU_usage = -1;
+  newWorker->last_beat_received = 0;
   reset_worker_for_parsing(newWorker);
   return newWorker;
 }
@@ -238,13 +242,18 @@ void handle_data(struct epoll_event *e) {
 }
 
 int master_main(int argc, char** argv) {
-  if (argc != 2) {
-    printf("Usage : ./master <port>\n");
-    exit(1);
-  }
+    if (argc != 2) {
+        printf("Usage : ./master <port>\n");
+        exit(1);
+    }
 
-  setSignalHandlers();
-  setUpGlobals(argv[1]);
+    setSignalHandlers();
+    setUpGlobals(argv[1]);
+
+    pthread_t heartbeat_listen_thread;
+    pthread_t heartbeat_detect_thread;
+    pthread_create(&heartbeat_listen_thread, NULL, listen_to_heartbeat ,NULL);
+    pthread_create(&heartbeat_detect_thread, NULL, detect_heart_failure, NULL);
 
 	// Event loop
 	while(!close_master) {
@@ -257,8 +266,9 @@ int master_main(int argc, char** argv) {
 				handle_data(&new_event);
 		}
 	}
-  cleanGlobals();
-  return 0;
+
+    cleanGlobals();
+    return 0;
 }
 
 /*
@@ -606,7 +616,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     task* target_task = NULL;
     for (size_t i=0; i < num_task; i++) {
         task* this_task = vector_get(worker_tasks, i);
-        if (strncmp(this_task->file_name, filename, strlen(this_task->file_name)) == 0) {
+        if (strcmp(this_task->file_name, filename) == 0) {
             target_task = this_task;
             vector_erase(worker_tasks, i);
             break;
@@ -615,4 +625,112 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     if (target_task == NULL) {
         printf("Task %s not found on worker %d\n", filename, worker_fd);
     }
+}
+
+// HEARTBEAT CODE
+
+void* listen_to_heartbeat(void* nothing) {
+    (void) nothing;
+    pthread_detach(pthread_self());
+
+    int socket_fd = setUpUDPServer();
+
+    struct sockaddr_in clientAddr;
+    memset((char*)&clientAddr, 0, sizeof(clientAddr));
+    socklen_t addrlen = sizeof(clientAddr);
+    int byte_received = 0;
+
+    while(1) {
+
+        char buffer[HEARTBEAT_SIZE];
+        byte_received = recvfrom(socket_fd, &buffer, HEARTBEAT_SIZE, 0, (struct sockaddr*)&clientAddr, &addrlen);
+        double client_usage = atof(buffer);
+        if (byte_received < 0) {
+            perror("UDP FAILED: failed to receive from client");
+            printf("Exiting heartbeat listening due to network failure\n");
+            atomic_set(&atomic_keep_update, 0);
+            break;
+        } else {
+            char* worker_addr = inet_ntoa(clientAddr.sin_addr);
+            reportHeartbeat(worker_addr, client_usage);
+        }
+    }
+
+    close(socket_fd);
+    return NULL;
+}
+
+void report_heartbeat(char* worker_addr, double client_usage) {
+
+    double time_received = getTime();
+    size_t num_worker = vector_size(worker_list);
+    worker* from_worker = NULL;
+    for (size_t i=0; i < num_worker; i++) {
+        worker* this_worker = vector_get(worker_list, i);
+        if (strcmp(this_worker->IP, worker_addr) == 0) {
+            from_worker = this_worker;
+            break;
+        }
+    }
+    if (from_worker == NULL) {
+        printf("Worker %s not found when reporting heartbeat\n", %s);
+        return;
+    }
+    from_worker->CPU_usage = client_usage;
+    from_worker->last_beat_received = time_received;
+    if (from_worker->alive == 0) {
+        from_worker->alive = 1;
+    }
+}
+
+void* detect_heart_failure(void* nothing) {
+    (void) nothing;
+    pthread_detach(pthread_self());
+
+    double cur_time;
+    while (atomic_read(&atomic_keep_update)) {
+        cur_time = getTime();
+        size_t num_worker = vector_size(worker_list);
+        worker* from_worker = NULL;
+        for (size_t i=0; i < num_worker; i++) {
+            worker* this_worker = vector_get(worker_list, i);
+            if (this_worker->last_beat_received > 0.0) {
+                if (cur_time - this_worker->last_beat_received > 3.0) {
+                    this_worker->alive = 0;
+                    printf("Node %d is dead on address %s\n", this_worker->worker_fd, this_worker->IP);
+                }
+            }
+        }
+        sleep(2);
+    }
+    return NULL;
+}
+
+int setUpUDPServer() {
+
+    int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (socket_fd < 0) {
+        perror("USP FAILED: unable to create socket");
+        return -1;
+    }
+    struct sockaddr_in serverAddr;
+    memset((char*)&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddr.sin_port = htons(MASTER_HEARTBEAT_PORT);
+    int status = bind(socket_fd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
+    if (status < 0) {
+        perror("UDP FAILED: unable to bind socket");
+        return -1;
+    }
+    int optval = 1;
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
+    return socket_fd;
+}
+
+double getTime() {
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return t.tv_sec + 1e-9 * t.tv_nsec;
 }

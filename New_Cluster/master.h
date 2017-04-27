@@ -15,8 +15,12 @@
 #include <arpa/inet.h>
 #include <signal.h>
 #include <stddef.h>
+#include <time.h>
+#include <asm/atomic.h>
+#include <pthread.h>
 
 #include "vector.h"
+#include "untils.h"
 
 #define START -1
 #define DONE_SENDING -7
@@ -43,6 +47,7 @@ typedef struct worker {
   char* IP; //IP address of the worker
   vector* tasks; //Vector of tasks that the worker is working on
   double CPU_usage; //Usage stat
+  double last_beat_received; //For heartbeat
 
   //Used for parsing and state tracking
   int status;
@@ -107,3 +112,9 @@ ssize_t find_worker_pos(int fd);
 void accept_connections(struct epoll_event *e,int epoll_fd);
 void handle_data(struct epoll_event *e);
 int master_main(int argc, char** argv);
+
+void* listen_to_heartbeat(void* nothing);
+void report_heartbeat(char* worker_addr, double client_usage);
+void* detect_heart_failure(void* nothing);
+int setUpUDPServer();
+double getTime();
