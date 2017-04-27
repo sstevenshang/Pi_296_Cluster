@@ -1,5 +1,5 @@
 #include "interface.h"
-
+ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size);
 int interface_main(int argc, char **argv) {
 
     int sockFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -31,20 +31,49 @@ int interface_main(int argc, char **argv) {
     size_t s = get_user_file_size(argv[2]);
     my_write(sockFd, (void *)&s, sizeof(size_t));
     write_binary_data(f, sockFd, buffer);
-
-    shutdown(sockFd, SHUT_WR);
-    if (!check_ok(sockFd, buffer)) {
-        freeaddrinfo(result);
-        exit(1);
-    }
-
-    size_t dataSize;
-    my_read(sockFd, &dataSize, 8);
-    print_binary_data(f, sockFd, buffer, dataSize);
+    // shutdown(sockFd, SHUT_WR);
+    write_all_from_socket_to_fd(sockFd, 1, -1);
+    // shutdown(sockFd, SHUT_WR);
+    // if (!check_ok(sockFd, buffer)) {
+    //     freeaddrinfo(result);
+    //     exit(1);
+    // }
+    //
+    // size_t dataSize;
+    // my_read(sockFd, &dataSize, 8);
+    // print_binary_data(f, sockFd, buffer, dataSize);
 
     free(buffer);
     freeaddrinfo(result);
     return 0;
+}
+
+
+ssize_t write_all_from_socket_to_fd(int socket, int fd, size_t size) {
+  char buffer[4096];
+  ssize_t curr_read;
+  ssize_t total_read = 0;
+  errno = 0;
+  ssize_t initial = size;
+  while (size) {
+    curr_read = (4096 < size || initial == -1) ? read(socket, buffer, 4096) : read(socket, buffer, size);
+    // printf("curr_read is %zi\n", curr_read);
+    if (curr_read == -1) {
+      // printf("%s\n", strerror(errno));
+      if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)
+        continue;
+      return -1;
+    } else if (curr_read == 0) {
+        break;
+    }
+    size -= curr_read;
+    total_read += curr_read;
+
+    write(fd, buffer, curr_read);
+  }
+
+
+  return total_read;
 }
 
 void send_request(int sockFd, char *buffer, char *local) {
@@ -73,19 +102,24 @@ void write_binary_data(FILE *f, int sockFd, char *buffer) {
 
 bool check_ok(int sockFd, char *buffer) {
     buffer[0] = '\0';
-    size_t s = my_read(sockFd, buffer, 1);
-    buffer[s] = '\0';
-    if (buffer[0] == 'O') { // OK
-        s = my_read(sockFd, buffer, 2);
-    } else { // ERROR
-        s = my_read(sockFd, buffer, 5);
-        buffer[0] = '\0';
-        s = my_read(sockFd, buffer, BUF_SIZE);
-        buffer[s] = '\0';
-        printf("%s", buffer);
-        free(buffer);
-        return false;
-    }
+    // size_t s = my_read(sockFd, buffer, 1);
+    // buffer[s] = '\0';
+    // if (buffer[0] == 'O') { // OK
+    //     s = my_read(sockFd, buffer, 2);
+    // } else { // ERROR
+    //     s = my_read(sockFd, buffer, 5);
+    //     buffer[0] = '\0';
+    //     s = my_read(sockFd, buffer, BUF_SIZE);
+    //     buffer[s] = '\0';
+    //     printf("%s", buffer);
+    //     free(buffer);
+    //     return false;
+    // }
+    char b;
+    do {
+      read(sockFd, &b, 1);
+    } while (b != '\n');
+
     return true;
 }
 

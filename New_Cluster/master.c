@@ -578,7 +578,7 @@ int schedule(task* t, vector* worker_list) {
         // MUTEX UNLOCK WHENCE INTEGRATED HEARTBEAT
     }
     //Dummy for now until we have heartbeats sending usage stats. Remove when heartbeat implemented.
-    best_worker = vector_get(worker_list, 1);
+    best_worker = vector_get(worker_list, 0);
 
     if (best_worker == NULL) {
         return -1;
