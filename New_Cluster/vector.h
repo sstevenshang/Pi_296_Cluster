@@ -33,6 +33,6 @@ void vector_insert(vector *this, size_t position, void *element);
 void vector_erase(vector *this, size_t position);
 void vector_clear(vector *this);
 
-void *shallow_copy_constructor(void *elem) { return elem; }
-void shallow_destructor(void *elem) {(void)elem; return;}
-void *shallow_default_constructor(void) { return NULL; }
+void *shallow_copy_constructor(void *elem);
+void shallow_destructor(void *elem);
+void *shallow_default_constructor(void);
