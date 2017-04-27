@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "utils.h"
 
 typedef struct vector {
@@ -31,3 +32,7 @@ void vector_pop_back(vector *this);
 void vector_insert(vector *this, size_t position, void *element);
 void vector_erase(vector *this, size_t position);
 void vector_clear(vector *this);
+
+void *shallow_copy_constructor(void *elem);
+void shallow_destructor(void *elem);
+void *shallow_default_constructor(void);

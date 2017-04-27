@@ -157,3 +157,7 @@ void vector_clear(vector *this) {
     }
     this->size = 0;
 }
+
+void *shallow_copy_constructor(void *elem) { return elem; }
+void shallow_destructor(void *elem) {(void)elem; return;}
+void *shallow_default_constructor(void) { return NULL; }
