@@ -653,7 +653,7 @@ void* listen_to_heartbeat(void* nothing) {
             break;
         } else {
             char* worker_addr = inet_ntoa(clientAddr.sin_addr);
-            reportHeartbeat(worker_addr, client_usage);
+            report_heartbeat(worker_addr, client_usage);
         }
     }
 
@@ -674,7 +674,7 @@ void report_heartbeat(char* worker_addr, double client_usage) {
         }
     }
     if (from_worker == NULL) {
-        printf("Worker %s not found when reporting heartbeat\n", %s);
+        printf("Worker %s not found when reporting heartbeat\n", worker_addr);
         return;
     }
     from_worker->CPU_usage = client_usage;
@@ -692,7 +692,6 @@ void* detect_heart_failure(void* nothing) {
     while (keep_update) {
         cur_time = getTime();
         size_t num_worker = vector_size(worker_list);
-        worker* from_worker = NULL;
         for (size_t i=0; i < num_worker; i++) {
             worker* this_worker = vector_get(worker_list, i);
             if (this_worker->last_beat_received > 0.0) {
