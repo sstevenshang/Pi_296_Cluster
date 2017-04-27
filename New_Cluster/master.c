@@ -556,3 +556,59 @@ size_t get_file_size(char* file_name) {
   fclose(fp);
   return size;
 }
+
+int schedule(task* t, vector* worker_list) {
+
+    size_t num_worker = vector_size(worker_list);
+    double min_load_factor = 100000000;
+    worker* best_worker = NULL;
+
+    for (size_t i=0; i < num_worker; i++) {
+        worker* this_worker = vector_get(worker_list, i);
+        // MUTEX LOCK WHENCE INTEGRATED HEARTBEAT
+        if (this_worker->alive) {
+            double load_factor = this_worker->CPU_usage * 10 + vector_size(this_worker->tasks);
+            if (load_factor < min_load_factor) {
+                min_load_factor = load_factor;
+                best_worker = this_worker;
+            }
+        }
+        // MUTEX UNLOCK WHENCE INTEGRATED HEARTBEAT
+    }
+
+    if (best_worker == NULL) {
+        return -1;
+    }
+    vector_push_back(best_worker->tasks, t);
+    return best_worker->worker_fd;
+}
+
+void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
+
+    size_t num_worker = vector_size(worker_list);
+    worker* target_worker = NULL;
+    for (size_t i=0; i < num_worker; i++) {
+        worker* this_worker = vector_get(worker_list, i);
+        if (this_worker->worker_fd == worker_fd) {
+            target_worker = this_worker;
+            break;
+        }
+    }
+    if (target_worker == NULL) {
+        printf("Worker %d not found when removing %s\n", worker_fd, filename);
+        return;
+    }
+    vector* worker_tasks = target_worker->tasks;
+    size_t num_task = vector_size(worker_tasks);
+    task* target_task = NULL;
+    for (size_t i=0; i < num_task; i++) {
+        task* this_task = vector_get(worker_tasks, i);
+        if (strncmp(this_task->file_name, filename) == 0) {
+            target_task = this_task;
+            break;
+        }
+    }
+    if (target_task == NULL) {
+        printf("Task %s not found on worker %d\n", filename, worker_fd);
+    }
+}
