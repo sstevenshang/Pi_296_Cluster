@@ -5,7 +5,7 @@ static int socket_fd;
 static queue* task_queue;
 static queue* finished_task_queue;
 
-static atomic_t atomic_stay_alive = ATOMIC_INIT(1)
+static int stay_alive;
 
 void* task_copy_constructor(void* elem) {
     task_t* new_task = malloc(sizeof(task_t));
@@ -26,6 +26,7 @@ void task_destructor(void* elem) {
 int worker_main(char* host, char* port) {
 
     socket_fd = setup_client(host, port);
+    stay_alive = 1;
     task_queue = queue_create(MAX_CONCURRENT_TASK, task_copy_constructor, task_destructor); // set the limit in case of malicious overloading
     finished_task_queue = queue_create(-1, task_copy_constructor, task_destructor);
 
@@ -372,7 +373,7 @@ int setup_client(char* host, char* port) {
 void* heartbeat(void* master_address) {
     int heartbeat_fd = setUpUDPClient();
     struct sockaddr_in master_info = setupUDPDestination((char*)master_address);
-    while (atomic_read(&atomic_stay_alive)) {
+    while (stay_alive) {
         if (send_heartbeat(heartbeat_fd, &master_info) == -1) {
             printf("UDP FAILED: exiting heartbeat due to network failure\n");
             break;
@@ -443,5 +444,5 @@ struct sockaddr_in setupUDPDestination(char* address) {
 }
 
 void kill_heartbeat() {
-    atomic_set(&atomic_stay_alive, 0);
+    stay_alive = 0;
 }

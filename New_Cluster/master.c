@@ -9,7 +9,7 @@ static int interface_fd = -1;
 static worker* interface = NULL;
 static vector* worker_list;
 
-static atomic_t atomic_keep_update = ATOMIC_INIT(1)
+static int keep_update;
 
 void kill_master() { close_master = 1; }
 
@@ -250,6 +250,7 @@ int master_main(int argc, char** argv) {
     setSignalHandlers();
     setUpGlobals(argv[1]);
 
+    keep_update = 1;
     pthread_t heartbeat_listen_thread;
     pthread_t heartbeat_detect_thread;
     pthread_create(&heartbeat_listen_thread, NULL, listen_to_heartbeat ,NULL);
@@ -648,7 +649,7 @@ void* listen_to_heartbeat(void* nothing) {
         if (byte_received < 0) {
             perror("UDP FAILED: failed to receive from client");
             printf("Exiting heartbeat listening due to network failure\n");
-            atomic_set(&atomic_keep_update, 0);
+            keep_update = 0;
             break;
         } else {
             char* worker_addr = inet_ntoa(clientAddr.sin_addr);
@@ -688,7 +689,7 @@ void* detect_heart_failure(void* nothing) {
     pthread_detach(pthread_self());
 
     double cur_time;
-    while (atomic_read(&atomic_keep_update)) {
+    while (keep_update) {
         cur_time = getTime();
         size_t num_worker = vector_size(worker_list);
         worker* from_worker = NULL;

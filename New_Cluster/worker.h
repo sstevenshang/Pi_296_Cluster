@@ -15,7 +15,6 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <errno.h>
-#include <atomic.h>
 
 #include "queue.h"
 #include "untils.h"
