@@ -15,8 +15,11 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <errno.h>
+#include <arpa/inet.h>
+#include <signal.h>
 
 #include "queue.h"
+#include "utils.h"
 
 #define PUT_REQUEST "PUT"
 #define PUT_REQUEST_SIZE (strlen(PUT_REQUEST))
@@ -52,3 +55,11 @@ ssize_t read_line_from_socket(int socket_fd, char** buffer);
 void allocate_buffer(char** buffer, size_t size);
 int setup_client(char* host, char* port);
 char* create_header(char* filename);
+
+void* heartbeat(void* master_address);
+int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info);
+double get_local_usage();
+int setUpUDPClient();
+struct sockaddr_in setupUDPDestination(char* address);
+void kill_heartbeat();
+void kill_worker();

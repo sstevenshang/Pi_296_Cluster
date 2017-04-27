@@ -5,6 +5,9 @@ static int socket_fd;
 static queue* task_queue;
 static queue* finished_task_queue;
 
+static int stay_alive;
+static int quitting;
+
 void* task_copy_constructor(void* elem) {
     task_t* new_task = malloc(sizeof(task_t));
     task_t* old_task = (task_t*)elem;
@@ -21,23 +24,42 @@ void task_destructor(void* elem) {
     free(old_task);
 }
 
+void kill_worker() {
+    shutdown(socket_fd, SHUT_RDWR);
+    quitting = 1;
+}
+
 int worker_main(char* host, char* port) {
 
+    struct sigaction act;
+    memset(&act, 0, sizeof(act));
+    act.sa_handler = kill_worker;
+    if (sigaction(SIGINT, &act, NULL) < 0) {
+      perror(NULL);
+      exit(1);
+    }
+
     socket_fd = setup_client(host, port);
+    stay_alive = 1;
     task_queue = queue_create(MAX_CONCURRENT_TASK, task_copy_constructor, task_destructor); // set the limit in case of malicious overloading
     finished_task_queue = queue_create(-1, task_copy_constructor, task_destructor);
 
     pthread_t tasking_threads[NUM_THREAD];
     pthread_t sending_thread;
+    pthread_t heartbeat_thread;
     for (int i=0; i < NUM_THREAD; i++) {
         pthread_create(&tasking_threads[i], NULL, tasking, NULL);
     }
     pthread_create(&sending_thread, NULL, sending, NULL);
+    pthread_create(&heartbeat_thread, NULL, heartbeat, host);
 
-    while(1) {
+    while(quitting == 0) {
+
         char* request = NULL;
-
         ssize_t byteRead = read_line_from_socket(socket_fd, &request);
+        if (quitting)
+            break;
+
         if (byteRead == -1) {
             perror(NULL);
             exit(-1);
@@ -66,6 +88,9 @@ int worker_main(char* host, char* port) {
 
     // clean up
 
+    kill_heartbeat();
+    close(socket_fd);
+
     task_t end = (task_t){NULL, NULL, 0};
     for (int i=0; i < NUM_THREAD; i++) {
         queue_push(task_queue, &end);
@@ -75,10 +100,10 @@ int worker_main(char* host, char* port) {
         pthread_join(tasking_threads[i], NULL);
     }
     pthread_join(sending_thread, NULL);
+    pthread_join(heartbeat_thread, NULL);
 
     queue_destroy(task_queue);
     queue_destroy(finished_task_queue);
-    close(socket_fd);
 
     return 0;
 }
@@ -357,4 +382,86 @@ int setup_client(char* host, char* port) {
 
     freeaddrinfo(result);
     return socket_fd;
+}
+
+// HEARTBEAT CODE
+
+void* heartbeat(void* master_address) {
+    int heartbeat_fd = setUpUDPClient();
+    struct sockaddr_in master_info = setupUDPDestination((char*)master_address);
+    while (stay_alive) {
+        if (send_heartbeat(heartbeat_fd, &master_info) == -1) {
+            printf("UDP FAILED: exiting heartbeat due to network failure\n");
+            break;
+        } else {
+            printf("Heartbeat succesfully sent\n"); // For debuggin only, uncomment once working
+        }
+        sleep(1);
+    }
+    printf("Closing heartbeat\n");
+    close(heartbeat_fd);
+    return NULL;
+}
+
+int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info) {
+    double cpu_usage = get_local_usage();
+    char message[HEARTBEAT_SIZE];
+    sprintf(message, "%f", cpu_usage);
+    int status = sendto(heartbeat_fd, &message, HEARTBEAT_SIZE, 0, (struct sockaddr*)master_info, sizeof(struct sockaddr));
+    if (status < 0) {
+      perror("UDP FAILED: unable to send message to server");
+      return -1;
+    }
+    return 0;
+}
+
+double get_local_usage() {
+  long double a[4], b[4], loadavg;
+  FILE *fp;
+  fp = fopen("/proc/stat","r");
+  if (!fp) {
+    return -1;
+  }
+  fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&a[0],&a[1],&a[2],&a[3]);
+  fclose(fp);
+  sleep(1);
+  fp = fopen("/proc/stat","r");
+  if (!fp) {
+    return -1;
+  }
+  fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&b[0],&b[1],&b[2],&b[3]);
+  fclose(fp);
+  loadavg = ((b[0]+b[1]+b[2]) - (a[0]+a[1]+a[2])) / ((b[0]+b[1]+b[2]+b[3]) - (a[0]+a[1]+a[2]+a[3]));
+  return loadavg;
+}
+
+int setUpUDPClient() {
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_fd < 0) {
+    perror("UDP FAILED: unable to create socket");
+    return -1;
+  }
+  return socket_fd;
+}
+
+struct sockaddr_in setupUDPDestination(char* address) {
+
+    struct hostent* dest;
+    dest = gethostbyname(address);
+    if (dest == NULL) {
+        printf("UDP FAILED: cannot find master: %s\n", address);
+    }
+    struct in_addr **addr_list = (struct in_addr**)dest->h_addr_list;
+    char* master_ip = inet_ntoa(*addr_list[0]);
+
+    struct sockaddr_in serverAddr;
+    memset((char*)&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = inet_addr(master_ip);
+    serverAddr.sin_port = htons(MASTER_HEARTBEAT_PORT);
+    return serverAddr;
+}
+
+void kill_heartbeat() {
+    stay_alive = 0;
 }
