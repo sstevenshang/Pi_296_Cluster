@@ -25,7 +25,7 @@ void task_destructor(void* elem) {
 }
 
 void kill_worker() {
-    kill_heartbeat();
+    shutdown(socket_fd, SHUT_RD);
     quitting = 1;
 }
 
@@ -54,9 +54,12 @@ int worker_main(char* host, char* port) {
     pthread_create(&heartbeat_thread, NULL, heartbeat, host);
 
     while(quitting == 0) {
+    
         char* request = NULL;
-
         ssize_t byteRead = read_line_from_socket(socket_fd, &request);
+        if (quitting)
+            break;
+
         if (byteRead == -1) {
             perror(NULL);
             exit(-1);
