@@ -115,12 +115,30 @@ void free_worker(worker* to_free) {
 ssize_t find_worker_pos(int fd){
   size_t i = 0;
   while(i < vector_size(worker_list)){
-    if(((worker*)vector_get(worker_list, i))->worker_fd == fd){
+    worker* tmp = vector_get(worker_list, i);
+    if(tmp == NULL){ continue;}
+    if(tmp->worker_fd == fd){
       return i;
     }
     i++;
   }
   return -1;
+}
+
+void checkOnNodes(){
+  worker* curr;
+  ssize_t i;
+  for(  i = (ssize_t)vector_size(worker_list)-1; i>=0; i--){
+    curr = vector_get(worker_list, i);
+    if(curr == NULL){ continue;}
+    if(curr->alive == 0){
+	puts("removed a worker from the list");
+	vector_erase(worker_list, i);
+     
+    }
+  }
+  fprintf(stdout, "total nodes is %zu\n", vector_size(worker_list));
+  puts("checked nodes");
 }
 
 void accept_connections(struct epoll_event *e,int epoll_fd) {
@@ -161,6 +179,8 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
 	}
 }
 
+
+
 void handle_data(struct epoll_event *e) {
 //    printf("Have a task coming in on file descriptor %i\n", e->data.fd);
     int vector_pos = find_worker_pos(e->data.fd);
@@ -171,7 +191,11 @@ void handle_data(struct epoll_event *e) {
       curr = interface;
     else
       curr = vector_get(worker_list, vector_pos);
-
+    if(curr == NULL) { return;}
+    if(curr->alive == 0){
+      //handleDeadWorker(curr);
+      return;
+    }
     if (curr->status == START) {
       check = get_command(curr);
       switch (check) {
@@ -190,6 +214,7 @@ void handle_data(struct epoll_event *e) {
           break;
         default:
           fprintf(stderr, "There was a failure in parsing the header!\n");
+	  curr->alive = 0;
           if (e->data.fd == interface_fd) {
             close(interface_fd);
             interface_fd = -1;
@@ -268,6 +293,8 @@ int master_main() {
 			else
 				handle_data(&new_event);
 		}
+		
+//		checkOnNodes();
 	}
 
     cleanGlobals();
@@ -547,6 +574,7 @@ int schedule(task* t, vector* worker_list) {
 
     for (size_t i=0; i < num_worker; i++) {
         worker* this_worker = vector_get(worker_list, i);
+	if(this_worker == NULL){continue;}
         // MUTEX LOCK WHENCE INTEGRATED HEARTBEAT
         if (this_worker->alive) {
             double load_factor = this_worker->CPU_usage * 10 + vector_size(this_worker->tasks);
@@ -574,6 +602,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     worker* target_worker = NULL;
     for (size_t i=0; i < num_worker; i++) {
         worker* this_worker = vector_get(worker_list, i);
+	if(this_worker == NULL){ continue;}
         if (this_worker->worker_fd == worker_fd) {
             target_worker = this_worker;
             break;
@@ -588,6 +617,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     task* target_task = NULL;
     for (size_t i=0; i < num_task; i++) {
         task* this_task = vector_get(worker_tasks, i);
+	
         if (strcmp(this_task->file_name, filename) == 0) {
             target_task = this_task;
             vector_erase(worker_tasks, i);
@@ -639,6 +669,7 @@ void report_heartbeat(char* worker_addr, double client_usage) {
     worker* from_worker = NULL;
     for (size_t i=0; i < num_worker; i++) {
         worker* this_worker = vector_get(worker_list, i);
+	if(this_worker == NULL){ continue;}
         if (strcmp(this_worker->IP, worker_addr) == 0) {
             from_worker = this_worker;
             break;
@@ -665,6 +696,7 @@ void* detect_heart_failure(void* nothing) {
         size_t num_worker = vector_size(worker_list);
         for (size_t i=0; i < num_worker; i++) {
             worker* this_worker = vector_get(worker_list, i);
+	    if(this_worker == NULL){ continue;}
             if (this_worker->last_beat_received > 0 && this_worker->alive == 1) {
                 if (cur_time - this_worker->last_beat_received > 3.0) {
                     this_worker->alive = 0;
@@ -673,6 +705,7 @@ void* detect_heart_failure(void* nothing) {
             }
         }
         sleep(2);
+checkOnNodes();
     }
     return NULL;
 }
