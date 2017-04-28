@@ -18,7 +18,7 @@
 #### Architecture
 
 Diagram:
-![image1](link here)
+![image1](http://github.com/sstevenshang/Pi_296_Cluster/blob/master/architecture_diagram.jpg)
 
 #### Todo:
 
