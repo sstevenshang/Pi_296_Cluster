@@ -1,48 +1,65 @@
-#ifndef _WORKER_H_
-#define _WORKER_H_
+#pragma once
 
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <pthread.h>
-#include <signal.h>
-#include <string.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
+#include <string.h>
 #include <unistd.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include "master.h"
-#include "node.h"
-#define CONNECTION_ATTEMPTS_BEFORE_GIVING_UP 5
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <errno.h>
+#include <arpa/inet.h>
+#include <signal.h>
 
-extern int runningC;
-extern int socketFd;
-//extern char* defaultMaster;
-extern char* defaultPort;
+#include "queue.h"
+#include "utils.h"
 
-//Non-heartbeat functions
-int server_main();
-int getFdForWriteFile(char* name);
-int setUpWorker(char* addr, char* port);
-int cleanUpWorker(int socket);
-char* getBinaryFile(int socket, char* name);
-void runBinaryFile(char* name);
-void* threadManager(void* arg);
-void resetPipeClient(int socket);
-void setupNode();
+#define PUT_REQUEST "PUT"
+#define PUT_REQUEST_SIZE (strlen(PUT_REQUEST))
+#define NUM_THREAD (5)
+#define MAX_CONCURRENT_TASK (15)
+#define OUTPUT_FILE_FORMAT "_OUTPUT.OUTPUT"
+#define BAD_EXEC_MESSAGE "Bad executable: "
+#define FILE_BUFFER_SIZE (4096)
+#define LINE_BUFFER_SIZE (32)
 
-//heartbeat functions
-void* spwan_heartbeat(void* load);
-int setUpUDPClient();
-void heartbeat(char* destinationAddr, char* destinationPort, int* alive);
-int sendHeartbeat(int socket_fd, char* destinationAddr, char* destinationPort);
+typedef struct task_t{
+    char* input_filename;
+    char* output_filename;
+    int output_fd;
+} task_t;
+
+void* task_copy_constructor(void* elem);
+void task_destructor(void* elem);
+
+int worker_main(char* host, char* port);
+void* sending(void* nothing);
+void* tasking(void* nothing);
+int create_output_file(char* input_filename, char** output_filename);
+void read_file(char* local_path);
+char* get_filename_from_header(char* header, size_t header_size, size_t verb_size);
+ssize_t write_size_to_socket(int socket_fd, size_t size);
+ssize_t write_file_to_socket(int socket_fd, int local_file_fd, size_t local_file_size);
+ssize_t write_to_socket(int socket_fd, char* buffer, ssize_t count);
+ssize_t read_file_from_socket(int socket_fd, int local_file_fd, size_t count);
+ssize_t read_from_socket(int socket_fd, char* buffer, ssize_t count);
+ssize_t read_size_from_socket(int socket_fd, size_t* size);
+ssize_t read_line_from_socket(int socket_fd, char** buffer);
+void allocate_buffer(char** buffer, size_t size);
+int setup_client(char* host, char* port);
+char* create_header(char* filename);
+
+void* heartbeat(void* master_address);
+int send_heartbeat(int heartbeat_fd, struct sockaddr_in* master_info);
 double get_local_usage();
-
-#endif
+int setUpUDPClient();
+struct sockaddr_in setupUDPDestination(char* address);
+void kill_heartbeat();
+void kill_worker();

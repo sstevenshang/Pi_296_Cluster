@@ -1,26 +1,23 @@
-#ifndef _QUEUE_H_
-#define _QUEUE_H_
+#pragma once
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "node.h"
+#include "utils.h"
 
 typedef struct queue_node {
-	//TODO let's move to a task struct. See node.h.
-	task* data;
-	struct queue_node* next;
+  void *data;
+  struct queue_node *next;
 } queue_node;
 
 typedef struct queue {
-	queue_node *head, *tail;
-	size_t size;
+  copy_constructor_type copy_constructor;
+  destructor_type destructor;
+  queue_node *head, *tail;
+  ssize_t size;
+  ssize_t max_size;
+  pthread_cond_t cv;
+  pthread_mutex_t m;
 } queue;
 
-queue* queue_create();
-void queue_destroy(queue* this);
-void queue_push(queue* this, task* element);
-task* queue_pull(queue* this);
-int queue_empty(queue* this);
-size_t queue_size(queue* this);
-
-#endif
+queue* queue_create (ssize_t max_size, copy_constructor_type copy_constructor, destructor_type destructor);
+void queue_destroy (queue* this);
+void queue_push (queue* this, void* element);
+void* queue_pull (queue* this);
