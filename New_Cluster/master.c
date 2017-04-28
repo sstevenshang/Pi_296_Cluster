@@ -8,7 +8,7 @@ static char* temp_directory;
 static int interface_fd = -1;
 static worker* interface = NULL;
 static vector* worker_list;
-
+static vector* task_list;
 static int keep_update;
 
 void kill_master() { close_master = 1; }
@@ -47,7 +47,7 @@ void setUpGlobals(char* port) {
   server_socket = set_up_server(port);
 	epoll_fd = epoll_create(1);
   worker_list = vector_create(NULL, NULL, NULL);
-
+  task_list = vector_create(NULL, NULL, NULL);
 	if(epoll_fd == -1) {
     cleanGlobals();
     perror("epoll_create()");
@@ -133,12 +133,22 @@ void checkOnNodes(){
     if(curr == NULL){ continue;}
     if(curr->alive == 0){
 	puts("removed a worker from the list");
+ 	vector* tmpTask = curr->tasks;
 	vector_erase(worker_list, i);
+	for(size_t j = 0; j < vector_size(tmpTask); j++){
+		schedule(vector_get(tmpTask, j), worker_list);
+		fprintf(stdout, "rescheduled a task\n");
+	}
      
     }
   }
   fprintf(stdout, "total nodes is %zu\n", vector_size(worker_list));
   puts("checked nodes");
+  for(i = (ssize_t)vector_size(task_list)-1; i >= 0; i--){// reschedules ppor task
+    task* tmp = (task*)vector_get(task_list,i);
+    vector_erase(task_list, i);
+    schedule(tmp, worker_list);
+  }
 }
 
 void accept_connections(struct epoll_event *e,int epoll_fd) {
@@ -258,6 +268,8 @@ void handle_data(struct epoll_event *e) {
       }
       //If this is a response from a worker, forward the data to interface
       else {
+	if(curr->file_size <= 0){ curr->alive = 0; return;}
+	//puts("removing task from worker in handle");
         scheduler_remove_task(curr->worker_fd, curr->temp_file_name, worker_list);
         curr->fd_to_send_to  = interface_fd;
       }
@@ -591,6 +603,8 @@ int schedule(task* t, vector* worker_list) {
     best_worker = vector_get(worker_list, 0);
 
     if (best_worker == NULL) {
+	puts("added to task_list");
+	vector_push_back(task_list, t);
         return -1;
     }
     vector_push_back(best_worker->tasks, t);
