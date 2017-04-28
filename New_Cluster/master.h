@@ -38,6 +38,8 @@ typedef enum { INTERFACE_PUT, PUT} command;
 
 typedef struct task {
   char* file_name;
+  int orphan;
+  int fd_owner;
 } task;
 
 typedef struct worker {

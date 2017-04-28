@@ -8,7 +8,7 @@ static char* temp_directory;
 static int interface_fd = -1;
 static worker* interface = NULL;
 static vector* worker_list;
-
+static vector* task_list;
 static int keep_update;
 
 static pthread_mutex_t data_structure_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -49,7 +49,7 @@ void setUpGlobals(char* port) {
   server_socket = set_up_server(port);
 	epoll_fd = epoll_create(1);
   worker_list = vector_create(NULL, NULL, NULL);
-
+  task_list = vector_create(NULL, NULL, NULL);
 	if(epoll_fd == -1) {
     cleanGlobals();
     perror("epoll_create()");
@@ -127,20 +127,47 @@ ssize_t find_worker_pos(int fd){
   return -1;
 }
 
-// void checkOnNodes() {
-//   worker* curr;
-//   ssize_t i;
-//   for(i = (ssize_t)vector_size(worker_list) - 1; i >= 0; i--){
-//     curr = vector_get(worker_list, i);
-//     if(curr == NULL){ continue;}
-//     if(curr->alive == 0){
-// 	puts("removed a worker from the list");
-// 	vector_erase(worker_list, i);
-//     }
-//   }
-//   fprintf(stdout, "total nodes is %zu\n", vector_size(worker_list));
-//   puts("checked nodes");
-// }
+void handleOrphans(worker* w, task* t){
+  w->status = FORWARDING_DATA;
+  ssize_t s = do_put(t->fd_owner, w);
+  reset_worker_for_parsing(w);
+  if( s != BIG_FAILURE){
+    printf("Sucessfully handled orphaned task\n");
+  }
+  w->status = START;
+}
+
+void checkOnNodes(){
+  worker* curr;
+  ssize_t i;
+  for(  i = (ssize_t)vector_size(worker_list)-1; i>=0; i--){
+    curr = vector_get(worker_list, i);
+    if(curr == NULL){ continue;}
+    if(curr->alive == 0){
+	puts("removed a worker from the list");
+ 	vector* tmpTask = curr->tasks;
+	vector_erase(worker_list, i);
+	for(size_t j = 0; j < vector_size(tmpTask); j++){
+		task* tmp = (task*)vector_get(tmpTask, j);
+		tmp->orphan = 1;
+		schedule(tmp, worker_list);
+		fprintf(stdout, "rescheduled a task\n");
+	}
+
+    }
+  }
+  fprintf(stdout, "total nodes is %zu\n", vector_size(worker_list));
+  puts("checked nodes");
+  for(i = (ssize_t)vector_size(task_list)-1; i >= 0; i--){// reschedules ppor task
+    task* tmp = (task*)vector_get(task_list,i);
+    tmp->orphan = 1;
+    vector_erase(task_list, i);
+    int val = schedule(tmp, worker_list);
+    if(val != -1){
+      handleOrphans(vector_get(worker_list,find_worker_pos(val)), tmp);
+    }
+  }
+}
 
 void accept_connections(struct epoll_event *e,int epoll_fd) {
 	while(1) {
@@ -179,8 +206,6 @@ void accept_connections(struct epoll_event *e,int epoll_fd) {
     }
 	}
 }
-
-
 
 void handle_data(struct epoll_event *e) {
 //    printf("Have a task coming in on file descriptor %i\n", e->data.fd);
@@ -233,6 +258,7 @@ void handle_data(struct epoll_event *e) {
           return;
         case DONE_SENDING:
           printf("Got the size of the file to be %zu\n", curr->file_size);
+	  if(curr->file_size == 0){ curr->alive = 0;}
           curr->status = RECIEVING_DATA;
           break;
         default:
@@ -261,6 +287,8 @@ void handle_data(struct epoll_event *e) {
       }
       //If this is a response from a worker, forward the data to interface
       else {
+	if(curr->alive == 0){ return;}
+	puts("removing task from worker in handle");
         scheduler_remove_task(curr->worker_fd, curr->temp_file_name, worker_list);
         curr->fd_to_send_to  = interface_fd;
       }
@@ -371,6 +399,8 @@ void free_task(task* t) {
 task* make_task(worker* w) {
   task* t = malloc(sizeof(task));
   t->file_name = strdup(w->temp_file_name);
+  t->orphan = 0;
+  t->fd_owner = w->fd_to_send_to;
   return t;
 }
 
@@ -595,6 +625,8 @@ int schedule(task* t, vector* worker_list) {
         }
     }
     if (best_worker == NULL) {
+	    puts("added to task_list");
+	    vector_push_back(task_list, t);
         pthread_mutex_unlock(&data_structure_mutex);
         return -1;
     }
