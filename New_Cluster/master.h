@@ -66,7 +66,6 @@ typedef struct worker {
 } worker;
 
 /*
-  TODO:
   Schedule returns the fd of the worker to send the task to while interally
   updating it's vector of current tasks. Doesn't manipulate any files. Used for
   bookeeping purposes to tell what tasks are allocated to what nodes as well as
@@ -110,10 +109,12 @@ ssize_t find_worker_pos(int fd);
 void accept_connections(struct epoll_event *e,int epoll_fd);
 void handle_data(struct epoll_event *e);
 int master_main();
-
+void checkOnNodes();
 
 void* listen_to_heartbeat(void* nothing);
 void report_heartbeat(char* worker_addr, double client_usage);
 void* detect_heart_failure(void* nothing);
 int setUpUDPServer();
 double getTime();
+
+void reschedule(worker* dead_worker);

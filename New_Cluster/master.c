@@ -11,6 +11,8 @@ static vector* worker_list;
 
 static int keep_update;
 
+static pthread_mutex_t data_structure_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void kill_master() { close_master = 1; }
 
 void ignore() { }
@@ -39,8 +41,8 @@ void cleanGlobals() {
   //Close file descriptors
   close(epoll_fd);
   // close(server_socket);
-
   // vector_destroy(worker_list);
+  pthread_mutex_destroy(&data_structure_mutex);
 }
 
 void setUpGlobals(char* port) {
@@ -125,21 +127,20 @@ ssize_t find_worker_pos(int fd){
   return -1;
 }
 
-void checkOnNodes(){
-  worker* curr;
-  ssize_t i;
-  for(  i = (ssize_t)vector_size(worker_list)-1; i>=0; i--){
-    curr = vector_get(worker_list, i);
-    if(curr == NULL){ continue;}
-    if(curr->alive == 0){
-	puts("removed a worker from the list");
-	vector_erase(worker_list, i);
-     
-    }
-  }
-  fprintf(stdout, "total nodes is %zu\n", vector_size(worker_list));
-  puts("checked nodes");
-}
+// void checkOnNodes() {
+//   worker* curr;
+//   ssize_t i;
+//   for(i = (ssize_t)vector_size(worker_list) - 1; i >= 0; i--){
+//     curr = vector_get(worker_list, i);
+//     if(curr == NULL){ continue;}
+//     if(curr->alive == 0){
+// 	puts("removed a worker from the list");
+// 	vector_erase(worker_list, i);
+//     }
+//   }
+//   fprintf(stdout, "total nodes is %zu\n", vector_size(worker_list));
+//   puts("checked nodes");
+// }
 
 void accept_connections(struct epoll_event *e,int epoll_fd) {
 	while(1) {
@@ -209,7 +210,9 @@ void handle_data(struct epoll_event *e) {
             //Later insted of checking if interface_fd is -1 we will check if its in workerlist
             interface_fd = curr->worker_fd;
       	    interface = curr;
+            pthread_mutex_lock(&data_structure_mutex);
       	    vector_erase(worker_list,find_worker_pos(e->data.fd));
+            pthread_mutex_unlock(&data_structure_mutex);
           }
           break;
         default:
@@ -293,10 +296,7 @@ int master_main() {
 			else
 				handle_data(&new_event);
 		}
-		
-//		checkOnNodes();
 	}
-
     cleanGlobals();
     return 0;
 }
@@ -306,6 +306,7 @@ int master_main() {
 */
 
 ssize_t do_put(int fd_to_send_to, worker* w) {
+  pthread_mutex_lock(&data_structure_mutex);
   int src_fd = w->temp_fd;
   size_t file_size = get_file_size(w->temp_file_name);
   char buff[4096];
@@ -314,12 +315,14 @@ ssize_t do_put(int fd_to_send_to, worker* w) {
   if (write_all_to_socket(fd_to_send_to, buff, strlen(buff)) != (ssize_t) strlen(buff)) {
     perror(NULL);
     fprintf(stderr, "There was an issue sending the header to fd %i\n", fd_to_send_to);
+    pthread_mutex_unlock(&data_structure_mutex);
     return BIG_FAILURE;
   }
   //Send the size
   if (write_all_to_socket(fd_to_send_to, (char*) &file_size, sizeof(size_t)) != (ssize_t) sizeof(size_t)) {
     perror(NULL);
     fprintf(stderr, "There was an issue sending the file size to fd %i\n", fd_to_send_to);
+    pthread_mutex_unlock(&data_structure_mutex);
     return BIG_FAILURE;
   }
 
@@ -333,24 +336,28 @@ ssize_t do_put(int fd_to_send_to, worker* w) {
         continue;
       else if (errno == EWOULDBLOCK || errno == EAGAIN) {
         fprintf(stderr, "There was an error (blocking) reading the file: %s\n", w->temp_file_name);
+        pthread_mutex_unlock(&data_structure_mutex);
         return BIG_FAILURE;
       }
       perror(NULL);
       fprintf(stderr, "There was an unknown error reading the file: %s\n", w->temp_file_name);
+      pthread_mutex_unlock(&data_structure_mutex);
       return BIG_FAILURE;
     } else if (ret == 0) {
       fprintf(stderr, "There was an error (read 0) reading the file: %s\n", w->temp_file_name);
+      pthread_mutex_unlock(&data_structure_mutex);
       return BIG_FAILURE;
     }
 
     ssize_t check_write = write_all_to_socket(fd_to_send_to, buff, ret);
     if (check_write == -1 || !check_write || check_write != ret) {
       fprintf(stderr, "There was an error writing the file over the network: %s to fd %i\n", w->temp_file_name, fd_to_send_to);
+      pthread_mutex_unlock(&data_structure_mutex);
       return BIG_FAILURE;
     }
     file_size -= ret;
   }
-
+  pthread_mutex_unlock(&data_structure_mutex);
   return DONE_SENDING;
 }
 
@@ -568,33 +575,53 @@ size_t get_file_size(char* file_name) {
 
 int schedule(task* t, vector* worker_list) {
 
+    pthread_mutex_lock(&data_structure_mutex);
+
     size_t num_worker = vector_size(worker_list);
     double min_load_factor = 100000000;
     worker* best_worker = NULL;
 
     for (size_t i=0; i < num_worker; i++) {
         worker* this_worker = vector_get(worker_list, i);
-	if(this_worker == NULL){continue;}
-        // MUTEX LOCK WHENCE INTEGRATED HEARTBEAT
+	    if (this_worker == NULL) {
+            continue;
+        }
         if (this_worker->alive) {
             double load_factor = this_worker->CPU_usage * 10 + vector_size(this_worker->tasks);
-            //Make sure laod factor is positive because nodes upon initialization are set to -1.
-            //First reception of the heartbeat allows a node to have work allocated to it
-            if (load_factor < min_load_factor && load_factor > 0) {
+            if (load_factor < min_load_factor) {
                 min_load_factor = load_factor;
                 best_worker = this_worker;
             }
         }
-        // MUTEX UNLOCK WHENCE INTEGRATED HEARTBEAT
     }
-    //Dummy for now until we have heartbeats sending usage stats. Remove when heartbeat implemented.
-    best_worker = vector_get(worker_list, 0);
-
     if (best_worker == NULL) {
+        pthread_mutex_unlock(&data_structure_mutex);
         return -1;
     }
     vector_push_back(best_worker->tasks, t);
+
+    pthread_mutex_unlock(&data_structure_mutex);
     return best_worker->worker_fd;
+}
+
+void reschedule(worker* dead_worker) {
+
+    vector* recoverable_tasks = tasks;
+    size_t size = vector_size(recoverable_tasks);
+    for (size_t i=0; i < size; i++) {
+
+        task* recovering_task = vector_get(recoverable_tasks, i);
+        int new_worker_fd = schedule(recovering_task, worker_list);
+        worker* temp_worker = malloc(sizeof(worker));
+        temp_worker->temp_file_name = strdup(recovering_task->filename);
+        temp_worker->temp_fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
+        ssize_t s = do_put(new_worker_fd, temp_worker);
+        if (s != BIG_FAILURE)
+          printf("Succesfully rescheduled task\n");
+    }
+    for (size_t i=0; i < size; i++) {
+        vector_erase(recoverable_tasks, i);
+    }
 }
 
 void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
@@ -602,7 +629,8 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     worker* target_worker = NULL;
     for (size_t i=0; i < num_worker; i++) {
         worker* this_worker = vector_get(worker_list, i);
-	if(this_worker == NULL){ continue;}
+	    if (this_worker == NULL)
+            continue;
         if (this_worker->worker_fd == worker_fd) {
             target_worker = this_worker;
             break;
@@ -617,7 +645,7 @@ void scheduler_remove_task(int worker_fd, char* filename, vector* worker_list) {
     task* target_task = NULL;
     for (size_t i=0; i < num_task; i++) {
         task* this_task = vector_get(worker_tasks, i);
-	
+
         if (strcmp(this_task->file_name, filename) == 0) {
             target_task = this_task;
             vector_erase(worker_tasks, i);
@@ -669,7 +697,8 @@ void report_heartbeat(char* worker_addr, double client_usage) {
     worker* from_worker = NULL;
     for (size_t i=0; i < num_worker; i++) {
         worker* this_worker = vector_get(worker_list, i);
-	if(this_worker == NULL){ continue;}
+	    if(this_worker == NULL)
+            continue;
         if (strcmp(this_worker->IP, worker_addr) == 0) {
             from_worker = this_worker;
             break;
@@ -679,11 +708,13 @@ void report_heartbeat(char* worker_addr, double client_usage) {
         printf("Worker %s not found when reporting heartbeat\n", worker_addr);
         return;
     }
+    pthread_mutex_lock(&data_structure_mutex);
     from_worker->CPU_usage = client_usage;
     from_worker->last_beat_received = time_received;
     if (from_worker->alive == 0) {
         from_worker->alive = 1;
     }
+    pthread_mutex_unlock(&data_structure_mutex);
 }
 
 void* detect_heart_failure(void* nothing) {
@@ -696,16 +727,21 @@ void* detect_heart_failure(void* nothing) {
         size_t num_worker = vector_size(worker_list);
         for (size_t i=0; i < num_worker; i++) {
             worker* this_worker = vector_get(worker_list, i);
-	    if(this_worker == NULL){ continue;}
-            if (this_worker->last_beat_received > 0 && this_worker->alive == 1) {
-                if (cur_time - this_worker->last_beat_received > 3.0) {
+	        if (this_worker == NULL)
+                continue;
+            pthread_mutex_lock(&data_structure_mutex);
+            double last_beat = this_worker->last_beat_received;
+            pthread_mutex_unlock(&data_structure_mutex);
+            if (last_beat > 0 && this_worker->alive == 1) {
+                if (cur_time - last_beat > 3.0) {
                     this_worker->alive = 0;
                     printf("Node %d is dead on address %s\n", this_worker->worker_fd, this_worker->IP);
+                    reschedule(this_worker);
                 }
             }
         }
+        //checkOnNodes();
         sleep(2);
-checkOnNodes();
     }
     return NULL;
 }
