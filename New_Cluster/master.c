@@ -125,6 +125,16 @@ ssize_t find_worker_pos(int fd){
   return -1;
 }
 
+void handleOrphans(worker* w, task* t){
+  w->status = FORWARDING_DATA;
+  ssize_t s = do_put(t->fd_owner, w);
+  reset_worker_for_parsing(w);
+  if( s != BIG_FAILURE){
+    printf("Sucessfully handled orphaned task\n");
+  }
+  w->status = START;
+}
+
 void checkOnNodes(){
   worker* curr;
   ssize_t i;
@@ -136,7 +146,9 @@ void checkOnNodes(){
  	vector* tmpTask = curr->tasks;
 	vector_erase(worker_list, i);
 	for(size_t j = 0; j < vector_size(tmpTask); j++){
-		schedule(vector_get(tmpTask, j), worker_list);
+		task* tmp = (task*)vector_get(tmpTask, j);
+		tmp->orphan = 1;
+		schedule(tmp, worker_list);
 		fprintf(stdout, "rescheduled a task\n");
 	}
      
@@ -146,8 +158,12 @@ void checkOnNodes(){
   puts("checked nodes");
   for(i = (ssize_t)vector_size(task_list)-1; i >= 0; i--){// reschedules ppor task
     task* tmp = (task*)vector_get(task_list,i);
+    tmp->orphan = 1;
     vector_erase(task_list, i);
-    schedule(tmp, worker_list);
+    int val = schedule(tmp, worker_list);
+    if(val != -1){
+      handleOrphans(vector_get(worker_list,find_worker_pos(val)), tmp);
+    }
   }
 }
 
@@ -240,6 +256,7 @@ void handle_data(struct epoll_event *e) {
           return;
         case DONE_SENDING:
           printf("Got the size of the file to be %zu\n", curr->file_size);
+	  if(curr->file_size == 0){ curr->alive = 0;}
           curr->status = RECIEVING_DATA;
           break;
         default:
@@ -268,8 +285,8 @@ void handle_data(struct epoll_event *e) {
       }
       //If this is a response from a worker, forward the data to interface
       else {
-	if(curr->file_size <= 0){ curr->alive = 0; return;}
-	//puts("removing task from worker in handle");
+	if(curr->alive == 0){ return;}
+	puts("removing task from worker in handle");
         scheduler_remove_task(curr->worker_fd, curr->temp_file_name, worker_list);
         curr->fd_to_send_to  = interface_fd;
       }
@@ -376,6 +393,8 @@ void free_task(task* t) {
 task* make_task(worker* w) {
   task* t = malloc(sizeof(task));
   t->file_name = strdup(w->temp_file_name);
+  t->orphan = 0;
+  t->fd_owner = w->fd_to_send_to;
   return t;
 }
 
