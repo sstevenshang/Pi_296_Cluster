@@ -638,15 +638,15 @@ int schedule(task* t, vector* worker_list) {
 
 void reschedule(worker* dead_worker) {
 
-    vector* recoverable_tasks = tasks;
+    vector* recoverable_tasks = dead_worker->tasks;
     size_t size = vector_size(recoverable_tasks);
     for (size_t i=0; i < size; i++) {
 
         task* recovering_task = vector_get(recoverable_tasks, i);
         int new_worker_fd = schedule(recovering_task, worker_list);
         worker* temp_worker = malloc(sizeof(worker));
-        temp_worker->temp_file_name = strdup(recovering_task->filename);
-        temp_worker->temp_fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
+        temp_worker->temp_file_name = strdup(recovering_task->file_name);
+        temp_worker->temp_fd = open(recovering_task->file_name, O_CREAT | O_RDWR | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
         ssize_t s = do_put(new_worker_fd, temp_worker);
         if (s != BIG_FAILURE)
           printf("Succesfully rescheduled task\n");
